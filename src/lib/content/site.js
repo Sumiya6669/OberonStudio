@@ -4,16 +4,15 @@
  * Сайт полностью статический: базы данных нет, всё редактируется здесь
  * и попадает на прод обычным коммитом.
  *
- * ЗАПОЛНИТЕ КОНТАКТЫ НИЖЕ — сейчас там заглушки.
+ * Telegram и WhatsApp — боевые. Email пока заглушка, замените на рабочий.
  */
 
 export const SITE_SETTINGS = {
-  telegram: '@oberon_studio',
-  telegram_url: 'https://t.me/oberon_studio',
-  whatsapp: '+7 700 000 0000',
-  whatsapp_url: 'https://wa.me/77000000000',
+  telegram: '@DeveloperAI0',
+  telegram_url: 'https://t.me/DeveloperAI0',
+  whatsapp: '+7 776 550 96 86',
+  whatsapp_url: 'https://wa.me/77765509686',
   email: 'hello@oberon.studio',
-  instagram_url: 'https://instagram.com/',
 };
 
 /**
