@@ -2,7 +2,8 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import Reveal from '../core/Reveal';
 import { useLang } from '@/lib/i18n/LangContext';
-import { SITE_ROUTES, CONTACT_PATH } from '@/lib/routes';
+import { SITE_ROUTES } from '@/lib/routes';
+import { SITE_SETTINGS } from '@/lib/content/site';
 
 export default function SiteFooter() {
   const { t } = useLang();
@@ -41,9 +42,22 @@ export default function SiteFooter() {
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 border-t border-line">
             <p className="text-xs text-white/15">{rights}</p>
             <div className="flex items-center gap-4">
-              {['Telegram', 'WhatsApp', 'Instagram'].map(l => (
-                <Link key={l} to={CONTACT_PATH} className="text-xs text-white/20 hover:text-white/50 transition-colors duration-300">{l}</Link>
-              ))}
+              <a
+                href={SITE_SETTINGS.telegram_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs text-white/20 hover:text-white/50 transition-colors duration-300"
+              >
+                {SITE_SETTINGS.telegram}
+              </a>
+              <a
+                href={SITE_SETTINGS.whatsapp_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs text-white/20 hover:text-white/50 transition-colors duration-300"
+              >
+                {SITE_SETTINGS.whatsapp}
+              </a>
             </div>
           </div>
         </Reveal>
