@@ -1,23 +1,36 @@
 import React, { useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { ArrowUpRight } from 'lucide-react';
 import Reveal from '../core/Reveal';
 import { useLang } from '@/lib/i18n/LangContext';
 import { buildFallbackProjects } from '@/lib/content/portfolio';
+import WorkModal from './WorkModal';
 
 const COLORS = ['#4d7fff', '#f0a020', '#10d4a8', '#a855f7', '#f472b6', '#06b6d4'];
 
-function WorkCard({ item, index }) {
+function WorkCard({ item, color, onOpen }) {
   const [hover, setHover] = useState(false);
-  const color = COLORS[index % COLORS.length];
+  const { t } = useLang();
   const stack = Array.isArray(item.technologies) ? item.technologies : [];
 
   return (
     <motion.div
+      role="button"
+      tabIndex={0}
+      onClick={onOpen}
+      onKeyDown={event => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          onOpen();
+        }
+      }}
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
       whileHover={{ y: -5 }}
       transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-      className="group relative rounded-2xl overflow-hidden border border-line cursor-pointer flex-shrink-0 w-full"
+      className="group relative rounded-2xl overflow-hidden border border-line cursor-pointer flex-shrink-0 w-full
+        h-full flex flex-col text-left outline-none hover:border-white/12
+        focus-visible:border-primary/50 focus-visible:ring-2 focus-visible:ring-primary/30 transition-colors"
     >
       <div className="absolute inset-0" style={{ background: `radial-gradient(ellipse at 50% 0%, ${color}08, transparent 70%)` }} />
       <div className="relative h-44 overflow-hidden border-b border-line">
@@ -49,7 +62,7 @@ function WorkCard({ item, index }) {
           </span>
         </div>
       </div>
-      <div className="p-5">
+      <div className="p-5 flex flex-col flex-1">
         <div className="flex items-start justify-between mb-1.5">
           <h3 className="text-sm font-semibold text-white/80 group-hover:text-white transition-colors">{item.title}</h3>
           <span className="text-[10px] text-white/20 ml-2 flex-shrink-0">{item.client_name || 'Oberon'}</span>
@@ -61,11 +74,18 @@ function WorkCard({ item, index }) {
           ))}
         </div>
         {item.result && (
-          <div className="flex items-center gap-1.5">
-            <span className="w-1 h-1 rounded-full" style={{ background: color }} />
+          <div className="flex items-center gap-1.5 mb-3">
+            <span className="w-1 h-1 rounded-full flex-shrink-0" style={{ background: color }} />
             <span className="text-[10px] text-white/20 line-clamp-1">{item.result}</span>
           </div>
         )}
+
+        <div className="mt-auto pt-3 border-t border-line flex items-center justify-between">
+          <span className="text-[10px] font-semibold text-white/30 group-hover:text-primary transition-colors">
+            {t.works.detail.open}
+          </span>
+          <ArrowUpRight className="w-3.5 h-3.5 text-white/20 group-hover:text-primary transition-all duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+        </div>
       </div>
     </motion.div>
   );
@@ -75,6 +95,7 @@ export default function Works() {
   const { t, lang } = useLang();
   const wt = t.works;
   const [activeTab, setActiveTab] = useState('Все');
+  const [selected, setSelected] = useState(null);
   const cases = useMemo(() => buildFallbackProjects(t, lang), [t, lang]);
 
   const tabs = useMemo(() => ['Все', ...Array.from(new Set(cases.map(item => item.industry).filter(Boolean)))], [cases]);
@@ -131,8 +152,14 @@ export default function Works() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.04, duration: 0.4 }}
+                className="h-full"
               >
-                <WorkCard item={item} index={i} />
+                <WorkCard
+                  item={item}
+                  index={i}
+                  color={COLORS[i % COLORS.length]}
+                  onOpen={() => setSelected({ item, color: COLORS[i % COLORS.length] })}
+                />
               </motion.div>
             ))}
           </motion.div>
@@ -142,6 +169,16 @@ export default function Works() {
           <p className="text-xs text-white/15 text-center mt-8">{wt.footer(filtered.length)}</p>
         </Reveal>
       </div>
+
+      <AnimatePresence>
+        {selected && (
+          <WorkModal
+            item={selected.item}
+            color={selected.color}
+            onClose={() => setSelected(null)}
+          />
+        )}
+      </AnimatePresence>
     </section>
   );
 }
