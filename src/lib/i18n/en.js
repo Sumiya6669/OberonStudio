@@ -73,6 +73,14 @@ const en = {
   // Works
   works: {
     label: 'Portfolio',
+    detail: {
+      open: 'View details',
+      description: 'About the project',
+      result: 'Result',
+      stack: 'Technologies',
+      cta: 'I want something similar',
+      ctaSecondary: 'Message on Telegram',
+    },
     emptyText: 'Projects in this category will appear here.',
     title: 'Selected',
     title2: 'Projects',
@@ -212,11 +220,13 @@ const en = {
   },
   // Consultant
   consultant: {
-    title: 'Consultant',
+    title: 'Oberon consultant',
     online: 'online',
-    placeholder: 'Your question...',
-    greeting: 'Welcome. Tell me about your challenge — I\'ll help you find the best solution.',
+    placeholder: 'Describe your task...',
+    greeting: 'Hello. Happy to work out which solution fits your case.\n\nWhat does your business do, and what would you like to automate?',
+    disclaimer: 'Answered by a bot. The team gives exact estimates.',
   },
+
 };
 
 export default en;
