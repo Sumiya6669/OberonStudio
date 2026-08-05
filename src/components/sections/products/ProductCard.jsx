@@ -26,15 +26,6 @@ export default function ProductCard({ product, index, onDemo, onOrder }) {
         style={{ background: `radial-gradient(ellipse at 50% 0%, ${product.color}08, transparent 60%)` }}
       />
 
-      {/* Popular badge */}
-      {product.popular && (
-        <div className="absolute top-4 right-4 z-10">
-          <span className="flex items-center gap-1 text-[9px] font-bold px-2.5 py-1 rounded-full bg-primary/15 text-primary border border-primary/25 uppercase tracking-wider">
-            <Zap className="w-2.5 h-2.5" /> Популярное
-          </span>
-        </div>
-      )}
-
       <div className="relative p-6 flex flex-col flex-1">
         {/* Icon + name */}
         <div className="flex items-start gap-4 mb-4">
@@ -45,7 +36,15 @@ export default function ProductCard({ product, index, onDemo, onOrder }) {
             {product.icon}
           </div>
           <div className="flex-1 min-w-0 pt-0.5">
-            <h3 className="text-base font-bold text-white/90 leading-tight mb-1">{product.name}</h3>
+            <div className="flex items-start justify-between gap-2 mb-1">
+              <h3 className="text-base font-bold text-white/90 leading-tight">{product.name}</h3>
+              {product.popular && (
+                <span className="flex-shrink-0 flex items-center gap-1 text-[9px] font-bold px-2 py-0.5 rounded-full
+                  bg-primary/15 text-primary border border-primary/25 uppercase tracking-wider whitespace-nowrap">
+                  <Zap className="w-2.5 h-2.5" /> Хит
+                </span>
+              )}
+            </div>
             <p className="text-[11px] text-white/35 leading-tight">{product.tagline}</p>
           </div>
         </div>
