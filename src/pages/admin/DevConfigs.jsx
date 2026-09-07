@@ -81,6 +81,8 @@ export default function DevConfigs() {
       </div>
 
       <ErrorNote error={error} />
+      <ErrorNote error={list.error} />
+      <ErrorNote error={companies.error} />
 
       {form && (
         <Panel title={form.id ? 'Правка' : 'Новая конфигурация'}>

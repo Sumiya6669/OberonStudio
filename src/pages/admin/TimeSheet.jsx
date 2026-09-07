@@ -31,6 +31,7 @@ export default function TimeSheet() {
   }, [data]);
 
   if (loading) return <Spinner />;
+  if (error) return <ErrorNote error={error} />;
 
   return (
     <div className="space-y-4">
