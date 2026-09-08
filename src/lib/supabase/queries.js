@@ -5,7 +5,7 @@
  * Права нигде не проверяются в этом файле — их проверяет база. Если запрос
  * вернул пусто, это может быть и правильным ответом разграничения доступа.
  */
-import { appDb, coreDb, crmDb, devDb, supabase } from './client';
+import { accDb, appDb, cmsDb, coreDb, crmDb, devDb, supabase } from './client';
 
 const unwrap = ({ data, error }) => {
   if (error) throw new Error(error.message);
@@ -147,3 +147,252 @@ export const fetchMe = async (authUserId) =>
 
 export const linkMe = async (email, name) =>
   unwrap(await supabase.rpc('link_me', { p_email: email, p_name: name }));
+
+/* ══ Бух учет ═══════════════════════════════════════════════════════════════ */
+
+/**
+ * Проведение, сторно и отмена идут через функции базы, а не через update.
+ * Причина в самой базе: проведённый документ неизменяем триггером, у проведения
+ * обязан быть автор-человек, а сторно — это отдельный зеркальный документ.
+ * Если бы панель делала update напрямую, она бы просто получала отказ.
+ */
+export const postEntry = async (id) =>
+  unwrap(await supabase.rpc('acc_entry_post', { p_entry: id }));
+
+export const reverseEntry = async (id, reason) =>
+  unwrap(await supabase.rpc('acc_entry_reverse', { p_entry: id, p_reason: reason }));
+
+export const voidEntry = async (id, reason) =>
+  unwrap(await supabase.rpc('acc_entry_void', { p_entry: id, p_reason: reason }));
+
+export const addExpense = async (payload) =>
+  unwrap(await supabase.rpc('acc_expense_new', { p: payload }));
+
+export const invoiceFromTime = async (payload) =>
+  unwrap(await supabase.rpc('acc_invoice_from_time', { p: payload }));
+
+export const fetchAccounts = async () =>
+  unwrap(await accDb.from('account').select('*').order('sort'));
+
+export const fetchBalance = async () =>
+  unwrap(await appDb.from('v_acc_balance').select('*').order('sort'));
+
+export const fetchEntries = async ({ status, kind, from, to, limit = 200 } = {}) => {
+  let q = appDb.from('v_entry_list').select('*').order('entry_date', { ascending: false })
+    .order('id', { ascending: false });
+  if (status?.length) q = q.in('status', status);
+  if (kind) q = q.eq('kind', kind);
+  if (from) q = q.gte('entry_date', from);
+  if (to) q = q.lte('entry_date', to);
+  return unwrap(await q.limit(limit));
+};
+
+/**
+ * Проводки читаются из витрины, а не из таблицы со встроенной связью:
+ * связь проводки со счётом составная (клиент + код), а PostgREST встраивает
+ * только связи по одной колонке — запрос с embed просто вернул бы ошибку.
+ */
+export const fetchPostings = async (entryId) =>
+  unwrap(await appDb.from('v_posting').select('*').eq('entry_id', entryId).order('id'));
+
+export const fetchDocs = async ({ status, kind, companyId, limit = 200 } = {}) => {
+  let q = appDb.from('v_doc_list').select('*').order('issued_on', { ascending: false })
+    .order('id', { ascending: false });
+  if (status?.length) q = q.in('status', status);
+  if (kind) q = q.eq('kind', kind);
+  if (companyId) q = q.eq('company_id', companyId);
+  return unwrap(await q.limit(limit));
+};
+
+export const updateDoc = async (id, patch) =>
+  unwrap(await crmDb.from('doc').update(patch).eq('id', id).select().single());
+
+export const fetchPayments = async ({ limit = 200 } = {}) =>
+  unwrap(await crmDb.from('payment')
+    .select('*, company:company_id(title), doc:doc_id(number, amount)')
+    .order('paid_on', { ascending: false }).order('id', { ascending: false })
+    .limit(limit));
+
+export const addPayment = async (values) =>
+  unwrap(await crmDb.from('payment').insert(values).select().single());
+
+export const fetchPnl = async () =>
+  unwrap(await appDb.from('v_pnl_month').select('*').order('month', { ascending: false }));
+
+export const fetchPnlLines = async (month) => {
+  let q = appDb.from('v_pnl_line').select('*').order('sort');
+  if (month) q = q.eq('month', month);
+  return unwrap(await q);
+};
+
+export const fetchCashMonths = async () =>
+  unwrap(await appDb.from('v_cash_month').select('*').order('month', { ascending: false }));
+
+export const fetchReceivables = async () =>
+  unwrap(await appDb.from('v_ar_company').select('*').order('debt', { ascending: false }));
+
+export const fetchHourCost = async () =>
+  unwrap(await appDb.from('v_hour_cost_month').select('*').order('month', { ascending: false }));
+
+export const fetchClientProfit = async () =>
+  unwrap(await appDb.from('v_client_profit').select('*').order('income', { ascending: false }));
+
+export const fetchUnbilled = async () =>
+  unwrap(await appDb.from('v_unbilled').select('*').order('amount', { ascending: false }));
+
+/* ══ ИИ ═════════════════════════════════════════════════════════════════════ */
+
+/** Один вызов на один такт опроса. Почему один — см. миграцию 016. */
+export const fetchPulse = async (since = null, steps = 40) =>
+  unwrap(await supabase.rpc('ai_pulse', { p_since: since, p_steps: steps }));
+
+export const fetchAgentBoard = async () =>
+  unwrap(await appDb.from('v_agent_board').select('*').order('title'));
+
+export const fetchSteps = async ({ outcome, actionType, jobId, limit = 200 } = {}) => {
+  let q = appDb.from('v_ai_step').select('*').order('at', { ascending: false });
+  if (outcome?.length) q = q.in('outcome', outcome);
+  if (actionType) q = q.eq('action_type', actionType);
+  if (jobId) q = q.eq('job_id', jobId);
+  return unwrap(await q.limit(limit));
+};
+
+export const fetchSpendDays = async () =>
+  unwrap(await appDb.from('v_ai_spend_day').select('*').order('day', { ascending: false }));
+
+export const fetchQuotas = async () =>
+  unwrap(await appDb.from('v_quota_state').select('*').order('provider'));
+
+export const saveQuota = async ({ tenant_id, provider, period, limit_units, soft_pct }) =>
+  unwrap(await coreDb.from('quota')
+    .upsert({ tenant_id, provider, period, limit_units, soft_pct },
+            { onConflict: 'tenant_id,provider,period' })
+    .select().single());
+
+export const fetchGrantMatrix = async () =>
+  unwrap(await appDb.from('v_grant_matrix').select('*')
+    .order('agent_title').order('action_title'));
+
+/**
+ * Смена режима права. Отзыв — это revoked_at у прежней строки, а не update
+ * поля mode: иначе исчезает след того, что право когда-то было выдано.
+ */
+export const setGrant = async ({ grantId, tenantId, agentKind, actionType, mode, grantedBy, note, limits }) => {
+  if (grantId) {
+    await unwrap(await coreDb.from('grant')
+      .update({ revoked_at: new Date().toISOString() }).eq('id', grantId).select());
+  }
+  if (mode === 'deny' && !grantId) return null;
+  return unwrap(await coreDb.from('grant').insert({
+    tenant_id: tenantId, agent_kind: agentKind, action_type: actionType,
+    mode, granted_by: grantedBy, note: note || null, limits: limits || {},
+  }).select().single());
+};
+
+export const fetchApprovals = async ({ status = ['pending'] } = {}) =>
+  unwrap(await appDb.from('v_approval').select('*').in('status', status)
+    .order('expires_at').limit(100));
+
+export const decideApproval = async (id, status, personId, { editDelta, rejectReason } = {}) =>
+  unwrap(await coreDb.from('approval').update({
+    status, decided_by: personId, decided_at: new Date().toISOString(),
+    edit_delta: editDelta || null, reject_reason: rejectReason || null,
+  }).eq('id', id).select().single());
+
+/* ══ Администрирование ══════════════════════════════════════════════════════ */
+
+export const fetchPeople = async () =>
+  unwrap(await appDb.from('v_person').select('*').order('full_name'));
+
+export const savePerson = async ({ id, ...values }) =>
+  id
+    ? unwrap(await coreDb.from('person').update(values).eq('id', id).select().single())
+    : unwrap(await coreDb.from('person').insert(values).select().single());
+
+export const fetchRoles = async () =>
+  unwrap(await coreDb.from('role').select('*').order('code'));
+
+export const setPersonRoles = async (tenantId, personId, roles) => {
+  await unwrap(await coreDb.from('person_role').delete().eq('person_id', personId).select());
+  if (!roles.length) return [];
+  return unwrap(await coreDb.from('person_role')
+    .insert(roles.map((role_code) => ({ tenant_id: tenantId, person_id: personId, role_code })))
+    .select());
+};
+
+export const fetchAllowedEmails = async () =>
+  unwrap(await coreDb.from('allowed_email').select('*').order('email'));
+
+export const addAllowedEmail = async (values) =>
+  unwrap(await coreDb.from('allowed_email').insert(values).select().single());
+
+export const removeAllowedEmail = async (email) =>
+  unwrap(await coreDb.from('allowed_email').delete().eq('email', email).select());
+
+export const fetchAgentKinds = async () =>
+  unwrap(await coreDb.from('agent_kind').select('*').order('title'));
+
+export const saveAgentKind = async (code, patch) =>
+  unwrap(await coreDb.from('agent_kind').update(patch).eq('code', code).select().single());
+
+export const fetchJobTypesAll = async () =>
+  unwrap(await coreDb.from('job_type').select('*').order('code'));
+
+export const saveJobType = async (code, patch) =>
+  unwrap(await coreDb.from('job_type').update(patch).eq('code', code).select().single());
+
+export const fetchHealth = async () =>
+  unwrap(await appDb.from('v_system_health').select('*').single());
+
+/* ══ Сайт (CMS) ═════════════════════════════════════════════════════════════ */
+
+export const fetchCmsPages = async () =>
+  unwrap(await appDb.from('v_cms_page').select('*').order('sort'));
+
+export const savePage = async ({ id, ...values }) =>
+  id
+    ? unwrap(await cmsDb.from('page').update(values).eq('id', id).select().single())
+    : unwrap(await cmsDb.from('page').insert(values).select().single());
+
+export const fetchBlocks = async (pageId) =>
+  unwrap(await cmsDb.from('block').select('*').eq('page_id', pageId).order('sort'));
+
+export const saveBlock = async ({ id, ...values }) =>
+  id
+    ? unwrap(await cmsDb.from('block').update(values).eq('id', id).select().single())
+    : unwrap(await cmsDb.from('block').insert(values).select().single());
+
+export const removeBlock = async (id) =>
+  unwrap(await cmsDb.from('block').delete().eq('id', id).select());
+
+export const fetchCollections = async () =>
+  unwrap(await cmsDb.from('collection').select('*').order('sort'));
+
+export const fetchItems = async (collection) =>
+  unwrap(await appDb.from('v_cms_item').select('*').eq('collection', collection).order('sort'));
+
+export const saveItem = async ({ id, ...values }) =>
+  id
+    ? unwrap(await cmsDb.from('item').update(values).eq('id', id).select().single())
+    : unwrap(await cmsDb.from('item').insert(values).select().single());
+
+export const removeItem = async (id) =>
+  unwrap(await cmsDb.from('item').delete().eq('id', id).select());
+
+export const fetchSiteSettings = async () =>
+  unwrap(await cmsDb.from('settings').select('*').maybeSingle());
+
+export const saveSiteSettings = async (tenantId, data) =>
+  unwrap(await cmsDb.from('settings')
+    .upsert({ tenant_id: tenantId, data, updated_at: new Date().toISOString() },
+            { onConflict: 'tenant_id' })
+    .select().single());
+
+export const fetchRevisions = async (entity, rowId, limit = 30) =>
+  unwrap(await cmsDb.from('revision').select('*')
+    .eq('entity', entity).eq('row_id', rowId)
+    .order('at', { ascending: false }).limit(limit));
+
+/** Опубликованное содержимое сайта. Той же функцией, что читает публичный сайт. */
+export const fetchSiteContent = async (locale = 'ru') =>
+  unwrap(await supabase.rpc('site_content', { p_locale: locale }));

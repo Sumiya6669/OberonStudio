@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Reveal from '../core/Reveal';
 import { useLang } from '@/lib/i18n/LangContext';
+import { useServices } from '@/lib/site/SiteContentContext';
 
 const servicesMeta = [
   { num: '01', tag: 'FLAGSHIP', tagColor: 'text-primary border-primary/30 bg-primary/5', accent: 'hsl(220 100% 60%)', price: 'от 500 000 ₸' },
@@ -16,7 +17,10 @@ export default function Services() {
   const [active, setActive] = useState(null);
   const st = t.services;
   // Контент услуг живёт в i18n — базы данных у сайта нет.
-  const services = st.items.map(item => ({
+  // Опубликованные услуги перекрывают зашитые. Нет опубликованных — null,
+  // и работает прежний список: правка содержимого не может обнулить раздел.
+  const fromDb = useServices();
+  const services = fromDb ?? st.items.map(item => ({
     title: item.title,
     category: item.tag,
     short_description: item.desc,

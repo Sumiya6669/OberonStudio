@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import Reveal from '../core/Reveal';
 import { useLang } from '@/lib/i18n/LangContext';
 import { buildFallbackTestimonials } from '@/lib/content/portfolio';
+import { useTestimonials } from '@/lib/site/SiteContentContext';
 
 function ReviewCard({ item }) {
   return (
@@ -33,7 +34,9 @@ export default function Reviews() {
   const offsetRef = useRef(0);
   const rafRef = useRef(null);
   const SPEED = 0.5;
-  const reviews = useMemo(() => buildFallbackTestimonials(t, lang), [t, lang]);
+  const fromDb = useTestimonials();
+  const fallbackReviews = useMemo(() => buildFallbackTestimonials(t, lang), [t, lang]);
+  const reviews = fromDb ?? fallbackReviews;
 
   const animate = useCallback(() => {
     if (!trackRef.current || isPaused) {

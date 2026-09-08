@@ -3,13 +3,15 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Reveal from '../core/Reveal';
 import { Link } from 'react-router-dom';
 import { useLang } from '@/lib/i18n/LangContext';
+import { useFaq } from '@/lib/site/SiteContentContext';
 import { CONTACT_PATH } from '@/lib/routes';
 
 export default function FAQ() {
   const { t } = useLang();
   const ft = t.faq;
   const [open, setOpen] = useState(null);
-  const items = ft.items.map(item => ({ question: item.q, answer: item.a }));
+  const fromDb = useFaq();
+  const items = (fromDb ?? ft.items).map(item => ({ question: item.q, answer: item.a }));
 
   return (
     <section className="relative py-28 overflow-hidden">

@@ -28,3 +28,7 @@ export const crmDb = isSupabaseConfigured ? supabase.schema('crm') : null;
 export const coreDb = isSupabaseConfigured ? supabase.schema('core') : null;
 /** Конфигурации 1С и отчёты агентов. */
 export const devDb = isSupabaseConfigured ? supabase.schema('dev') : null;
+/** Управленческий учёт: план счетов, документы, проводки. */
+export const accDb = isSupabaseConfigured ? supabase.schema('acc') : null;
+/** Содержимое сайта: страницы, блоки, справочники, история правок. */
+export const cmsDb = isSupabaseConfigured ? supabase.schema('cms') : null;

@@ -8,6 +8,7 @@ import ProductCard from './products/ProductCard';
 import ProductCompare from './products/ProductCompare';
 import DemoModal from './products/DemoModal';
 import { PRODUCTS } from '@/lib/content/site';
+import { useProducts } from '@/lib/site/SiteContentContext';
 import { CONTACT_PATH } from '@/lib/routes';
 
 export default function OberonProducts() {
@@ -15,7 +16,8 @@ export default function OberonProducts() {
   const [activeCategory, setActiveCategory] = useState('Все');
   const [showCompare, setShowCompare] = useState(false);
   const [demoProduct, setDemoProduct] = useState(undefined);
-  const products = PRODUCTS;
+  const fromDb = useProducts();
+  const products = fromDb ?? PRODUCTS;
   const categories = useMemo(() => ['Все', ...Array.from(new Set(products.flatMap(p => p.categories)))], [products]);
 
   const filtered = useMemo(() => {

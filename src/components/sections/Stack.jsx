@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import Reveal from '../core/Reveal';
 import { useLang } from '@/lib/i18n/LangContext';
+import { useStack } from '@/lib/site/SiteContentContext';
 
-const categories = [
+const BUILT_IN_CATEGORIES = [
   {
     icon: '🧠',
     color: '#4d7fff',
@@ -81,7 +82,13 @@ export default function Stack() {
   const { t, lang } = useLang();
   const st = t.stack;
   const [hoveredCat, setHoveredCat] = useState(null);
-  const labels = CAT_LABELS[lang] || CAT_LABELS.ru;
+  // Группы из панели перекрывают зашитые. Названия групп приходят вместе
+  // с группами, поэтому подписи из CAT_LABELS нужны только для зашитых.
+  const fromDb = useStack();
+  const categories = fromDb ?? BUILT_IN_CATEGORIES;
+  const labels = fromDb
+    ? fromDb.map((c) => c.label)
+    : (CAT_LABELS[lang] || CAT_LABELS.ru);
 
   return (
     <section id="stack" className="relative py-28 overflow-hidden">

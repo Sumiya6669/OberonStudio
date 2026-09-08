@@ -4,9 +4,11 @@ import { CheckCircle2, Loader2, Mail, MessageCircle, Phone } from 'lucide-react'
 import Reveal from '../core/Reveal';
 import { useLang } from '@/lib/i18n/LangContext';
 import { submitLead } from '@/lib/leads';
-import { SITE_SETTINGS as settings } from '@/lib/content/site';
+import { SITE_SETTINGS } from '@/lib/content/site';
+import { useSettings } from '@/lib/site/SiteContentContext';
 
 export default function Contact() {
+  const settings = useSettings(SITE_SETTINGS);
   const { t } = useLang();
   const ct = t.contact;
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });

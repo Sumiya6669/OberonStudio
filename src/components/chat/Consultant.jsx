@@ -4,6 +4,7 @@ import { X, Send, ArrowUpRight, MessageCircle, Phone } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useLang } from '@/lib/i18n/LangContext';
 import { SITE_SETTINGS } from '@/lib/content/site';
+import { useSettings } from '@/lib/site/SiteContentContext';
 import { submitLead } from '@/lib/leads';
 import {
   findAnswer, containsContact,
@@ -27,6 +28,7 @@ function TelegramIcon(props) {
 }
 
 export default function Consultant() {
+  const SETTINGS = useSettings(SITE_SETTINGS);
   const { t, lang } = useLang();
   const ct = t.consultant;
 
@@ -259,11 +261,11 @@ export default function Consultant() {
       {/* Мессенджеры + чат */}
       <div className="flex items-center gap-2.5">
         <motion.a
-          href={SITE_SETTINGS.whatsapp_url}
+          href={SETTINGS.whatsapp_url}
           target="_blank"
           rel="noopener noreferrer"
-          aria-label={`WhatsApp ${SITE_SETTINGS.whatsapp}`}
-          title={SITE_SETTINGS.whatsapp}
+          aria-label={`WhatsApp ${SETTINGS.whatsapp}`}
+          title={SETTINGS.whatsapp}
           whileHover={{ scale: 1.08, y: -2 }}
           whileTap={{ scale: 0.94 }}
           className="w-11 h-11 rounded-full flex items-center justify-center border border-emerald-400/25
@@ -275,11 +277,11 @@ export default function Consultant() {
         </motion.a>
 
         <motion.a
-          href={SITE_SETTINGS.telegram_url}
+          href={SETTINGS.telegram_url}
           target="_blank"
           rel="noopener noreferrer"
-          aria-label={`Telegram ${SITE_SETTINGS.telegram}`}
-          title={SITE_SETTINGS.telegram}
+          aria-label={`Telegram ${SETTINGS.telegram}`}
+          title={SETTINGS.telegram}
           whileHover={{ scale: 1.08, y: -2 }}
           whileTap={{ scale: 0.94 }}
           className="w-11 h-11 rounded-full flex items-center justify-center border border-sky-400/25

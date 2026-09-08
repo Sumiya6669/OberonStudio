@@ -4,8 +4,11 @@ import Reveal from '../core/Reveal';
 import { useLang } from '@/lib/i18n/LangContext';
 import { SITE_ROUTES } from '@/lib/routes';
 import { SITE_SETTINGS } from '@/lib/content/site';
+import { useSettings } from '@/lib/site/SiteContentContext';
 
 export default function SiteFooter() {
+  // Контакты из панели поверх зашитых. Пустое поле в панели ничего не стирает.
+  const SETTINGS = useSettings(SITE_SETTINGS);
   const { t } = useLang();
   const ft = t.footer;
   const rights = ft.rights.replace('{year}', new Date().getFullYear());
@@ -43,20 +46,20 @@ export default function SiteFooter() {
             <p className="text-xs text-white/15">{rights}</p>
             <div className="flex items-center gap-4">
               <a
-                href={SITE_SETTINGS.telegram_url}
+                href={SETTINGS.telegram_url}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-xs text-white/20 hover:text-white/50 transition-colors duration-300"
               >
-                {SITE_SETTINGS.telegram}
+                {SETTINGS.telegram}
               </a>
               <a
-                href={SITE_SETTINGS.whatsapp_url}
+                href={SETTINGS.whatsapp_url}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-xs text-white/20 hover:text-white/50 transition-colors duration-300"
               >
-                {SITE_SETTINGS.whatsapp}
+                {SETTINGS.whatsapp}
               </a>
             </div>
           </div>

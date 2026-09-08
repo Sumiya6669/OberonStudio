@@ -4,6 +4,7 @@ import { ArrowUpRight } from 'lucide-react';
 import Reveal from '../core/Reveal';
 import { useLang } from '@/lib/i18n/LangContext';
 import { buildFallbackProjects } from '@/lib/content/portfolio';
+import { useProjects } from '@/lib/site/SiteContentContext';
 import WorkModal from './WorkModal';
 
 const COLORS = ['#4d7fff', '#f0a020', '#10d4a8', '#a855f7', '#f472b6', '#06b6d4'];
@@ -96,7 +97,9 @@ export default function Works() {
   const wt = t.works;
   const [activeTab, setActiveTab] = useState('Все');
   const [selected, setSelected] = useState(null);
-  const cases = useMemo(() => buildFallbackProjects(t, lang), [t, lang]);
+  const fromDb = useProjects();
+  const fallbackCases = useMemo(() => buildFallbackProjects(t, lang), [t, lang]);
+  const cases = fromDb ?? fallbackCases;
 
   const tabs = useMemo(() => ['Все', ...Array.from(new Set(cases.map(item => item.industry).filter(Boolean)))], [cases]);
   const filtered = activeTab === 'Все' ? cases : cases.filter(item => item.industry === activeTab);

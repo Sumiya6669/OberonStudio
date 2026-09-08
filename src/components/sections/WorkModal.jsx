@@ -4,10 +4,12 @@ import { Link } from 'react-router-dom';
 import { X, ArrowUpRight } from 'lucide-react';
 import { useLang } from '@/lib/i18n/LangContext';
 import { SITE_SETTINGS } from '@/lib/content/site';
+import { useSettings } from '@/lib/site/SiteContentContext';
 import { CONTACT_PATH } from '@/lib/routes';
 
 /** Подробности проекта. Стоимость не показываем — её здесь и нет. */
 export default function WorkModal({ item, color, onClose }) {
+  const SETTINGS = useSettings(SITE_SETTINGS);
   const { t } = useLang();
   const dt = t.works.detail;
 
@@ -118,7 +120,7 @@ export default function WorkModal({ item, color, onClose }) {
               {dt.cta}
             </Link>
             <a
-              href={SITE_SETTINGS.telegram_url}
+              href={SETTINGS.telegram_url}
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center justify-center gap-1.5 px-6 py-3.5 rounded-xl
