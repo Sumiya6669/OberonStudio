@@ -68,7 +68,11 @@ export default function Companies() {
         <Button onClick={() => edit(null)}>Добавить</Button>
       </div>
 
+      {/* Ошибка формы и ошибка загрузки списка — разные вещи, и обе должны
+          быть видны. Экран, который сломан, но выглядит пустым, — это тот
+          самый мёртвый канал, который живёт незамеченным. */}
       <ErrorNote error={error} />
+      <ErrorNote error={list.error} />
 
       {form && (
         <Panel title={form.id ? 'Правка компании' : 'Новая компания'}>
