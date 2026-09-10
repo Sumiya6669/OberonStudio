@@ -3,10 +3,9 @@
   "cleanUrls": true,
   "trailingSlash": false,
   "rewrites": [
-    {
-      "source": "/((?!api/|assets/|admin$|admin/).*)",
-      "destination": "/index.html"
-    }
+    { "source": "/admin", "destination": "/app.html" },
+    { "source": "/admin/:path*", "destination": "/app.html" },
+    { "source": "/((?!api/).*)", "destination": "/app.html" }
   ],
   "headers": [
     {

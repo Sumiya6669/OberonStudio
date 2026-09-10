@@ -217,11 +217,21 @@ async function main() {
     log(`${route.padEnd(12)} → ${path.relative(ROOT, file)}  (${Math.round(page.length / 1024)} КБ)`);
   }
 
+  // Пустая оболочка для маршрутов, которые заранее не собираются: панель
+  // /admin и всё неизвестное.
+  //
+  // Отдельным файлом, а не через dist/index.html: index.html — это теперь
+  // СОБРАННАЯ ГЛАВНАЯ. Отдать её на /admin значит попросить браузер подхватить
+  // разметку главной страницы на маршруте панели: расхождение гидратации,
+  // мелькнувшая главная и ошибки в консоли. Пустая оболочка отрисуется
+  // обычным образом, как панель и работала всегда.
+  await writeFile(path.join(DIST, 'app.html'), template, 'utf8');
+
   await writeFile(path.join(DIST, 'sitemap.xml'), buildSitemap(ROUTES, content), 'utf8');
   await writeFile(path.join(DIST, 'robots.txt'), buildRobots(), 'utf8');
   await writeFile(path.join(DIST, 'llms.txt'), buildLlmsTxt(content), 'utf8');
 
-  log(`собрано страниц: ${done}; sitemap.xml, robots.txt, llms.txt на месте`);
+  log(`собрано страниц: ${done}; app.html, sitemap.xml, robots.txt, llms.txt на месте`);
 }
 
 main().catch((error) => {
