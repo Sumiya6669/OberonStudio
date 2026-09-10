@@ -332,14 +332,40 @@ export const removeAllowedEmail = async (email) =>
 export const fetchAgentKinds = async () =>
   unwrap(await coreDb.from('agent_kind').select('*').order('title'));
 
-export const saveAgentKind = async (code, patch) =>
-  unwrap(await coreDb.from('agent_kind').update(patch).eq('code', code).select().single());
+/**
+ * Выключатель и предел одновременности пишутся в переопределение на клиента,
+ * а не в общий реестр core.agent_kind.
+ *
+ * Причина не косметическая: у общего реестра нет tenant_id, и политика
+ * доступа разрешает только чтение — предел одного клиента не должен меняться
+ * из панели другого. Прямая правка реестра просто не сохранялась бы.
+ *
+ * Пустое значение означает «как в общем реестре»: строка переопределения
+ * с одним заполненным полем не обнуляет остальные.
+ */
+export const saveAgentLimit = async ({ tenantId, agentKind, maxParallel, isActive, note }) =>
+  unwrap(await coreDb.from('agent_limit')
+    .upsert({
+      tenant_id: tenantId,
+      agent_kind: agentKind,
+      max_parallel: maxParallel ?? null,
+      is_active: isActive ?? null,
+      note: note || null,
+      updated_at: new Date().toISOString(),
+    }, { onConflict: 'tenant_id,agent_kind' })
+    .select().single());
 
+export const resetAgentLimit = async (agentKind) =>
+  unwrap(await coreDb.from('agent_limit').delete().eq('agent_kind', agentKind).select());
+
+/**
+ * Виды заданий только читаются. Их сроки и число попыток — свойство самой
+ * работы, а не клиента: «аудит доработок держится два часа» верно для любого.
+ * Менять это стоит осознанно и редко, поэтому правка идёт запросом в базе,
+ * а не кнопкой, которую легко нажать не туда.
+ */
 export const fetchJobTypesAll = async () =>
   unwrap(await coreDb.from('job_type').select('*').order('code'));
-
-export const saveJobType = async (code, patch) =>
-  unwrap(await coreDb.from('job_type').update(patch).eq('code', code).select().single());
 
 export const fetchHealth = async () =>
   unwrap(await appDb.from('v_system_health').select('*').single());
