@@ -519,3 +519,27 @@ export const fetchRateHealth = async (limit = 12) =>
 
 export const fetchRateBaseline = async () =>
   unwrap(await appDb.from('v_rate_baseline').select('*').maybeSingle());
+
+/* ── Закрытие месяца ───────────────────────────────────────────────────── */
+
+/**
+ * Месяц передаётся первым числом. Без аргумента база берёт ПРОШЛЫЙ месяц:
+ * закрывают всегда закончившийся, а не текущий.
+ */
+export const fetchMonthClose = async (month = null) =>
+  unwrap(await appDb.rpc('month_close', { p_month: month }).maybeSingle());
+
+export const fetchMonthCloseSubs = async (month = null) =>
+  unwrap(await appDb.rpc('month_close_subs', { p_month: month }));
+
+export const fetchMonthCloseHours = async (month = null) =>
+  unwrap(await appDb.rpc('month_close_hours', { p_month: month }));
+
+/* ── Гигиена базы ──────────────────────────────────────────────────────── */
+
+/**
+ * Структурные дыры: незакреплённый search_path, таблицы и разделы без
+ * разграничения доступа, витрины от владельца, живость pgcrypto.
+ */
+export const fetchDbHygiene = async () =>
+  unwrap(await appDb.from('v_db_hygiene').select('*').maybeSingle());

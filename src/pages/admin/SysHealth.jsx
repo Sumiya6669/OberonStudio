@@ -10,7 +10,8 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { CheckCircle2, XCircle, AlertTriangle } from 'lucide-react';
 import { usePoll } from '@/lib/admin/usePoll';
-import { fetchHealth } from '@/lib/supabase/queries';
+import { useAsync } from '@/lib/admin/useAsync';
+import { fetchHealth, fetchDbHygiene } from '@/lib/supabase/queries';
 import {
   Button, ErrorNote, Freshness, Panel, Spinner, Stat, cx, dateTime, num,
 } from '@/components/admin/ui';
@@ -56,8 +57,54 @@ const CHECKS = [
   },
 ];
 
+/**
+ * Гигиена базы. Это не «что сейчас происходит», а «нет ли структурных дыр»:
+ * такие вещи не мигают и не растут, они просто однажды оказываются открыты.
+ * hash_ok проверяет pgcrypto ВЫЗОВОМ — из-за того, что расширение стоит в
+ * другой схеме, приём заявок и журнал молча не работали (миграция 027).
+ */
+const HYGIENE = [
+  {
+    key: 'hash_ok',
+    title: 'Криптофункции доступны',
+    good: (v) => v === true,
+    ok: 'да: отпечатки считаются, значит форма и журнал работают',
+    bad: 'нет — приём заявок и журнал действий будут падать молча',
+  },
+  {
+    key: 'partitions_open',
+    title: 'Открытые разделы журнала',
+    good: (v) => Number(v) === 0,
+    ok: 'нет: каждый раздел закрыт политикой',
+    bad: (v) => `${v} — журнал одного клиента читается другим напрямую через раздел`,
+    fix: "select core.partition_seal('core', 'action_log_2026m09');",
+  },
+  {
+    key: 'rls_without_policy',
+    title: 'Закрытые таблицы без политики',
+    good: (v) => Number(v) === 0,
+    ok: 'нет',
+    bad: (v) => `${v}: доступ закрыт для всех, включая вас — запросы вернут пусто`,
+  },
+  {
+    key: 'functions_unpinned',
+    title: 'Функции без закреплённого search_path',
+    good: (v) => Number(v) === 0,
+    ok: 'нет',
+    bad: (v) => `${v}: у функции можно подменить, откуда она берёт объекты`,
+  },
+  {
+    key: 'views_as_owner',
+    title: 'Витрины от имени владельца',
+    good: (v) => Number(v) === 0,
+    ok: 'нет: все витрины отдают строки по правам вошедшего',
+    bad: (v) => `${v}: витрина обходит разграничение доступа`,
+  },
+];
+
 export default function SysHealth() {
   const health = usePoll(fetchHealth, { interval: 15000 });
+  const hyg = useAsync(fetchDbHygiene);
 
   if (health.loading && !health.data) return <Spinner />;
   const h = health.data || {};
@@ -119,6 +166,41 @@ export default function SysHealth() {
             );
           })}
         </ul>
+      </Panel>
+
+      <Panel title="Гигиена базы"
+             action={<span className="text-xs text-muted-foreground">
+               структура, а не загрузка
+             </span>}>
+        {hyg.loading ? <Spinner /> : (
+          <ul className="space-y-2">
+            {HYGIENE.map((c) => {
+              const value = hyg.data?.[c.key];
+              const ok = c.good(value);
+              const text = ok
+                ? (typeof c.ok === 'function' ? c.ok(value) : c.ok)
+                : (typeof c.bad === 'function' ? c.bad(value) : c.bad);
+              return (
+                <li key={c.key}
+                    className={cx('flex items-start gap-3 rounded-lg border px-3 py-2.5',
+                      ok ? 'border-line' : 'border-red-500/40 bg-red-500/5')}>
+                  {ok
+                    ? <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-400" />
+                    : <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-red-400" />}
+                  <div className="min-w-0">
+                    <div className="text-sm font-medium">{c.title}</div>
+                    <div className="text-xs text-muted-foreground">{text}</div>
+                    {!ok && c.fix && (
+                      <code className="mt-1 block break-all rounded bg-background px-2 py-1 font-mono text-xs">
+                        {c.fix}
+                      </code>
+                    )}
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        )}
       </Panel>
 
       <div className="grid gap-4 lg:grid-cols-2">

@@ -80,15 +80,27 @@ export function websiteLd() {
 }
 
 /** Хлебные крошки. Только для внутренних страниц: на главной их нет. */
-export function breadcrumbLd(path, title) {
+export function breadcrumbLd(path, title, parents = []) {
   if (!path || path === '/') return null;
+
+  // Промежуточные шаги нужны там, где страница лежит в разделе: разбор в
+  // «Ответах по 1С», работа в «Работах и ценах». Без них выдача показывает
+  // путь «Oberon Studio → Обмен с банком встал», как будто раздела нет, а
+  // человеку из поиска полезнее видеть, что рядом есть другие разборы.
+  const steps = [
+    { name: SITE_NAME, item: `${SITE_URL}/` },
+    ...parents.filter((p) => p?.name && p?.path).map((p) => ({
+      name: p.name, item: `${SITE_URL}${p.path}`,
+    })),
+    { name: title, item: `${SITE_URL}${path}` },
+  ];
+
   return {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
-    itemListElement: [
-      { '@type': 'ListItem', position: 1, name: SITE_NAME, item: `${SITE_URL}/` },
-      { '@type': 'ListItem', position: 2, name: title, item: `${SITE_URL}${path}` },
-    ],
+    itemListElement: steps.map((step, i) => ({
+      '@type': 'ListItem', position: i + 1, name: step.name, item: step.item,
+    })),
   };
 }
 

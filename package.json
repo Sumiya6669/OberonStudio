@@ -11,7 +11,9 @@
     "typecheck": "tsc -p ./jsconfig.json",
     "preview": "vite preview",
     "build:client": "vite build",
-    "prerender": "node scripts/prerender.mjs"
+    "prerender": "node scripts/prerender.mjs",
+    "check": "node scripts/check-site.mjs",
+    "check:live": "node scripts/check-site.mjs --url https://oberon-studio.vercel.app"
   },
   "dependencies": {
     "@hello-pangea/dnd": "^17.0.0",

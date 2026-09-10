@@ -95,7 +95,13 @@ export default function RouteSeo() {
 
   const jsonLd = React.useMemo(() => {
     const blocks = [organizationLd(settings), websiteLd()];
-    const crumb = breadcrumbLd(pathname, seo.pageName || seo.title);
+    // Раздел, в котором лежит страница. Знание о том, что разбор живёт в
+    // /1c, а работа в /uslugi, уже есть в маршрутах — здесь только путь
+    // для крошек, чтобы он не расходился с адресом.
+    const parents = [];
+    if (/^\/1c\/.+/.test(pathname)) parents.push({ name: 'Ответы по 1С', path: '/1c' });
+    if (/^\/uslugi\/.+/.test(pathname)) parents.push({ name: 'Работы и цены', path: '/uslugi' });
+    const crumb = breadcrumbLd(pathname, seo.pageName || seo.title, parents);
     if (crumb) blocks.push(crumb);
 
     // Списочная разметка — только там, где такой список действительно

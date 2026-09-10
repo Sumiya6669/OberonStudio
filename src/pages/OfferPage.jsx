@@ -13,6 +13,7 @@ import React from 'react';
 import { useParams } from 'react-router-dom';
 import Reveal from '@/components/core/Reveal';
 import { LocaleLink as Link } from '@/components/nav/LocaleLink';
+import Breadcrumbs from '@/components/nav/Breadcrumbs';
 import { useOffers, useContentReady } from '@/lib/site/SiteContentContext';
 import { CONTACT_PATH } from '@/lib/routes';
 import PageNotFound from '@/lib/PageNotFound';
@@ -53,9 +54,9 @@ export default function OfferPage() {
     <section className="relative overflow-hidden py-28">
       <div className="relative z-10 mx-auto max-w-4xl px-5">
         <Reveal>
-          <Link to="/uslugi" className="text-xs text-white/25 transition-colors hover:text-white/60">
-            ← Все работы
-          </Link>
+          <Breadcrumbs
+            items={[{ to: '/', label: 'Главная' }, { to: '/uslugi', label: 'Работы и цены' }]}
+            current={offer.title} />
           <div className="mt-6 flex items-start gap-4">
             <span className="text-3xl leading-none">{offer.icon}</span>
             <div>

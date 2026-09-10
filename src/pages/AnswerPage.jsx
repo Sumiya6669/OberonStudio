@@ -12,6 +12,7 @@ import React from 'react';
 import { useParams } from 'react-router-dom';
 import Reveal from '@/components/core/Reveal';
 import { LocaleLink as Link } from '@/components/nav/LocaleLink';
+import Breadcrumbs from '@/components/nav/Breadcrumbs';
 import { useAnswers, useContentReady } from '@/lib/site/SiteContentContext';
 import { CONTACT_PATH } from '@/lib/routes';
 import PageNotFound from '@/lib/PageNotFound';
@@ -53,9 +54,9 @@ export default function AnswerPage() {
     <section className="relative overflow-hidden py-28">
       <div className="relative z-10 mx-auto max-w-4xl px-5">
         <Reveal>
-          <Link to="/1c" className="text-xs text-white/25 transition-colors hover:text-white/60">
-            ← Все разборы
-          </Link>
+          <Breadcrumbs
+            items={[{ to: '/', label: 'Главная' }, { to: '/1c', label: 'Ответы по 1С' }]}
+            current={answer.title} />
           <h1 className="mb-6 mt-6 text-[clamp(1.8rem,3.4vw,3rem)] font-black leading-[1.08] tracking-[-0.03em] text-white">
             {answer.title}
           </h1>

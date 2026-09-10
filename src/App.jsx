@@ -42,6 +42,7 @@ import MoneyExpenses from './pages/admin/MoneyExpenses';
 import MoneyEntries from './pages/admin/MoneyEntries';
 import MoneyReports from './pages/admin/MoneyReports';
 import MoneyRate from './pages/admin/MoneyRate';
+import MoneyClose from './pages/admin/MoneyClose';
 import AiLive from './pages/admin/AiLive';
 import AiSpend from './pages/admin/AiSpend';
 import AiRights from './pages/admin/AiRights';
@@ -122,6 +123,7 @@ const AppRoutes = () => (
       <Route path="money/entries" element={<MoneyEntries />} />
       <Route path="money/reports" element={<MoneyReports />} />
       <Route path="money/rate" element={<MoneyRate />} />
+      <Route path="money/close" element={<MoneyClose />} />
 
       {/* ИИ */}
       <Route path="ai" element={<AiLive />} />
