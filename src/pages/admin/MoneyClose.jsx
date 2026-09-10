@@ -102,6 +102,12 @@ export default function MoneyClose() {
     },
   ];
 
+  // Заголовок считается по этому же списку, а не по признаку `ready` из
+  // базы: там учитываются только счета, часы и черновики, а на экране пять
+  // шагов. Иначе панель писала бы «месяц закрыт» над двумя незакрытыми
+  // строками — ровно та диагностика, которая врёт.
+  const allDone = steps.every((s) => s.done);
+
   if (close.loading && !close.data) return <Spinner />;
 
   return (
@@ -143,7 +149,7 @@ export default function MoneyClose() {
               tone={Number(c.docs_unpaid || 0) > 0 ? 'warn' : 'default'} />
       </div>
 
-      <Panel title={c.ready ? 'Месяц закрыт' : 'Что осталось сделать'}>
+      <Panel title={allDone ? 'Месяц закрыт' : 'Что осталось сделать'}>
         <ul className="space-y-2">
           {steps.map((s) => (
             <li key={s.title}
