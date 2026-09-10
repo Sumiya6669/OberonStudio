@@ -64,8 +64,15 @@ function fromDist(path) {
 }
 
 async function fromWeb(path) {
-  const res = await fetch(BASE + path, { redirect: 'follow' });
-  return { status: res.status, body: await res.text(), from: 'сеть' };
+  // Сетевая ошибка — это не «страница сломана», и вываливать на неё стек
+  // вызовов бессмысленно: читать его всё равно будет человек, у которого
+  // просто нет интернета. Отдаём 0 и объясняем это выше по-человечески.
+  try {
+    const res = await fetch(BASE + path, { redirect: 'follow' });
+    return { status: res.status, body: await res.text(), from: 'сеть' };
+  } catch (e) {
+    return { status: 0, body: '', from: 'сеть', error: e.message };
+  }
 }
 
 const get = (path) => (BASE ? fromWeb(path) : Promise.resolve(fromDist(path)));
@@ -103,11 +110,11 @@ const isRuOnly = (path) => RU_ONLY.some((re) => re.test(path));
 async function checkSitemap() {
   console.log('\nКарта сайта');
   const { status, body } = await get('/sitemap.xml');
-  if (BASE && [403, 407, 502, 503].includes(status)) {
+  if (BASE && [0, 403, 407, 502, 503].includes(status)) {
     // Такой ответ на карту сайта означает не сломанный сайт, а закрытую
     // сеть: прокси, корпоративный фильтр, отсутствие интернета. Сообщать
     // об этом как о сорока шести сломанных страницах — врать.
-    console.log(`\n  Сеть не пускает: ${BASE}/sitemap.xml отдался как ${status}.`);
+    console.log(`\n  Сеть не пускает: ${BASE}/sitemap.xml — ${status === 0 ? 'адрес не разрешается' : 'ответ ' + status}.`);
     console.log('  Это про доступ, а не про сайт. Проверьте без --url или из другой сети.');
     process.exit(2);
   }
