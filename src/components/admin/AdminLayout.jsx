@@ -11,10 +11,11 @@ import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import {
   Bot, Building2, Clock, Database, ExternalLink, FileText, Globe, Inbox,
   LayoutDashboard, ListTodo, LogOut, Receipt, Settings, ShieldCheck, Users,
-  Wallet, Activity, Coins, BookOpen, PieChart, HeartPulse, Boxes,
+  Wallet, Activity, Coins, BookOpen, PieChart, HeartPulse, Boxes, Compass,
 } from 'lucide-react';
 import { useAuth } from '@/lib/auth/AuthContext';
 import { cx } from './ui';
+import { Seo } from '@/lib/seo/Seo';
 
 export const NAV_GROUPS = [
   {
@@ -25,6 +26,7 @@ export const NAV_GROUPS = [
       { to: '/admin/companies', label: 'Компании', icon: Building2 },
       { to: '/admin/time', label: 'Время', icon: Clock },
       { to: '/admin/configs', label: 'Конфигурации 1С', icon: Database },
+      { to: '/admin/sources', label: 'Источники заявок', icon: Compass },
     ],
   },
   {
@@ -92,6 +94,8 @@ export default function AdminLayout() {
 
   return (
     <div className="min-h-screen bg-background font-inter text-foreground">
+      {/* Панель в поиске не нужна и не должна там оказаться. */}
+      <Seo title="Oberon Core" noindex />
       <div className="flex min-h-screen">
         <aside className="hidden w-60 shrink-0 border-r border-line bg-surface/40 lg:flex lg:flex-col">
           <div className="border-b border-line px-4 py-4">

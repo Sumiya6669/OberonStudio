@@ -3,7 +3,12 @@
  * которая пересылает данные в Telegram. Токен бота живёт только на сервере
  * и в браузер не попадает.
  */
+import { readCampaign } from '@/lib/analytics/campaign';
+
 export async function submitLead(values) {
+  // Метки снимались при заходе на сайт, а не сейчас: см. campaign.js.
+  const campaign = readCampaign();
+
   const response = await fetch('/api/lead', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -15,7 +20,12 @@ export async function submitLead(values) {
       message: values.message?.trim() || '',
       service: values.service || '',
       source: values.source || 'website',
+      // Страница отправки формы и страница входа — разные вещи, и обе
+      // нужны: первая говорит, где человек решился, вторая — что его привело.
       page: typeof window !== 'undefined' ? window.location.pathname : '',
+      landing: campaign.landing || '',
+      referrer: campaign.referrer || '',
+      utm: campaign.utm || {},
     }),
   });
 

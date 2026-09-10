@@ -4,6 +4,7 @@ import SiteNav from '../nav/SiteNav';
 import SiteFooter from './SiteFooter';
 import Consultant from '../chat/Consultant';
 import CursorGlow from '../core/CursorGlow';
+import RouteSeo from '@/lib/seo/RouteSeo';
 
 /**
  * Раскладка публичного сайта.
@@ -16,6 +17,8 @@ export default function SiteLayout() {
 
   return (
     <div className="min-h-screen bg-background font-inter">
+      {/* Заголовок, описание и разметка страницы. Ничего не рисует. */}
+      <RouteSeo />
       <CursorGlow />
       <SiteNav />
 

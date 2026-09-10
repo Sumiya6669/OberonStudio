@@ -148,6 +148,15 @@ export const fetchMe = async (authUserId) =>
 export const linkMe = async (email, name) =>
   unwrap(await supabase.rpc('link_me', { p_email: email, p_name: name }));
 
+/**
+ * Откуда приходят заявки. Витрина считает и деньги: доля счёта, приходящаяся
+ * на заявку. Один счёт на несколько заявок делится поровну — в обычном случае
+ * это точная цифра, в остальных честная оценка.
+ */
+export const fetchLeadSources = async () =>
+  unwrap(await appDb.from('v_lead_source').select('*')
+    .order('leads', { ascending: false }));
+
 /* ══ Бух учет ═══════════════════════════════════════════════════════════════ */
 
 /**

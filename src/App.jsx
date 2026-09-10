@@ -28,6 +28,7 @@ import Companies from './pages/admin/Companies';
 import DevConfigs from './pages/admin/DevConfigs';
 import TimeSheet from './pages/admin/TimeSheet';
 import Queue from './pages/admin/Queue';
+import Sources from './pages/admin/Sources';
 import MoneyOverview from './pages/admin/MoneyOverview';
 import MoneyDocs from './pages/admin/MoneyDocs';
 import MoneyPayments from './pages/admin/MoneyPayments';
@@ -69,6 +70,7 @@ const AppRoutes = () => (
       <Route path="companies" element={<Companies />} />
       <Route path="configs" element={<DevConfigs />} />
       <Route path="time" element={<TimeSheet />} />
+      <Route path="sources" element={<Sources />} />
 
       {/* Бух учет */}
       <Route path="money" element={<MoneyOverview />} />
@@ -101,22 +103,36 @@ const AppRoutes = () => (
   </Routes>
 );
 
-function App() {
+/**
+ * Всё приложение БЕЗ маршрутизатора.
+ *
+ * Отдельно от App, потому что маршрутизатор разный: в браузере это
+ * BrowserRouter, а на сборке страниц — StaticRouter с заданным адресом.
+ * Всё остальное — провайдеры, маршруты, уведомления — общее, и раздваивать
+ * его нельзя: разошлись бы разметка сборки и первый кадр в браузере.
+ */
+export function AppShell({ initialContent = null, initialLang }) {
   return (
-    <LangProvider>
+    <LangProvider initialLang={initialLang}>
       {/* Содержимое сайта из базы. Провайдер внутри LangProvider, потому что
           запрос зависит от языка, и снаружи AuthProvider — публичному сайту
           вход не нужен, содержимое читается ключом anon через одну функцию. */}
-      <SiteContentProvider>
+      <SiteContentProvider initialContent={initialContent}>
         <AuthProvider>
-          <Router>
-            <ScrollToTop />
-            <AppRoutes />
-          </Router>
+          <ScrollToTop />
+          <AppRoutes />
           <Toaster />
         </AuthProvider>
       </SiteContentProvider>
     </LangProvider>
+  );
+}
+
+function App() {
+  return (
+    <Router>
+      <AppShell />
+    </Router>
   );
 }
 

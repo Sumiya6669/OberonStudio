@@ -20,27 +20,38 @@ import { useLang } from '@/lib/i18n/LangContext';
 
 const SiteContentContext = React.createContext({ content: null, ready: false });
 
-export function SiteContentProvider({ children }) {
+export function SiteContentProvider({ children, initialContent = null }) {
   const { lang } = useLang();
-  const [byLocale, setByLocale] = React.useState({});
+  // Содержимое, вшитое на сборке: страницы собираются с ним, поэтому робот
+  // видит опубликованный текст, а не пустой div.
+  const [byLocale, setByLocale] = React.useState(() => (
+    initialContent ? { [initialContent.locale || 'ru']: initialContent } : {}
+  ));
   const [ready, setReady] = React.useState(!isSupabaseConfigured);
+  // Один запрос на язык за сеанс. Даже если содержимое пришло со сборки,
+  // один раз перечитываем: сборка могла быть неделю назад.
+  const asked = React.useRef(new Set());
 
   React.useEffect(() => {
-    if (!isSupabaseConfigured) return;
+    if (!isSupabaseConfigured) return undefined;
+    if (asked.current.has(lang)) return undefined;
+    asked.current.add(lang);
     let alive = true;
-    // Кэш по языку: переключение языка туда-обратно не должно ходить в сеть.
-    if (byLocale[lang]) return;
     supabase
       .rpc('site_content', { p_locale: lang })
       .then(({ data, error }) => {
         if (!alive) return;
         // Ошибку намеренно не показываем посетителю: для него это не событие.
-        // Сайт просто остаётся на содержимом из кода.
-        setByLocale((prev) => ({ ...prev, [lang]: error ? { failed: true } : data }));
+        // Сайт просто остаётся на том содержимом, что уже есть.
+        if (error) {
+          setByLocale((prev) => (prev[lang] ? prev : { ...prev, [lang]: { failed: true } }));
+        } else {
+          setByLocale((prev) => ({ ...prev, [lang]: data }));
+        }
         setReady(true);
       });
     return () => { alive = false; };
-  }, [lang, byLocale]);
+  }, [lang]);
 
   const content = byLocale[lang] && !byLocale[lang].failed ? byLocale[lang] : null;
 

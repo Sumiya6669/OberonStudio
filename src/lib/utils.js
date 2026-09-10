@@ -6,4 +6,10 @@ export function cn(...inputs) {
 } 
 
 
-export const isIframe = window.self !== window.top;
+/**
+ * Открыт ли сайт внутри рамки. Проверка обёрнута, потому что этот модуль
+ * выполняется и на сборке, при серверном рендере, где window не существует:
+ * без обёртки падала бы вся сборка страниц.
+ */
+export const isIframe =
+  typeof window !== 'undefined' && window.self !== window.top;

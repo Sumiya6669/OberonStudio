@@ -24,6 +24,8 @@ const FIELD_LABELS = {
   message: 'Сообщение',
   source: 'Источник',
   page: 'Страница',
+  landing: 'Страница входа',
+  referrer: 'Переход с',
 };
 
 /** Экранирование под parse_mode: HTML. */
@@ -68,6 +70,12 @@ async function saveToDatabase(body) {
         message: body.message,
         service: body.service,
         page: body.page,
+        // Источник: страница входа, переход и метки кампании. Хранится
+        // колонками заявки, а не строкой в тексте, — иначе это нельзя
+        // посчитать, а значит нельзя понять, что работает.
+        landing: body.landing || body.page,
+        referrer: body.referrer,
+        utm: body.utm,
         channel: 'site',
         received_at: new Date().toISOString(),
       },
@@ -101,6 +109,16 @@ export default async function handler(request, response) {
   const clean = value => String(value || '').trim().slice(0, 1000);
   const cleaned = Object.fromEntries(
     Object.keys(FIELD_LABELS).map(key => [key, clean(body[key])]),
+  );
+
+  // Метки кампании приходят объектом, поэтому через строковую чистку не идут.
+  // Берём только известные ключи и только строки: складывать в базу
+  // произвольный объект из браузера — значит однажды получить туда мусор.
+  const UTM_KEYS = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term'];
+  cleaned.utm = Object.fromEntries(
+    UTM_KEYS
+      .map(key => [key, String(body?.utm?.[key] ?? '').trim().slice(0, 200)])
+      .filter(([, value]) => value !== ''),
   );
 
   let ticketId = null;
