@@ -39,9 +39,15 @@ export default function SiteFooter() {
                   {t.nav[route.navKey]}
                 </Link>
               ))}
-              {/* Разборы по 1С только по-русски, поэтому ссылка ведёт в
-                  русскую версию из любой языковой: страницы на других
-                  языках нет, и притворяться незачем. */}
+              {/* Разборы и офферы только по-русски, поэтому ссылки ведут в
+                  русскую версию из любой языковой: страниц на других языках
+                  нет, и притворяться незачем. */}
+              <a
+                href="/uslugi"
+                className="text-xs text-white/25 hover:text-white/60 transition-colors duration-300"
+              >
+                Работы и цены
+              </a>
               <a
                 href="/1c"
                 className="text-xs text-white/25 hover:text-white/60 transition-colors duration-300"

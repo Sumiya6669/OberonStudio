@@ -207,6 +207,35 @@ export function useAnswers() {
 }
 
 /**
+ * Офферы — страницы под конкретную покупку: /uslugi/<slug>.
+ *
+ * Как и разборы, из кода не подставляются: раздела просто нет, пока в
+ * панели ничего не опубликовано. Цена может быть пустой — это нормально
+ * и означает «по запросу», а не «ошибка».
+ */
+export function useOffers() {
+  const items = useCollection('offer');
+  return React.useMemo(() => items && items.map((it) => ({
+    slug: it.slug,
+    title: it.text?.title || '',
+    tagline: it.text?.tagline || '',
+    lead: it.text?.lead || '',
+    included: it.text?.included || [],
+    excluded: it.text?.excluded || [],
+    steps: it.text?.steps || [],
+    term: it.text?.term || '',
+    priceNote: it.text?.price_note || '',
+    result: it.text?.result || '',
+    seoTitle: it.text?.seo_title || '',
+    seoDesc: it.text?.seo_desc || '',
+    priceFrom: it.props?.price_from ?? null,
+    unit: it.props?.unit || '',
+    icon: it.props?.icon || '•',
+    accent: Boolean(it.props?.accent),
+  })), [items]);
+}
+
+/**
  * Настройки сайта: то, что задано в панели, поверх зашитого в код.
  *
  * Слияние, а не замена. Пустое или незаданное значение в базе не стирает

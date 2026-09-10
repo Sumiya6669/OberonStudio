@@ -17,6 +17,8 @@ import ReviewsPage from './pages/ReviewsPage';
 import FaqPage from './pages/FaqPage';
 import ContactPage from './pages/ContactPage';
 import AnswersPage from './pages/AnswersPage';
+import OffersPage from './pages/OffersPage';
+import OfferPage from './pages/OfferPage';
 import AnswerPage from './pages/AnswerPage';
 
 // Админка: своя раскладка, свой вход. Данные защищает RLS в базе,
@@ -32,12 +34,14 @@ import DevConfigs from './pages/admin/DevConfigs';
 import TimeSheet from './pages/admin/TimeSheet';
 import Queue from './pages/admin/Queue';
 import Sources from './pages/admin/Sources';
+import CrmSubscriptions from './pages/admin/CrmSubscriptions';
 import MoneyOverview from './pages/admin/MoneyOverview';
 import MoneyDocs from './pages/admin/MoneyDocs';
 import MoneyPayments from './pages/admin/MoneyPayments';
 import MoneyExpenses from './pages/admin/MoneyExpenses';
 import MoneyEntries from './pages/admin/MoneyEntries';
 import MoneyReports from './pages/admin/MoneyReports';
+import MoneyRate from './pages/admin/MoneyRate';
 import AiLive from './pages/admin/AiLive';
 import AiSpend from './pages/admin/AiSpend';
 import AiRights from './pages/admin/AiRights';
@@ -89,6 +93,12 @@ const AppRoutes = () => (
           страницами без читателей и с машинным переводом. */}
       <Route path="/1c" element={<AnswersPage />} />
       <Route path="/1c/:slug" element={<AnswerPage />} />
+
+      {/* Что можно купить, с ценами. Тоже только по-русски: цена и условия
+          обсуждаются на русском, а переведённый прайс без переведённого
+          разговора — обещание, которое нечем поддержать. */}
+      <Route path="/uslugi" element={<OffersPage />} />
+      <Route path="/uslugi/:slug" element={<OfferPage />} />
     </Route>
 
     {/* Рабочая панель */}
@@ -102,6 +112,7 @@ const AppRoutes = () => (
       <Route path="configs" element={<DevConfigs />} />
       <Route path="time" element={<TimeSheet />} />
       <Route path="sources" element={<Sources />} />
+      <Route path="subscriptions" element={<CrmSubscriptions />} />
 
       {/* Бух учет */}
       <Route path="money" element={<MoneyOverview />} />
@@ -110,6 +121,7 @@ const AppRoutes = () => (
       <Route path="money/expenses" element={<MoneyExpenses />} />
       <Route path="money/entries" element={<MoneyEntries />} />
       <Route path="money/reports" element={<MoneyReports />} />
+      <Route path="money/rate" element={<MoneyRate />} />
 
       {/* ИИ */}
       <Route path="ai" element={<AiLive />} />

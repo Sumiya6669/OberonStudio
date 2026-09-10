@@ -45,9 +45,13 @@ function safeParse(value) {
 }
 
 /**
- * Запись заявки в базу. Возвращает id заявки либо null, если Supabase
- * не настроен. Ошибка записи не должна ронять приём: заявка уйдёт хотя бы
- * в Telegram, а расхождение будет видно в журнале Vercel.
+ * Запись заявки в базу. Возвращает РАСПИСКУ — номер обращения и время, до
+ * которого обещан ответ, — либо null, если Supabase не настроен. Ошибка
+ * записи не должна ронять приём: заявка уйдёт хотя бы в Telegram, а
+ * расхождение будет видно в журнале Vercel.
+ *
+ * Время ответа берётся из базы, а не пишется в вёрстке: по этому же полю
+ * панель считает просрочку, поэтому сайт и панель не могут разойтись.
  */
 async function saveToDatabase(body) {
   const url = process.env.SUPABASE_URL;
@@ -121,10 +125,12 @@ export default async function handler(request, response) {
       .filter(([, value]) => value !== ''),
   );
 
+  let receipt = null;
   let ticketId = null;
   let stored = false;
   try {
-    ticketId = await saveToDatabase(cleaned);
+    receipt = await saveToDatabase(cleaned);
+    ticketId = receipt?.ticket_id ?? null;
     stored = ticketId !== null;
   } catch (error) {
     // Не роняем приём: заявка уйдёт в Telegram, а расхождение видно в журнале.
@@ -135,7 +141,12 @@ export default async function handler(request, response) {
   const chatId = process.env.TELEGRAM_CHAT_ID;
 
   if (!token || !chatId) {
-    if (stored) return response.status(200).json({ ok: true, ticketId, delivered: false });
+    if (stored) {
+      return response.status(200).json({
+        ok: true, ticketId, delivered: false,
+        ref: receipt?.ref ?? null, reactBy: receipt?.react_by ?? null,
+      });
+    }
     console.error('Telegram credentials are not configured');
     return response.status(500).json({ error: 'Форма не настроена. Напишите нам в Telegram.' });
   }
@@ -166,14 +177,27 @@ export default async function handler(request, response) {
       const details = await telegram.text();
       console.error('Telegram API error:', telegram.status, details);
       // Заявка в базе — значит она не потеряна, и клиенту не за что извиняться.
-      if (stored) return response.status(200).json({ ok: true, ticketId, delivered: false });
+      if (stored) {
+        return response.status(200).json({
+          ok: true, ticketId, delivered: false,
+          ref: receipt?.ref ?? null, reactBy: receipt?.react_by ?? null,
+        });
+      }
       return response.status(502).json({ error: 'Не удалось доставить заявку. Напишите нам в Telegram.' });
     }
 
-    return response.status(200).json({ ok: true, ticketId, delivered: true });
+    return response.status(200).json({
+      ok: true, ticketId, delivered: true,
+      ref: receipt?.ref ?? null, reactBy: receipt?.react_by ?? null,
+    });
   } catch (error) {
     console.error('Lead delivery failed:', error);
-    if (stored) return response.status(200).json({ ok: true, ticketId, delivered: false });
+    if (stored) {
+      return response.status(200).json({
+        ok: true, ticketId, delivered: false,
+        ref: receipt?.ref ?? null, reactBy: receipt?.react_by ?? null,
+      });
+    }
     return response.status(500).json({ error: 'Не удалось отправить заявку. Попробуйте позже.' });
   }
 }

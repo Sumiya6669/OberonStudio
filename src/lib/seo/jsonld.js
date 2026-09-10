@@ -261,3 +261,57 @@ export function answersListLd(answers) {
     })),
   };
 }
+
+/**
+ * Оффер — конкретная работа с ценой.
+ *
+ * Цена попадает в разметку только если она задана. Пустая цена означает
+ * «по запросу», и размечать её нулём нельзя: в выдаче это прочитается как
+ * «бесплатно», а объясняться придётся с живым человеком.
+ */
+export function offerLd(offer) {
+  if (!offer?.title) return null;
+
+  const price = Number(offer.priceFrom) > 0
+    ? clean({
+        '@type': 'Offer',
+        priceCurrency: 'KZT',
+        price: Number(offer.priceFrom),
+        // от — то есть это минимум, а не точная цена.
+        priceSpecification: {
+          '@type': 'PriceSpecification',
+          minPrice: Number(offer.priceFrom),
+          priceCurrency: 'KZT',
+        },
+        availability: 'https://schema.org/InStock',
+        url: `${SITE_URL}/uslugi/${offer.slug}`,
+      })
+    : null;
+
+  return clean({
+    '@context': 'https://schema.org',
+    '@type': 'Service',
+    name: offer.title,
+    description: offer.seoDesc || offer.tagline || offer.lead,
+    serviceType: '1С: разработка и сопровождение',
+    provider: { '@type': 'Organization', name: SITE_NAME, url: `${SITE_URL}/` },
+    areaServed: { '@type': 'Country', name: 'Kazakhstan' },
+    url: `${SITE_URL}/uslugi/${offer.slug}`,
+    offers: price || undefined,
+  });
+}
+
+export function offersListLd(offers) {
+  if (!offers?.length) return null;
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'Работы и цены',
+    itemListElement: offers.map((o, i) => ({
+      '@type': 'ListItem',
+      position: i + 1,
+      name: o.title,
+      url: `${SITE_URL}/uslugi/${o.slug}`,
+    })),
+  };
+}

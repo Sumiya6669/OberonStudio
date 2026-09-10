@@ -203,6 +203,10 @@ function buildLlmsTxt(content) {
     .filter((item) => item?.slug)
     .map((item) => `- [${item.text?.title || item.slug}](${SITE_URL}/1c/${item.slug}): ${item.text?.question || ''}`)
     .join('\n');
+  const offers = (content?.collections?.offer || [])
+    .filter((item) => item?.slug)
+    .map((item) => `- [${item.text?.title || item.slug}](${SITE_URL}/uslugi/${item.slug}): ${item.text?.tagline || ''}`)
+    .join('\n');
   const contacts = [
     settings.telegram_url && `- Telegram: ${settings.telegram_url}`,
     settings.whatsapp_url && `- WhatsApp: ${settings.whatsapp_url}`,
@@ -226,6 +230,7 @@ function buildLlmsTxt(content) {
 - [Вопросы](${SITE_URL}/faq): частые вопросы и ответы
 - [Контакты](${SITE_URL}/contact): связаться
 
+${offers.length ? `## Что можно заказать\n\n${offers}\n` : ''}
 ${answers.length ? `## Разборы частых проблем 1С\n\n${answers}\n` : ''}
 ${contacts ? `## Связаться\n\n${contacts}\n` : ''}`;
 }
@@ -314,15 +319,25 @@ async function main() {
   await mkdir(path.join(DIST, 'admin'), { recursive: true });
   await writeFile(path.join(DIST, 'admin', 'index.html'), template, 'utf8');
 
-  // Разборы по 1С: адреса берутся из опубликованного, а не из списка в коде.
-  // Добавили разбор в панели — он появится на сайте следующей сборкой сам.
+  // Разделы, которые существуют только по-русски и собираются по
+  // опубликованному содержимому: адреса берутся из CMS, а не из списка в
+  // коде. Добавили запись в панели — она появится на сайте следующей
+  // сборкой сама, и её не надо нигде дублировать.
   const ru = contentByLang.ru;
-  const answers = (ru?.collections?.answer || [])
-    .map((item) => item?.slug)
-    .filter(Boolean);
-  const answerUrls = ['/1c', ...answers.map((slug) => `/1c/${slug}`)];
+  const RU_SECTIONS = [
+    { base: '/1c',     collection: 'answer' },
+    { base: '/uslugi', collection: 'offer' },
+  ];
 
-  for (const url of answerUrls) {
+  const ruOnlyUrls = [];
+  for (const { base, collection } of RU_SECTIONS) {
+    const slugs = (ru?.collections?.[collection] || [])
+      .map((item) => item?.slug)
+      .filter(Boolean);
+    ruOnlyUrls.push(base, ...slugs.map((slug) => `${base}/${slug}`));
+  }
+
+  for (const url of ruOnlyUrls) {
     const { html, head } = render(url, { content: ru });
     const page = template
       .replace(/<!--seo-->[\s\S]*?<!--\/seo-->/, `<!--seo-->\n    ${head}\n    <!--\/seo-->`)
@@ -333,11 +348,11 @@ async function main() {
     await mkdir(path.dirname(file), { recursive: true });
     await writeFile(file, page, 'utf8');
     done += 1;
-    log(`${url.padEnd(16)} → ${path.relative(ROOT, file)}  (${Math.round(page.length / 1024)} КБ)`);
+    log(`${url.padEnd(30)} → ${path.relative(ROOT, file)}  (${Math.round(page.length / 1024)} КБ)`);
   }
 
   await writeFile(path.join(DIST, 'sitemap.xml'),
-    buildSitemap(ROUTES, ru, answerUrls), 'utf8');
+    buildSitemap(ROUTES, ru, ruOnlyUrls), 'utf8');
   await writeFile(path.join(DIST, 'robots.txt'), buildRobots(), 'utf8');
   await writeFile(path.join(DIST, 'llms.txt'), buildLlmsTxt(ru), 'utf8');
 

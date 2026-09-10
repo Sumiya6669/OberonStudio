@@ -468,3 +468,54 @@ export async function requestRebuild(reason = 'publish') {
   if (!response.ok) throw new Error(body.error || `сборка не запустилась (${response.status})`);
   return body;
 }
+
+/* ── Абонементы и обязательства по срокам ──────────────────────────────────
+ *
+ * Предмет сделки в сопровождении и «скорой» — не часы, а обещание. Пока
+ * обещание не записано, его нельзя ни проверить, ни предъявить.
+ */
+
+export const fetchPlans = async () =>
+  unwrap(await crmDb.from('plan').select('*').order('sort'));
+
+export const savePlan = async ({ tenant_id, code, ...values }) =>
+  unwrap(await crmDb.from('plan')
+    .upsert({ tenant_id, code, ...values }, { onConflict: 'tenant_id,code' })
+    .select().single());
+
+export const fetchSubscriptions = async () =>
+  unwrap(await appDb.from('v_subscription').select('*').order('status').order('company'));
+
+/** Заявки с уже нарушенным обещанием: реакция или срок сдачи. */
+export const fetchSlaBreach = async () =>
+  unwrap(await appDb.from('v_sla_breach').select('*').order('react_by'));
+
+/** Держим ли обещание вообще — по месяцам. */
+export const fetchSlaMonth = async (limit = 6) =>
+  unwrap(await appDb.from('v_sla_month').select('*')
+    .order('month', { ascending: false }).limit(limit));
+
+export const sellSubscription = async ({ company, plan, from, price, minutes }) =>
+  unwrap(await supabase.rpc('subscription_new', {
+    p_company: company, p_plan: plan, p_from: from,
+    p_price: price ?? null, p_included_minutes: minutes ?? null,
+  }));
+
+export const endSubscription = async (id, on) =>
+  unwrap(await supabase.rpc('subscription_end', { p_id: id, p_on: on }));
+
+export const invoiceSubscription = async (id, month = null) =>
+  unwrap(await supabase.rpc('subscription_invoice', { p_id: id, p_month: month }));
+
+/* ── Ставка и безубыточность ───────────────────────────────────────────────
+ *
+ * Витрины отдают только факты по месяцам. «Что если» считает экран: это
+ * разговор с самим собой, ему нечего делать в базе.
+ */
+
+export const fetchRateHealth = async (limit = 12) =>
+  unwrap(await appDb.from('v_rate_health').select('*')
+    .order('month', { ascending: false }).limit(limit));
+
+export const fetchRateBaseline = async () =>
+  unwrap(await appDb.from('v_rate_baseline').select('*').maybeSingle());

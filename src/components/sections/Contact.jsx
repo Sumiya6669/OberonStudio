@@ -15,6 +15,10 @@ export default function Contact() {
   const [form, setForm] = useState({ name: '', phone: '', email: '', company: '', message: '' });
   const [saving, setSaving] = useState(false);
   const [sent, setSent] = useState(false);
+  // Расписка из базы: номер обращения и время, до которого обещан ответ.
+  // Обещание не пишется здесь словами — иначе сайт и панель однажды
+  // разойдутся, и правой окажется панель.
+  const [receipt, setReceipt] = useState(null);
   const [error, setError] = useState('');
   const sectionRef = useRef(null);
 
@@ -42,7 +46,8 @@ export default function Contact() {
     setSaving(true);
     setError('');
     try {
-      await submitLead({ ...form, source: 'contact_form' });
+      const receipt = await submitLead({ ...form, source: 'contact_form' });
+      setReceipt(receipt || null);
       setSent(true);
       setForm({ name: '', phone: '', email: '', company: '', message: '' });
     } catch (err) {
@@ -114,9 +119,33 @@ export default function Contact() {
                   <div className="w-16 h-16 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center mb-5">
                     <CheckCircle2 className="w-8 h-8 text-emerald-400" />
                   </div>
-                  <h3 className="text-2xl font-black text-white mb-3">Заявка отправлена</h3>
-                  <p className="text-sm text-white/35 max-w-sm">Мы получили обращение и свяжемся с вами в ближайшее рабочее время.</p>
-                  <button onClick={() => setSent(false)} className="mt-8 px-5 py-3 rounded-xl border border-primary/20 text-primary text-sm font-semibold hover:bg-primary/10 transition-colors">
+                  <h3 className="text-2xl font-black text-white mb-3">Заявка принята</h3>
+
+                  {receipt?.ref ? (
+                    <>
+                      <p className="text-sm text-white/35 max-w-sm">
+                        Номер обращения <span className="font-semibold text-white/70">{receipt.ref}</span>
+                        {' '}— по нему можно спросить о ходе работы.
+                      </p>
+                      {receipt.reactBy && (
+                        <p className="mt-3 text-sm text-white/50 max-w-sm">
+                          Отвечу до{' '}
+                          <span className="font-semibold text-primary">
+                            {new Date(receipt.reactBy).toLocaleString('ru-RU', {
+                              hour: '2-digit', minute: '2-digit',
+                              day: '2-digit', month: 'long',
+                            })}
+                          </span>.
+                        </p>
+                      )}
+                    </>
+                  ) : (
+                    <p className="text-sm text-white/35 max-w-sm">
+                      Мы получили обращение и свяжемся с вами в ближайшее рабочее время.
+                    </p>
+                  )}
+
+                  <button onClick={() => { setSent(false); setReceipt(null); }} className="mt-8 px-5 py-3 rounded-xl border border-primary/20 text-primary text-sm font-semibold hover:bg-primary/10 transition-colors">
                     Отправить ещё одну
                   </button>
                 </div>

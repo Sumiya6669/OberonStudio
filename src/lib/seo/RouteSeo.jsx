@@ -11,13 +11,13 @@ import { useLocation } from 'react-router-dom';
 import { useLang } from '@/lib/i18n/LangContext';
 import { SITE_SETTINGS } from '@/lib/content/site';
 import {
-  useAnswers, useFaq, usePageText, useProducts, useProjects, useServices, useSettings,
+  useAnswers, useFaq, useOffers, usePageText, useProducts, useProjects, useServices, useSettings,
 } from '@/lib/site/SiteContentContext';
 import { Seo } from './Seo';
 import { resolvePageSeo } from './pages';
 import {
-  answerLd, answersListLd, breadcrumbLd, faqLd, organizationLd, productsLd,
-  reviewsLd, servicesLd, websiteLd,
+  answerLd, answersListLd, breadcrumbLd, faqLd, offerLd, offersListLd,
+  organizationLd, productsLd, reviewsLd, servicesLd, websiteLd,
 } from './jsonld';
 import { SITE_NAME } from './pages';
 import { useTestimonials } from '@/lib/site/SiteContentContext';
@@ -39,6 +39,7 @@ export default function RouteSeo() {
   const faq = useFaq();
   const reviewsDb = useTestimonials();
   const answers = useAnswers();
+  const offers = useOffers();
 
   // Разборы по 1С описываются не словарём переводов, а своим содержимым:
   // заголовок и описание берутся из самой записи.
@@ -48,7 +49,30 @@ export default function RouteSeo() {
     return (answers || []).find((a) => a.slug === slug) || null;
   }, [pathname, answers]);
 
+  const offer = React.useMemo(() => {
+    if (!pathname.startsWith('/uslugi/')) return null;
+    const slug = pathname.slice('/uslugi/'.length).replace(/\/$/, '');
+    return (offers || []).find((o) => o.slug === slug) || null;
+  }, [pathname, offers]);
+
   const seo = React.useMemo(() => {
+    if (pathname === '/uslugi') {
+      return {
+        ...resolvePageSeo({ path: '/uslugi', t, lang, cmsText, localised: false }),
+        pageName: 'Работы и цены',
+        title: `Работы и цены по 1С — ${SITE_NAME}`,
+        description: 'Что можно заказать: аудит конфигурации перед обновлением, наблюдение за обменами, срочная помощь по 1С. Что входит, что не входит, сроки и стоимость.',
+      };
+    }
+    if (offer) {
+      return {
+        ...resolvePageSeo({ path: pathname, t, lang, cmsText, localised: false }),
+        pageName: offer.title,
+        title: `${offer.seoTitle || offer.title} — ${SITE_NAME}`,
+        description: offer.seoDesc || offer.tagline || offer.lead,
+        type: 'article',
+      };
+    }
     if (pathname === '/1c') {
       return {
         ...resolvePageSeo({ path: '/1c', t, lang, cmsText, localised: false }),
@@ -67,7 +91,7 @@ export default function RouteSeo() {
       };
     }
     return resolvePageSeo({ path: pathname, t, lang, cmsText });
-  }, [pathname, t, lang, cmsText, answer]);
+  }, [pathname, t, lang, cmsText, answer, offer]);
 
   const jsonLd = React.useMemo(() => {
     const blocks = [organizationLd(settings), websiteLd()];
@@ -105,6 +129,14 @@ export default function RouteSeo() {
       const block = answerLd(answer);
       if (block) blocks.push(block);
     }
+    if (offer) {
+      const block = offerLd(offer);
+      if (block) blocks.push(block);
+    }
+    if (pathname === '/uslugi') {
+      const block = offersListLd(offers);
+      if (block) blocks.push(block);
+    }
     if (pathname === '/projects') {
       // Проекты размечаются на своей странице; список берётся тот же,
       // что показан, — из базы либо из кода.
@@ -120,7 +152,7 @@ export default function RouteSeo() {
     }
     return blocks.filter(Boolean);
   }, [pathname, settings, seo.pageName, seo.title, services, faq, products, projects,
-      reviewsDb, answers, answer, t, lang]);
+      reviewsDb, answers, answer, offers, offer, t, lang]);
 
   const verification = React.useMemo(() => [
     { name: 'google-site-verification', content: settings.google_verify },

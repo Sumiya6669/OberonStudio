@@ -12,6 +12,7 @@ import {
   Bot, Building2, Clock, Database, ExternalLink, FileText, Globe, Inbox,
   LayoutDashboard, ListTodo, LogOut, Receipt, Settings, ShieldCheck, Users,
   Wallet, Activity, Coins, BookOpen, PieChart, HeartPulse, Boxes, Compass,
+  Repeat, Gauge,
 } from 'lucide-react';
 import { useAuth } from '@/lib/auth/AuthContext';
 import { cx } from './ui';
@@ -25,6 +26,7 @@ export const NAV_GROUPS = [
       { to: '/admin/tickets', label: 'Заявки', icon: Inbox },
       { to: '/admin/companies', label: 'Компании', icon: Building2 },
       { to: '/admin/time', label: 'Время', icon: Clock },
+      { to: '/admin/subscriptions', label: 'Абонементы и сроки', icon: Repeat },
       { to: '/admin/configs', label: 'Конфигурации 1С', icon: Database },
       { to: '/admin/sources', label: 'Источники заявок', icon: Compass },
     ],
@@ -38,6 +40,7 @@ export const NAV_GROUPS = [
       { to: '/admin/money/expenses', label: 'Расходы', icon: Coins },
       { to: '/admin/money/entries', label: 'Документы учёта', icon: BookOpen },
       { to: '/admin/money/reports', label: 'Отчёты', icon: PieChart },
+      { to: '/admin/money/rate', label: 'Ставка и безубыточность', icon: Gauge },
     ],
   },
   {

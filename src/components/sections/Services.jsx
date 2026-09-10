@@ -96,6 +96,30 @@ export default function Services() {
             );
           })}
         </div>
+
+        {/* Перечислить умения — половина дела. Человек, дочитавший до
+            конца, хочет знать предмет сделки: что именно он покупает и за
+            сколько. Раньше здесь была только кнопка «обсудить проект» —
+            она отсекает того, кто ещё не готов к переговорам. */}
+        <Reveal>
+          <div className="mt-20 rounded-2xl border border-line bg-white/[0.02] p-8">
+            <p className="text-xs uppercase tracking-[0.3em] text-white/20">Сколько это стоит</p>
+            <p className="mt-4 max-w-2xl text-sm leading-relaxed text-white/45">
+              Разовые доработки и интеграции считаются по часам, оценку я называю
+              до начала работ. Для трёх самых частых работ есть отдельные
+              страницы: что входит, что не входит, сроки и стоимость.
+            </p>
+            <a
+              href="/uslugi"
+              className="mt-6 inline-flex items-center gap-2 text-sm text-primary transition-colors duration-300 hover:text-white"
+            >
+              Работы и цены
+              <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 16 16">
+                <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </a>
+          </div>
+        </Reveal>
       </div>
     </section>
   );
