@@ -16,13 +16,17 @@
  * страниц перестают конкурировать друг с другом.
  */
 
+import { HREFLANG, OG_LOCALE, localeAlternates, localePath } from '@/lib/i18n/locales';
+
 export const SITE_URL = (
   import.meta?.env?.VITE_SITE_URL || 'https://oberon-studio.vercel.app'
 ).replace(/\/$/, '');
 
 export const SITE_NAME = 'Oberon Studio';
 
-const OG_LOCALE = { ru: 'ru_RU', kz: 'kk_KZ', en: 'en_US' };
+/** Картинка для превью ссылки в мессенджере и соцсети. */
+export const OG_IMAGE = `${SITE_URL}/og.png`;
+export const OG_IMAGE_SIZE = { width: 1200, height: 630 };
 
 /** Страницы, которые попадают в карту сайта и получают свои мета-теги. */
 export const SEO_ROUTES = [
@@ -132,9 +136,24 @@ function pageDescription(path, t, lang) {
  * Итоговые мета-данные страницы.
  * cmsText — тексты страницы из CMS (если опубликована), они главнее.
  */
-export function resolvePageSeo({ path, t, lang, cmsText }) {
+export function resolvePageSeo({ path, t, lang, cmsText, localised = true }) {
   const clean = path === '/' ? '/' : path.replace(/\/$/, '');
-  const canonical = `${SITE_URL}${clean === '/' ? '/' : clean}`;
+  const canonical = `${SITE_URL}${localePath(localised ? lang : 'ru', clean)}`;
+
+  // hreflang: три языковые версии этой же страницы плюс x-default.
+  // x-default — русская: запросы про 1С в Казахстане идут на русском,
+  // и отправлять человека «в никуда» ради симметрии незачем.
+  //
+  // localised = false — страница существует только по-русски (разборы по 1С).
+  // Тогда hreflang не ставится вовсе: указать перевод, которого нет, хуже,
+  // чем не указывать ничего.
+  const alternates = localised ? [
+    ...localeAlternates(clean).map((alt) => ({
+      hreflang: alt.hreflang,
+      href: `${SITE_URL}${alt.path}`,
+    })),
+    { hreflang: 'x-default', href: `${SITE_URL}${localePath('ru', clean)}` },
+  ] : [];
 
   const cmsTitle = cmsText?.seo_title || cmsText?.title || null;
   const cmsDesc = cmsText?.seo_desc || cmsText?.subtitle || null;
@@ -150,9 +169,13 @@ export function resolvePageSeo({ path, t, lang, cmsText }) {
     title: clip(title, 90),
     description: clip(cmsDesc || pageDescription(clean, t, lang), 300),
     canonical,
+    alternates,
+    image: OG_IMAGE,
+    imageWidth: OG_IMAGE_SIZE.width,
+    imageHeight: OG_IMAGE_SIZE.height,
     siteName: SITE_NAME,
     ogLocale: OG_LOCALE[lang] || OG_LOCALE.ru,
-    lang: lang === 'kz' ? 'kk' : lang,
+    lang: HREFLANG[lang] || lang,
     type: clean === '/' ? 'website' : 'article',
   };
 }

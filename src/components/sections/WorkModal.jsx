@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Link } from 'react-router-dom';
+import { LocaleLink as Link } from '@/components/nav/LocaleLink';
 import { X, ArrowUpRight } from 'lucide-react';
 import { useLang } from '@/lib/i18n/LangContext';
 import { SITE_SETTINGS } from '@/lib/content/site';

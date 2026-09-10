@@ -19,6 +19,7 @@ import {
   Badge, Button, Empty, ErrorNote, Modal, Panel, Spinner, Stat, StatusBadge,
   Table, Tabs, cmsStatusLabel, cx, dateTime, num,
 } from '@/components/admin/ui';
+import SiteFreshness from '@/components/admin/SiteFreshness';
 import { ItemFields, LOCALES } from '@/components/admin/fields';
 
 export default function SiteContent() {
@@ -76,6 +77,8 @@ export default function SiteContent() {
           Добавить: {current.title_one.toLowerCase()}
         </Button>
       </div>
+
+      <SiteFreshness reason="items" />
       <ErrorNote error={collections.error || items.error || error} />
 
       <Tabs value={current.code} onChange={setCode}

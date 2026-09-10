@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Send, ArrowUpRight, MessageCircle, Phone } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { LocaleLink as Link } from '@/components/nav/LocaleLink';
 import { useLang } from '@/lib/i18n/LangContext';
 import { SITE_SETTINGS } from '@/lib/content/site';
 import { useSettings } from '@/lib/site/SiteContentContext';

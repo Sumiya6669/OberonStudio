@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Link } from 'react-router-dom';
+import { LocaleLink as Link } from '@/components/nav/LocaleLink';
 import { Search, BarChart2 } from 'lucide-react';
 import Reveal from '../core/Reveal';
 import OberonCore from './products/OberonCore';

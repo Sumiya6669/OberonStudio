@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Reveal from '../core/Reveal';
-import { Link } from 'react-router-dom';
+import { LocaleLink as Link } from '@/components/nav/LocaleLink';
 import { useLang } from '@/lib/i18n/LangContext';
 import { useFaq } from '@/lib/site/SiteContentContext';
 import { CONTACT_PATH } from '@/lib/routes';
@@ -25,6 +25,9 @@ export default function FAQ() {
               </h2>
               <p className="text-sm text-white/30 leading-relaxed">{ft.sub}</p>
               <div className="mt-8">
+                <a href="/1c" className="mb-4 block text-sm text-white/40 transition-colors duration-300 hover:text-white/70">
+                  Разборы частых проблем в 1С →
+                </a>
                 <Link to={CONTACT_PATH} className="inline-flex items-center gap-2 text-sm text-primary hover:text-white transition-colors duration-300">
                   {ft.cta}
                   <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 16 16">

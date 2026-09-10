@@ -431,3 +431,40 @@ export const fetchRevisions = async (entity, rowId, limit = 30) =>
 /** Опубликованное содержимое сайта. Той же функцией, что читает публичный сайт. */
 export const fetchSiteContent = async (locale = 'ru') =>
   unwrap(await supabase.rpc('site_content', { p_locale: locale }));
+
+/* ── Пересборка сайта ──────────────────────────────────────────────────────
+ *
+ * Правка в CMS попадает в базу сразу, а на сайт — только со сборкой:
+ * страницы собираются заранее, иначе роботы моделей видят пустой div.
+ * Поэтому панель обязана показывать, что сайт отстал, и уметь его догнать.
+ */
+
+/** Отстал ли собранный сайт от того, что опубликовано в базе. */
+export const fetchSiteFreshness = async () =>
+  unwrap(await appDb.from('v_site_freshness').select('*').maybeSingle());
+
+export const fetchRebuilds = async (limit = 10) =>
+  unwrap(await cmsDb.from('rebuild').select('*')
+    .order('requested_at', { ascending: false }).limit(limit));
+
+/**
+ * Просит сайт пересобраться.
+ *
+ * Через свою функцию /api/rebuild, а не напрямую: адрес пересборки — ключ,
+ * и в браузере его быть не может. Кому можно и как часто — решает база.
+ */
+export async function requestRebuild(reason = 'publish') {
+  const { data } = await supabase.auth.getSession();
+  const token = data?.session?.access_token;
+  if (!token) throw new Error('нужен вход');
+
+  const response = await fetch('/api/rebuild', {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ reason }),
+  });
+
+  const body = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(body.error || `сборка не запустилась (${response.status})`);
+  return body;
+}

@@ -3,7 +3,7 @@ import { motion, useScroll, useTransform } from 'framer-motion';
 import NeuralCanvas from '../core/NeuralCanvas';
 import MagBtn from '../core/MagBtn';
 import Counter from '../core/Counter';
-import { Link } from 'react-router-dom';
+import { LocaleLink as Link } from '@/components/nav/LocaleLink';
 import { useLang } from '@/lib/i18n/LangContext';
 import { CONTACT_PATH, PROJECTS_PATH } from '@/lib/routes';
 

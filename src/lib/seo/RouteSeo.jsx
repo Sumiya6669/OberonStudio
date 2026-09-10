@@ -11,19 +11,24 @@ import { useLocation } from 'react-router-dom';
 import { useLang } from '@/lib/i18n/LangContext';
 import { SITE_SETTINGS } from '@/lib/content/site';
 import {
-  useFaq, usePageText, useProducts, useProjects, useServices, useSettings,
+  useAnswers, useFaq, usePageText, useProducts, useProjects, useServices, useSettings,
 } from '@/lib/site/SiteContentContext';
 import { Seo } from './Seo';
 import { resolvePageSeo } from './pages';
 import {
-  breadcrumbLd, faqLd, organizationLd, productsLd, reviewsLd, servicesLd,
-  websiteLd,
+  answerLd, answersListLd, breadcrumbLd, faqLd, organizationLd, productsLd,
+  reviewsLd, servicesLd, websiteLd,
 } from './jsonld';
+import { SITE_NAME } from './pages';
 import { useTestimonials } from '@/lib/site/SiteContentContext';
 import { buildFallbackTestimonials } from '@/lib/content/portfolio';
+import { splitLocale } from '@/lib/i18n/locales';
 
 export default function RouteSeo() {
-  const { pathname } = useLocation();
+  const { pathname: fullPath } = useLocation();
+  // Язык уже в адресе; всё остальное считается от пути БЕЗ приставки,
+  // иначе `/kz/faq` пришлось бы описывать отдельно от `/faq`.
+  const { path: pathname } = splitLocale(fullPath);
   const { t, lang } = useLang();
   const settings = useSettings(SITE_SETTINGS);
   const cmsText = usePageText(pathname);
@@ -33,11 +38,36 @@ export default function RouteSeo() {
   const products = useProducts();
   const faq = useFaq();
   const reviewsDb = useTestimonials();
+  const answers = useAnswers();
 
-  const seo = React.useMemo(
-    () => resolvePageSeo({ path: pathname, t, lang, cmsText }),
-    [pathname, t, lang, cmsText],
-  );
+  // Разборы по 1С описываются не словарём переводов, а своим содержимым:
+  // заголовок и описание берутся из самой записи.
+  const answer = React.useMemo(() => {
+    if (!pathname.startsWith('/1c/')) return null;
+    const slug = pathname.slice('/1c/'.length).replace(/\/$/, '');
+    return (answers || []).find((a) => a.slug === slug) || null;
+  }, [pathname, answers]);
+
+  const seo = React.useMemo(() => {
+    if (pathname === '/1c') {
+      return {
+        ...resolvePageSeo({ path: '/1c', t, lang, cmsText, localised: false }),
+        pageName: 'Ответы по 1С',
+        title: `Частые вопросы по 1С и что с ними делать — ${SITE_NAME}`,
+        description: 'Разборы частых проблем в 1С: не проводится документ, не грузится выписка из банка, ошибки ЭСФ, тормоза, расхождения остатков. Что проверить самому.',
+      };
+    }
+    if (answer) {
+      return {
+        ...resolvePageSeo({ path: pathname, t, lang, cmsText, localised: false }),
+        pageName: answer.title,
+        title: `${answer.seoTitle || answer.title} — ${SITE_NAME}`,
+        description: answer.seoDesc || answer.lead,
+        type: 'article',
+      };
+    }
+    return resolvePageSeo({ path: pathname, t, lang, cmsText });
+  }, [pathname, t, lang, cmsText, answer]);
 
   const jsonLd = React.useMemo(() => {
     const blocks = [organizationLd(settings), websiteLd()];
@@ -67,6 +97,14 @@ export default function RouteSeo() {
       const block = reviewsLd(list);
       if (block) blocks.push(block);
     }
+    if (pathname === '/1c') {
+      const block = answersListLd(answers);
+      if (block) blocks.push(block);
+    }
+    if (answer) {
+      const block = answerLd(answer);
+      if (block) blocks.push(block);
+    }
     if (pathname === '/projects') {
       // Проекты размечаются на своей странице; список берётся тот же,
       // что показан, — из базы либо из кода.
@@ -81,9 +119,15 @@ export default function RouteSeo() {
       if (block) blocks.push(block);
     }
     return blocks.filter(Boolean);
-  }, [pathname, settings, seo.pageName, seo.title, services, faq, products, projects, reviewsDb, t, lang]);
+  }, [pathname, settings, seo.pageName, seo.title, services, faq, products, projects,
+      reviewsDb, answers, answer, t, lang]);
+
+  const verification = React.useMemo(() => [
+    { name: 'google-site-verification', content: settings.google_verify },
+    { name: 'yandex-verification', content: settings.yandex_verify },
+  ].filter((item) => item.content), [settings.google_verify, settings.yandex_verify]);
 
   // pageName нужен только крошкам, в мета-теги он не идёт.
   const { pageName, ...meta } = seo;
-  return <Seo {...meta} jsonLd={jsonLd} />;
+  return <Seo {...meta} verification={verification} jsonLd={jsonLd} />;
 }

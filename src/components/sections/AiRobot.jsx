@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Link } from 'react-router-dom';
+import { LocaleLink as Link } from '@/components/nav/LocaleLink';
 import { InteractiveRobotSpline } from '@/components/ui/interactive-3d-robot';
 import { useLang } from '@/lib/i18n/LangContext';
 import { CONTACT_PATH } from '@/lib/routes';

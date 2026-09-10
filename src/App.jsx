@@ -1,5 +1,6 @@
 import { Toaster } from "@/components/ui/toaster"
 import { BrowserRouter as Router, Navigate, Route, Routes } from 'react-router-dom';
+import { LOCALE_PREFIX } from '@/lib/i18n/locales';
 import PageNotFound from './lib/PageNotFound';
 import { LangProvider } from '@/lib/i18n/LangContext';
 import { AuthProvider } from '@/lib/auth/AuthContext';
@@ -15,6 +16,8 @@ import StackPage from './pages/StackPage';
 import ReviewsPage from './pages/ReviewsPage';
 import FaqPage from './pages/FaqPage';
 import ContactPage from './pages/ContactPage';
+import AnswersPage from './pages/AnswersPage';
+import AnswerPage from './pages/AnswerPage';
 
 // Админка: своя раскладка, свой вход. Данные защищает RLS в базе,
 // страж маршрута — только удобство.
@@ -45,19 +48,47 @@ import SitePages from './pages/admin/SitePages';
 import SiteContent from './pages/admin/SiteContent';
 import SiteSettings from './pages/admin/SiteSettings';
 
+/**
+ * Страницы публичного сайта. Список отдельно от маршрутов, потому что
+ * каждая страница существует на трёх адресах: `/faq`, `/kz/faq`, `/en/faq`.
+ * Держать их тремя копиями вручную — это гарантированно забыть один
+ * из трёх при следующем добавлении страницы.
+ */
+export const SITE_PAGES = [
+  { path: '/', element: <Home /> },
+  { path: '/services', element: <ServicesPage /> },
+  { path: '/projects', element: <ProjectsPage /> },
+  { path: '/products', element: <ProductsPage /> },
+  { path: '/process', element: <ProcessPage /> },
+  { path: '/stack', element: <StackPage /> },
+  { path: '/reviews', element: <ReviewsPage /> },
+  { path: '/faq', element: <FaqPage /> },
+  { path: '/contact', element: <ContactPage /> },
+];
+
+/** Один и тот же набор страниц под каждой языковой приставкой. */
+const localisedRoutes = () => Object.entries(LOCALE_PREFIX).flatMap(
+  ([lang, prefix]) => SITE_PAGES.map(({ path, element }) => (
+    <Route
+      key={`${lang}:${path}`}
+      path={prefix + (path === '/' ? '' : path) || '/'}
+      element={element}
+    />
+  )),
+);
+
 const AppRoutes = () => (
   <Routes>
-    {/* Публичный сайт: каждый раздел — отдельная страница */}
+    {/* Публичный сайт: каждый раздел — отдельная страница, на трёх языках */}
     <Route element={<SiteLayout />}>
-      <Route path="/" element={<Home />} />
-      <Route path="/services" element={<ServicesPage />} />
-      <Route path="/projects" element={<ProjectsPage />} />
-      <Route path="/products" element={<ProductsPage />} />
-      <Route path="/process" element={<ProcessPage />} />
-      <Route path="/stack" element={<StackPage />} />
-      <Route path="/reviews" element={<ReviewsPage />} />
-      <Route path="/faq" element={<FaqPage />} />
-      <Route path="/contact" element={<ContactPage />} />
+      {localisedRoutes()}
+
+      {/* Разборы конкретных бед в 1С. Только по-русски и намеренно:
+          запросы «не проводится документ 1С» приходят на русском, а
+          казахская и английская версии, собранные ради симметрии, были бы
+          страницами без читателей и с машинным переводом. */}
+      <Route path="/1c" element={<AnswersPage />} />
+      <Route path="/1c/:slug" element={<AnswerPage />} />
     </Route>
 
     {/* Рабочая панель */}
@@ -111,9 +142,9 @@ const AppRoutes = () => (
  * Всё остальное — провайдеры, маршруты, уведомления — общее, и раздваивать
  * его нельзя: разошлись бы разметка сборки и первый кадр в браузере.
  */
-export function AppShell({ initialContent = null, initialLang }) {
+export function AppShell({ initialContent = null }) {
   return (
-    <LangProvider initialLang={initialLang}>
+    <LangProvider>
       {/* Содержимое сайта из базы. Провайдер внутри LangProvider, потому что
           запрос зависит от языка, и снаружи AuthProvider — публичному сайту
           вход не нужен, содержимое читается ключом anon через одну функцию. */}
@@ -128,10 +159,10 @@ export function AppShell({ initialContent = null, initialLang }) {
   );
 }
 
-function App() {
+function App({ initialContent = null }) {
   return (
     <Router>
-      <AppShell />
+      <AppShell initialContent={initialContent} />
     </Router>
   );
 }

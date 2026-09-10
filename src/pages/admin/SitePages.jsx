@@ -16,6 +16,7 @@ import {
   Badge, Button, ErrorNote, Field, Modal, Panel, Spinner, Stat, StatusBadge,
   Table, cmsStatusLabel, cx, dateTime, inputClass,
 } from '@/components/admin/ui';
+import SiteFreshness from '@/components/admin/SiteFreshness';
 import { ItemFields, LOCALES } from '@/components/admin/fields';
 
 const BLOCK_TYPES = [
@@ -82,6 +83,8 @@ export default function SitePages() {
           });
         }}>Новая страница</Button>
       </div>
+
+      <SiteFreshness reason="pages" />
       <ErrorNote error={pages.error || error} />
 
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-3">

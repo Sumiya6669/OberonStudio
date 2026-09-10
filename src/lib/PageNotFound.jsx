@@ -1,4 +1,5 @@
-import { Link, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
+import { LocaleLink as Link } from '@/components/nav/LocaleLink';
 
 export default function PageNotFound() {
   const location = useLocation();

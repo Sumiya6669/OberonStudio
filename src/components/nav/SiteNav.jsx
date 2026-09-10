@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Link, NavLink, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
+import { LocaleLink as Link, LocaleNavLink as NavLink } from '@/components/nav/LocaleLink';
 import {
   Home, Sparkles, FolderKanban, Package, Workflow,
   Layers, Star, HelpCircle, Mail, Menu, X,

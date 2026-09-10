@@ -12,6 +12,7 @@ import { fetchSiteSettings, saveSiteSettings, fetchSiteContent } from '@/lib/sup
 import {
   Button, ErrorNote, Field, Panel, Spinner, Stat, inputClass, dateTime,
 } from '@/components/admin/ui';
+import SiteFreshness from '@/components/admin/SiteFreshness';
 
 const FIELDS = [
   ['telegram', 'Telegram, имя', '@DeveloperAI0'],
@@ -23,6 +24,14 @@ const FIELDS = [
   ['address', 'Адрес', 'город, улица'],
   ['bin', 'БИН', ''],
   ['company_legal', 'Юридическое название', 'ТОО ...'],
+  // Подтверждение прав на сайт. Код выдают Search Console и Вебмастер;
+  // он появляется в мета-тегах после ближайшей сборки сайта.
+  ['google_verify', 'Google Search Console: код подтверждения', 'например aBcD…'],
+  ['yandex_verify', 'Яндекс.Вебмастер: код подтверждения', 'например 1a2b3c…'],
+  // Ссылки на карточки в картах: из них собирается разметка «это одна и
+  // та же организация». Пусто — в разметку ничего не попадёт.
+  ['maps_2gis_url', '2ГИС: ссылка на карточку', 'https://2gis.kz/...'],
+  ['maps_google_url', 'Google Карты: ссылка на карточку', 'https://maps.app.goo.gl/...'],
 ];
 
 export default function SiteSettings() {
@@ -58,6 +67,7 @@ export default function SiteSettings() {
   return (
     <div className="space-y-5">
       <h1 className="text-lg font-semibold tracking-tight">Сайт: настройки</h1>
+      <SiteFreshness reason="settings" />
       <ErrorNote error={settings.error || error} />
 
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">

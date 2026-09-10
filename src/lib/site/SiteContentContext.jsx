@@ -61,6 +61,16 @@ export function SiteContentProvider({ children, initialContent = null }) {
 
 const useContent = () => React.useContext(SiteContentContext).content;
 
+/**
+ * Пришёл ли ответ из базы.
+ *
+ * Нужно там, где «нет записи» и «ещё не спросили» — разные вещи. Для услуг
+ * и отзывов разницы нет: пока нет данных, показывается вариант из кода.
+ * А для разборов по 1С вариант из кода не существует, и поспешное «такой
+ * страницы нет» вместо ожидания — это пустая страница вместо ответа.
+ */
+export const useContentReady = () => React.useContext(SiteContentContext).ready;
+
 /** Записи справочника или null, если ничего не опубликовано. */
 function useCollection(code) {
   const content = useContent();
@@ -168,6 +178,31 @@ export function useProducts() {
     price: it.props?.price ?? null,
     subscription: it.props?.subscription ?? null,
     popular: Boolean(it.props?.popular),
+  })), [items]);
+}
+
+/**
+ * Ответы на конкретные вопросы про 1С — страницы /1c/<slug>.
+ *
+ * Отдаём как есть, включая пустой список: в отличие от услуг и отзывов,
+ * здесь нет варианта «взять из кода». Раздела просто нет, пока в панели
+ * ничего не опубликовано, — и это правильнее, чем показать заготовку.
+ */
+export function useAnswers() {
+  const items = useCollection('answer');
+  return React.useMemo(() => items && items.map((it) => ({
+    slug: it.slug,
+    title: it.text?.title || '',
+    question: it.text?.question || '',
+    lead: it.text?.lead || '',
+    symptoms: it.text?.symptoms || [],
+    causes: it.text?.causes || [],
+    steps: it.text?.steps || [],
+    callUs: it.text?.call_us || '',
+    seoTitle: it.text?.seo_title || '',
+    seoDesc: it.text?.seo_desc || '',
+    topic: it.props?.topic || null,
+    icon: it.props?.icon || '•',
   })), [items]);
 }
 

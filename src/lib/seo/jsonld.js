@@ -24,7 +24,13 @@ const clean = (obj) => {
 
 /** Кто мы. Ссылки на мессенджеры — из настроек сайта, а не из головы. */
 export function organizationLd(settings = {}) {
-  const sameAs = [settings.telegram_url, settings.whatsapp_url].filter(Boolean);
+  // sameAs — «это та же организация, что и вон там». Карточки в 2ГИС и
+  // Google Картах здесь работают сильнее соцсетей: по ним поиск связывает
+  // сайт с реальной точкой на карте.
+  const sameAs = [
+    settings.telegram_url, settings.whatsapp_url,
+    settings.maps_2gis_url, settings.maps_google_url,
+  ].filter(Boolean);
 
   const contactPoint = [];
   if (settings.email || settings.phone) {
@@ -206,6 +212,52 @@ export function productsLd(products) {
             }
           : undefined,
       }),
+    })),
+  };
+}
+
+/**
+ * Разбор одной беды в 1С.
+ *
+ * Размечается как вопрос с ответом, а не как статья: страница и написана
+ * как ответ на запрос человека своими словами. Именно из такой разметки
+ * блок ответа в поиске и модель берут текст. В ответ идёт короткое
+ * объяснение плюс то, что можно проверить самому, — то есть ровно то, что
+ * на странице; разметка, обещающая больше страницы, вредна.
+ */
+export function answerLd(answer) {
+  if (!answer?.question || !answer?.lead) return null;
+
+  const steps = (answer.steps || []).filter(Boolean);
+  const text = steps.length
+    ? `${answer.lead}\n\nЧто проверить: ${steps.join('; ')}.`
+    : answer.lead;
+
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'QAPage',
+    mainEntity: {
+      '@type': 'Question',
+      name: answer.question,
+      text: answer.title || answer.question,
+      answerCount: 1,
+      acceptedAnswer: { '@type': 'Answer', text },
+    },
+  };
+}
+
+/** Список разборов — обычный перечень ссылок, без обещаний. */
+export function answersListLd(answers) {
+  if (!answers?.length) return null;
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'Частые вопросы по 1С',
+    itemListElement: answers.slice(0, 50).map((a, i) => ({
+      '@type': 'ListItem',
+      position: i + 1,
+      name: a.title,
+      url: `${SITE_URL}/1c/${a.slug}`,
     })),
   };
 }

@@ -39,6 +39,19 @@ const ROUTES = [
   '/process', '/stack', '/reviews', '/faq', '/contact',
 ];
 
+/**
+ * Языки и приставки в адресе. Русский — корень сайта и x-default.
+ * Здесь список продублирован из src/lib/i18n/locales.js намеренно: скрипт
+ * сборки запускается обычным node, без псевдонимов путей Vite.
+ */
+const LOCALES = [
+  { lang: 'ru', prefix: '',    hreflang: 'ru' },
+  { lang: 'kz', prefix: '/kz', hreflang: 'kk' },
+  { lang: 'en', prefix: '/en', hreflang: 'en' },
+];
+
+const localeUrl = (prefix, route) => `${prefix}${route === '/' ? '' : route}` || '/';
+
 /** Краулеры моделей. Пускаем осознанно: без них раздела GEO просто нет. */
 const AI_CRAWLERS = [
   'GPTBot', 'OAI-SearchBot', 'ChatGPT-User',
@@ -88,13 +101,31 @@ async function loadContent(locale = 'ru') {
   }
 }
 
-function outFile(route) {
-  return route === '/'
-    ? path.join(DIST, 'index.html')
-    : path.join(DIST, route.replace(/^\//, ''), 'index.html');
+/**
+ * Содержимое, вшитое в страницу.
+ *
+ * Без него первый кадр в браузере не совпадает с собранным HTML: разметку
+ * собирали с данными из CMS, а браузер стартует пустым и рисует запасной
+ * вариант из кода. React это замечает как расхождение гидратации и
+ * перерисовывает поддерево — человек видит, как текст подменяется.
+ *
+ * Поэтому те же самые данные едут вместе со страницей. Экранируется только
+ * «<», и именно он: последовательность </script> внутри JSON закрыла бы
+ * тег раньше времени.
+ */
+function embedContent(content) {
+  if (!content) return '';
+  const json = JSON.stringify(content).replace(/</g, '\\u003c');
+  return `<script id="site-content" type="application/json">${json}</script>`;
 }
 
-function buildSitemap(routes, content) {
+function outFile(url) {
+  return url === '/'
+    ? path.join(DIST, 'index.html')
+    : path.join(DIST, url.replace(/^\//, ''), 'index.html');
+}
+
+function buildSitemap(routes, content, ruOnly = []) {
   const lastmod = content?.updated_at
     ? new Date(content.updated_at).toISOString().slice(0, 10)
     : new Date().toISOString().slice(0, 10);
@@ -103,17 +134,44 @@ function buildSitemap(routes, content) {
   // магические: это подсказка обходчику, а не обещание.
   const weight = (route) => (route === '/' ? '1.0' : route === '/contact' ? '0.6' : '0.8');
 
-  const urls = routes.map((route) => [
-    '  <url>',
-    `    <loc>${SITE_URL}${route === '/' ? '/' : route}</loc>`,
-    `    <lastmod>${lastmod}</lastmod>`,
-    `    <priority>${weight(route)}</priority>`,
-    '  </url>',
-  ].join('\n')).join('\n');
+  // Каждый языковой адрес — отдельная запись, и в каждой перечислены все
+  // три версии. Так поисковик понимает, что это одна страница на трёх
+  // языках, а не три похожие страницы, конкурирующие между собой.
+  const entries = [];
+  for (const route of routes) {
+    const alternates = LOCALES.map(({ prefix, hreflang }) =>
+      `    <xhtml:link rel="alternate" hreflang="${hreflang}" href="${SITE_URL}${localeUrl(prefix, route)}"/>`);
+    alternates.push(
+      `    <xhtml:link rel="alternate" hreflang="x-default" href="${SITE_URL}${localeUrl('', route)}"/>`);
+
+    for (const { prefix } of LOCALES) {
+      entries.push([
+        '  <url>',
+        `    <loc>${SITE_URL}${localeUrl(prefix, route)}</loc>`,
+        ...alternates,
+        `    <lastmod>${lastmod}</lastmod>`,
+        `    <priority>${weight(route)}</priority>`,
+        '  </url>',
+      ].join('\n'));
+    }
+  }
+
+  // Разборы по 1С существуют только по-русски, поэтому идут без alternate:
+  // ссылка на перевод, которого нет, — это обещание, которое сайт не держит.
+  for (const url of ruOnly) {
+    entries.push([
+      '  <url>',
+      `    <loc>${SITE_URL}${url}</loc>`,
+      `    <lastmod>${lastmod}</lastmod>`,
+      '    <priority>0.7</priority>',
+      '  </url>',
+    ].join('\n'));
+  }
 
   return `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-${urls}
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+${entries.join('\n')}
 </urlset>
 `;
 }
@@ -141,6 +199,10 @@ Sitemap: ${SITE_URL}/sitemap.xml
 /** Короткая карта сайта для агентов: складывающаяся, но дешёвая договорённость. */
 function buildLlmsTxt(content) {
   const settings = content?.settings || {};
+  const answers = (content?.collections?.answer || [])
+    .filter((item) => item?.slug)
+    .map((item) => `- [${item.text?.title || item.slug}](${SITE_URL}/1c/${item.slug}): ${item.text?.question || ''}`)
+    .join('\n');
   const contacts = [
     settings.telegram_url && `- Telegram: ${settings.telegram_url}`,
     settings.whatsapp_url && `- WhatsApp: ${settings.whatsapp_url}`,
@@ -164,6 +226,7 @@ function buildLlmsTxt(content) {
 - [Вопросы](${SITE_URL}/faq): частые вопросы и ответы
 - [Контакты](${SITE_URL}/contact): связаться
 
+${answers.length ? `## Разборы частых проблем 1С\n\n${answers}\n` : ''}
 ${contacts ? `## Связаться\n\n${contacts}\n` : ''}`;
 }
 
@@ -195,27 +258,40 @@ async function main() {
   }
 
   const { render } = await import(SSR);
-  const content = await loadContent('ru');
+
+  // Содержимое CMS запрашивается один раз на язык, а не на страницу.
+  const contentByLang = {};
+  for (const { lang } of LOCALES) {
+    const data = await loadContent(lang);
+    // Провайдер в приложении раскладывает содержимое по языкам, поэтому
+    // язык должен быть внутри самих данных, а не только в имени переменной.
+    contentByLang[lang] = data ? { ...data, locale: lang } : null;
+  }
 
   let done = 0;
   for (const route of ROUTES) {
-    const { html, head } = render(route, { content, lang: 'ru' });
+    for (const { lang, prefix } of LOCALES) {
+      const url = localeUrl(prefix, route);
+      const { html, head } = render(url, { content: contentByLang[lang] });
 
-    const page = template
-      .replace(
-        /<!--seo-->[\s\S]*?<!--\/seo-->/,
-        `<!--seo-->\n    ${head}\n    <!--/seo-->`,
-      )
-      // Пометка для браузера: разметка пришла собранной. По ней LangProvider
-      // понимает, что первый кадр обязан совпасть с русской версией.
-      .replace('<html lang="ru">', '<html lang="ru" data-prerendered="1">')
-      .replace('<div id="root"></div>', `<div id="root">${html}</div>`);
+      const page = template
+        .replace(
+          /<!--seo-->[\s\S]*?<!--\/seo-->/,
+          `<!--seo-->\n    ${head}\n    <!--/seo-->`,
+        )
+        // Пометка для отладки: страница пришла собранной, а не отрисована
+        // браузером. Язык здесь же — по нему видно, что собралось.
+        .replace('<html lang="ru">',
+          `<html lang="${lang === 'kz' ? 'kk' : lang}" data-prerendered="1">`)
+        .replace('<div id="root"></div>', `<div id="root">${html}</div>`)
+        .replace('</body>', `  ${embedContent(contentByLang[lang])}\n  </body>`);
 
-    const file = outFile(route);
-    await mkdir(path.dirname(file), { recursive: true });
-    await writeFile(file, page, 'utf8');
-    done += 1;
-    log(`${route.padEnd(12)} → ${path.relative(ROOT, file)}  (${Math.round(page.length / 1024)} КБ)`);
+      const file = outFile(url);
+      await mkdir(path.dirname(file), { recursive: true });
+      await writeFile(file, page, 'utf8');
+      done += 1;
+      log(`${url.padEnd(16)} → ${path.relative(ROOT, file)}  (${Math.round(page.length / 1024)} КБ)`);
+    }
   }
 
   // Пустая оболочка для маршрутов, которые заранее не собираются: панель
@@ -238,9 +314,32 @@ async function main() {
   await mkdir(path.join(DIST, 'admin'), { recursive: true });
   await writeFile(path.join(DIST, 'admin', 'index.html'), template, 'utf8');
 
-  await writeFile(path.join(DIST, 'sitemap.xml'), buildSitemap(ROUTES, content), 'utf8');
+  // Разборы по 1С: адреса берутся из опубликованного, а не из списка в коде.
+  // Добавили разбор в панели — он появится на сайте следующей сборкой сам.
+  const ru = contentByLang.ru;
+  const answers = (ru?.collections?.answer || [])
+    .map((item) => item?.slug)
+    .filter(Boolean);
+  const answerUrls = ['/1c', ...answers.map((slug) => `/1c/${slug}`)];
+
+  for (const url of answerUrls) {
+    const { html, head } = render(url, { content: ru });
+    const page = template
+      .replace(/<!--seo-->[\s\S]*?<!--\/seo-->/, `<!--seo-->\n    ${head}\n    <!--\/seo-->`)
+      .replace('<html lang="ru">', '<html lang="ru" data-prerendered="1">')
+      .replace('<div id="root"></div>', `<div id="root">${html}</div>`)
+      .replace('</body>', `  ${embedContent(ru)}\n  </body>`);
+    const file = outFile(url);
+    await mkdir(path.dirname(file), { recursive: true });
+    await writeFile(file, page, 'utf8');
+    done += 1;
+    log(`${url.padEnd(16)} → ${path.relative(ROOT, file)}  (${Math.round(page.length / 1024)} КБ)`);
+  }
+
+  await writeFile(path.join(DIST, 'sitemap.xml'),
+    buildSitemap(ROUTES, ru, answerUrls), 'utf8');
   await writeFile(path.join(DIST, 'robots.txt'), buildRobots(), 'utf8');
-  await writeFile(path.join(DIST, 'llms.txt'), buildLlmsTxt(content), 'utf8');
+  await writeFile(path.join(DIST, 'llms.txt'), buildLlmsTxt(ru), 'utf8');
 
   log(`собрано страниц: ${done}; app.html, admin/index.html, sitemap.xml, robots.txt, llms.txt на месте`);
 }

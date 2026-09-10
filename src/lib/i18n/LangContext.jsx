@@ -1,47 +1,41 @@
-import React, {
-  createContext, useContext, useState, useMemo, useLayoutEffect, useEffect,
-} from 'react';
-import { translations, getStoredLang, setStoredLang } from './index';
+import React, { createContext, useContext, useMemo } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { translations, setStoredLang } from './index';
+import { DEFAULT_LANG, localePath, splitLocale } from './locales';
 
 const LangContext = createContext(null);
 
 /**
- * Страница отдана уже собранной на сборке. Тогда в разметке русский язык,
- * и первый кадр в браузере обязан совпасть с ней — иначе гидратация
- * разойдётся с разметкой, а человек увидит подмену текста.
+ * Язык берётся из адреса страницы и больше ниоткуда.
+ *
+ * Раньше он брался из localStorage, и это приходилось примирять с
+ * предрендером: разметка приезжала русской, а браузер тут же переключал
+ * язык. Теперь примирять нечего — `/kz/faq` по-казахски и на сборке, и в
+ * браузере, и у робота. Заодно исчез весь код про «первый кадр обязан
+ * совпасть»: совпадать нечему, состояние выводится из одного и того же
+ * адреса.
+ *
+ * Переключатель языка не меняет состояние, а ПЕРЕХОДИТ на другой адрес.
  */
-const PRERENDERED =
-  typeof document !== 'undefined' &&
-  document.documentElement.getAttribute('data-prerendered') === '1';
+export function LangProvider({ children }) {
+  const { pathname, search, hash } = useLocation();
+  const navigate = useNavigate();
+  const { lang, path } = splitLocale(pathname);
 
-const useIsoLayoutEffect = typeof window !== 'undefined' ? useLayoutEffect : useEffect;
+  const value = useMemo(() => ({
+    lang,
+    t: translations[lang] || translations[DEFAULT_LANG],
+    setLang: (code) => {
+      if (!translations[code] || code === lang) return;
+      // Выбор запоминаем — но только чтобы подсветить его в переключателе
+      // на других устройствах человека; на то, что показывает страница,
+      // он не влияет.
+      setStoredLang(code);
+      navigate(`${localePath(code, path)}${search || ''}${hash || ''}`);
+    },
+  }), [lang, path, search, hash, navigate]);
 
-export function LangProvider({ children, initialLang }) {
-  const [lang, setLangState] = useState(
-    () => initialLang || (PRERENDERED ? 'ru' : getStoredLang()),
-  );
-
-  // Сохранённый язык подставляется ДО первой отрисовки: смена состояния
-  // в layout-эффекте успевает пройти до кадра, поэтому мигания нет.
-  useIsoLayoutEffect(() => {
-    if (!PRERENDERED) return;
-    const stored = getStoredLang();
-    if (stored !== lang) setLangState(stored);
-    // Только один раз, на монтировании.
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
-
-  const setLang = (code) => {
-    setLangState(code);
-    setStoredLang(code);
-  };
-
-  const t = useMemo(() => translations[lang], [lang]);
-
-  return (
-    <LangContext.Provider value={{ lang, setLang, t }}>
-      {children}
-    </LangContext.Provider>
-  );
+  return <LangContext.Provider value={value}>{children}</LangContext.Provider>;
 }
 
 export function useLang() {

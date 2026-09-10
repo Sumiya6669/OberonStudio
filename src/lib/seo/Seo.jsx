@@ -50,12 +50,26 @@ function buildTags(seo) {
   meta('property', 'og:url', seo.canonical);
   meta('property', 'og:site_name', seo.siteName);
   meta('property', 'og:locale', seo.ogLocale);
-  if (seo.image) meta('property', 'og:image', seo.image);
+  if (seo.image) {
+    meta('property', 'og:image', seo.image);
+    // Размер обязателен: без него мессенджер часто рисует не карточку с
+    // широкой картинкой, а маленькую иконку сбоку.
+    if (seo.imageWidth) meta('property', 'og:image:width', String(seo.imageWidth));
+    if (seo.imageHeight) meta('property', 'og:image:height', String(seo.imageHeight));
+    meta('property', 'og:image:alt', seo.title);
+  }
 
   meta('name', 'twitter:card', seo.image ? 'summary_large_image' : 'summary');
   meta('name', 'twitter:title', seo.title);
   meta('name', 'twitter:description', seo.description);
   if (seo.image) meta('name', 'twitter:image', seo.image);
+
+  // Подтверждение прав на сайт для Search Console и Вебмастера. Коды
+  // задаются в панели: просить программиста ради строчки в head — верный
+  // способ отложить регистрацию в поиске на месяц.
+  for (const item of seo.verification || []) {
+    if (item?.name && item?.content) meta('name', item.name, item.content);
+  }
 
   if (seo.canonical) {
     tags.push({ tag: 'link', attrs: { rel: 'canonical', href: seo.canonical } });

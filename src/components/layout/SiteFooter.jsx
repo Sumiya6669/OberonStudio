@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { LocaleLink as Link } from '@/components/nav/LocaleLink';
 import Reveal from '../core/Reveal';
 import { useLang } from '@/lib/i18n/LangContext';
 import { SITE_ROUTES } from '@/lib/routes';
@@ -39,6 +39,15 @@ export default function SiteFooter() {
                   {t.nav[route.navKey]}
                 </Link>
               ))}
+              {/* Разборы по 1С только по-русски, поэтому ссылка ведёт в
+                  русскую версию из любой языковой: страницы на других
+                  языках нет, и притворяться незачем. */}
+              <a
+                href="/1c"
+                className="text-xs text-white/25 hover:text-white/60 transition-colors duration-300"
+              >
+                Ответы по 1С
+              </a>
             </nav>
           </div>
 
