@@ -120,7 +120,7 @@ ${urls}
 
 function buildRobots() {
   const allowAi = AI_CRAWLERS.map(
-    (bot) => `User-agent: ${bot}\nAllow: /\nDisallow: /admin\n`,
+    (bot) => `User-agent: ${bot}\nAllow: /\nDisallow: /admin\nDisallow: /app.html\n`,
   ).join('\n');
 
   return `# Панель управления в поиске не нужна.
@@ -128,6 +128,7 @@ User-agent: *
 Allow: /
 Disallow: /admin
 Disallow: /api
+Disallow: /app.html
 
 # Краулеры моделей пускаем осознанно: именно они решают, попадёт ли студия
 # в ответ, когда человек спрашивает про 1С в Казахстане. Запрет по умолчанию
@@ -227,11 +228,21 @@ async function main() {
   // обычным образом, как панель и работала всегда.
   await writeFile(path.join(DIST, 'app.html'), template, 'utf8');
 
+  // Та же оболочка вторым файлом — как настоящая страница /admin.
+  //
+  // Зачем дубль. Переписывание адреса (rewrites) — это правило, которое
+  // выполняется ПОСЛЕ поиска файла. Пока /admin существует файлом, вход в
+  // панель не зависит от правил вообще: сколько бы раз ни менялась
+  // маршрутизация, эта дверь открыта. Вложенные адреса панели
+  // (/admin/money и прочие) по-прежнему приходят через правило.
+  await mkdir(path.join(DIST, 'admin'), { recursive: true });
+  await writeFile(path.join(DIST, 'admin', 'index.html'), template, 'utf8');
+
   await writeFile(path.join(DIST, 'sitemap.xml'), buildSitemap(ROUTES, content), 'utf8');
   await writeFile(path.join(DIST, 'robots.txt'), buildRobots(), 'utf8');
   await writeFile(path.join(DIST, 'llms.txt'), buildLlmsTxt(content), 'utf8');
 
-  log(`собрано страниц: ${done}; app.html, sitemap.xml, robots.txt, llms.txt на месте`);
+  log(`собрано страниц: ${done}; app.html, admin/index.html, sitemap.xml, robots.txt, llms.txt на месте`);
 }
 
 main().catch((error) => {
