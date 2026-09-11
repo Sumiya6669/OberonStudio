@@ -59,6 +59,9 @@ export default function CrmSubscriptions() {
   const rows = subs.data || [];
   const active = rows.filter((r) => r.status === 'active');
   const mrr = active.reduce((s, r) => s + Number(r.price || 0), 0);
+  // Тариф «без абонемента» цены не имеет по смыслу, поэтому в счёт не идёт.
+  const plansPriced = (plans.data || [])
+    .some((p) => p.code !== 'default' && Number(p.price) > 0);
   const now = (month.data || [])[0];
   const overdue = breach.data || [];
 
@@ -113,8 +116,13 @@ export default function CrmSubscriptions() {
 
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <Stat label="Действующих абонементов" value={active.length} />
+        {/* Ноль бывает по двум разным причинам, и лечатся они по-разному:
+            либо тарифы без цены, либо цены есть, а продаж нет. Одна и та же
+            подпись на оба случая отправляет чинить не то. */}
         <Stat label="Повторяемый доход в месяц" value={money(mrr)}
-              hint={mrr === 0 ? 'цены абонементов не заданы' : null}
+              hint={mrr > 0 ? null
+                : plansPriced ? 'абонементов пока не продано'
+                : 'цены абонементов не заданы'}
               tone={mrr === 0 ? 'warn' : 'default'} />
         <Stat label="Обещаний в срок за месяц"
               value={now?.promised ? `${now.in_time} из ${now.promised}` : '—'}
