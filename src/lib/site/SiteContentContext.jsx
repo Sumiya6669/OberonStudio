@@ -236,6 +236,31 @@ export function useOffers() {
 }
 
 /**
+ * Кейсы — работы, которые были. Раздел живёт по тем же правилам, что и
+ * разборы: только русский язык и только то, что делалось на самом деле.
+ */
+export function useCases() {
+  const items = useCollection('case');
+  return React.useMemo(() => items && items.map((it) => ({
+    slug: it.slug,
+    title: it.text?.title || '',
+    tagline: it.text?.tagline || '',
+    who: it.text?.who || '',
+    situation: it.text?.situation || '',
+    work: it.text?.work || [],
+    result: it.text?.result || '',
+    caveat: it.text?.caveat || '',
+    term: it.text?.term || '',
+    seoTitle: it.text?.seo_title || '',
+    seoDesc: it.text?.seo_desc || '',
+    stack: it.props?.stack || [],
+    icon: it.props?.icon || '•',
+    offerSlug: it.props?.offer_slug || '',
+    accent: Boolean(it.props?.accent),
+  })), [items]);
+}
+
+/**
  * Настройки сайта: то, что задано в панели, поверх зашитого в код.
  *
  * Слияние, а не замена. Пустое или незаданное значение в базе не стирает

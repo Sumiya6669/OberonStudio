@@ -313,6 +313,42 @@ export function offerLd(offer) {
   });
 }
 
+/**
+ * Кейс. Размечается как Article, а не как Review или CreativeWork с
+ * рейтингом: отзыва клиента здесь нет, и притворяться, что он есть,
+ * нельзя — это ровно та разметка, за которую поисковик наказывает.
+ */
+export function caseLd(item) {
+  if (!item?.title) return null;
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: item.title,
+    description: item.seoDesc || item.tagline || '',
+    articleSection: 'Кейсы',
+    inLanguage: 'ru',
+    url: `${SITE_URL}/keysy/${item.slug}`,
+    author: { '@type': 'Organization', name: SITE_NAME, url: `${SITE_URL}/` },
+    publisher: { '@type': 'Organization', name: SITE_NAME, url: `${SITE_URL}/` },
+  };
+}
+
+/** Список кейсов — перечень ссылок, без обещаний и без оценок. */
+export function casesListLd(items) {
+  if (!items?.length) return null;
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'Кейсы Oberon Studio',
+    itemListElement: items.slice(0, 50).map((c, i) => ({
+      '@type': 'ListItem',
+      position: i + 1,
+      name: c.title,
+      url: `${SITE_URL}/keysy/${c.slug}`,
+    })),
+  };
+}
+
 export function offersListLd(offers) {
   if (!offers?.length) return null;
   return {

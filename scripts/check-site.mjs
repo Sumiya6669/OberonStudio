@@ -29,7 +29,7 @@ const DIST = resolve(args.find((a) => !a.startsWith('--') && a !== BASE) || 'dis
 
 const LOCALES = ['ru', 'kk', 'en'];
 /** Разделы только на русском: у них не должно быть языковых альтернатив. */
-const RU_ONLY = [/^\/1c(\/|$)/, /^\/uslugi(\/|$)/];
+const RU_ONLY = [/^\/1c(\/|$)/, /^\/uslugi(\/|$)/, /^\/keysy(\/|$)/];
 
 let failed = 0;
 let passed = 0;

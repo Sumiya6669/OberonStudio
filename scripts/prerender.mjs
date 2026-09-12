@@ -327,6 +327,7 @@ async function main() {
   const RU_SECTIONS = [
     { base: '/1c',     collection: 'answer' },
     { base: '/uslugi', collection: 'offer' },
+    { base: '/keysy',  collection: 'case' },
   ];
 
   const ruOnlyUrls = [];

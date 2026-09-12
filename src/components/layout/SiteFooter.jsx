@@ -54,6 +54,12 @@ export default function SiteFooter() {
               >
                 Ответы по 1С
               </a>
+              <a
+                href="/keysy"
+                className="text-xs text-white/25 hover:text-white/60 transition-colors duration-300"
+              >
+                Кейсы
+              </a>
             </nav>
           </div>
 

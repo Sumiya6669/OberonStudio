@@ -11,12 +11,13 @@ import { useLocation } from 'react-router-dom';
 import { useLang } from '@/lib/i18n/LangContext';
 import { SITE_SETTINGS } from '@/lib/content/site';
 import {
-  useAnswers, useFaq, useOffers, usePageText, useProducts, useProjects, useServices, useSettings,
+  useAnswers, useCases, useFaq, useOffers, usePageText, useProducts, useProjects, useServices,
+  useSettings,
 } from '@/lib/site/SiteContentContext';
 import { Seo } from './Seo';
 import { resolvePageSeo } from './pages';
 import {
-  answerLd, answersListLd, breadcrumbLd, faqLd, offerLd, offersListLd,
+  answerLd, answersListLd, breadcrumbLd, caseLd, casesListLd, faqLd, offerLd, offersListLd,
   organizationLd, productsLd, reviewsLd, servicesLd, websiteLd,
 } from './jsonld';
 import { SITE_NAME } from './pages';
@@ -40,6 +41,7 @@ export default function RouteSeo() {
   const reviewsDb = useTestimonials();
   const answers = useAnswers();
   const offers = useOffers();
+  const cases = useCases();
 
   // Разборы по 1С описываются не словарём переводов, а своим содержимым:
   // заголовок и описание берутся из самой записи.
@@ -55,7 +57,30 @@ export default function RouteSeo() {
     return (offers || []).find((o) => o.slug === slug) || null;
   }, [pathname, offers]);
 
+  const kase = React.useMemo(() => {
+    if (!pathname.startsWith('/keysy/')) return null;
+    const slug = pathname.slice('/keysy/'.length).replace(/\/$/, '');
+    return (cases || []).find((c) => c.slug === slug) || null;
+  }, [pathname, cases]);
+
   const seo = React.useMemo(() => {
+    if (pathname === '/keysy') {
+      return {
+        ...resolvePageSeo({ path: '/keysy', t, lang, cmsText, localised: false }),
+        pageName: 'Кейсы',
+        title: `Кейсы: работы по 1С и автоматизации — ${SITE_NAME}`,
+        description: 'Что уже делалось: интеграция оборудования с 1С, разбор доработанной конфигурации с пятилетней историей, работа в двух локализациях, отчёты вместо Excel, перенос доработок в расширения.',
+      };
+    }
+    if (kase) {
+      return {
+        ...resolvePageSeo({ path: pathname, t, lang, cmsText, localised: false }),
+        pageName: kase.title,
+        title: `${kase.seoTitle || kase.title} — ${SITE_NAME}`,
+        description: kase.seoDesc || kase.tagline,
+        type: 'article',
+      };
+    }
     if (pathname === '/uslugi') {
       return {
         ...resolvePageSeo({ path: '/uslugi', t, lang, cmsText, localised: false }),
@@ -91,7 +116,7 @@ export default function RouteSeo() {
       };
     }
     return resolvePageSeo({ path: pathname, t, lang, cmsText });
-  }, [pathname, t, lang, cmsText, answer, offer]);
+  }, [pathname, t, lang, cmsText, answer, offer, kase]);
 
   const jsonLd = React.useMemo(() => {
     const blocks = [organizationLd(settings), websiteLd()];
@@ -101,6 +126,7 @@ export default function RouteSeo() {
     const parents = [];
     if (/^\/1c\/.+/.test(pathname)) parents.push({ name: 'Ответы по 1С', path: '/1c' });
     if (/^\/uslugi\/.+/.test(pathname)) parents.push({ name: 'Работы и цены', path: '/uslugi' });
+    if (/^\/keysy\/.+/.test(pathname)) parents.push({ name: 'Кейсы', path: '/keysy' });
     const crumb = breadcrumbLd(pathname, seo.pageName || seo.title, parents);
     if (crumb) blocks.push(crumb);
 
@@ -143,6 +169,14 @@ export default function RouteSeo() {
       const block = offersListLd(offers);
       if (block) blocks.push(block);
     }
+    if (pathname === '/keysy') {
+      const block = casesListLd(cases);
+      if (block) blocks.push(block);
+    }
+    if (kase) {
+      const block = caseLd(kase);
+      if (block) blocks.push(block);
+    }
     if (pathname === '/projects') {
       // Проекты размечаются на своей странице; список берётся тот же,
       // что показан, — из базы либо из кода.
@@ -158,7 +192,7 @@ export default function RouteSeo() {
     }
     return blocks.filter(Boolean);
   }, [pathname, settings, seo.pageName, seo.title, services, faq, products, projects,
-      reviewsDb, answers, answer, offers, offer, t, lang]);
+      reviewsDb, answers, answer, offers, offer, cases, kase, t, lang]);
 
   const verification = React.useMemo(() => [
     { name: 'google-site-verification', content: settings.google_verify },

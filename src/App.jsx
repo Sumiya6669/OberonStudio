@@ -19,6 +19,8 @@ import ContactPage from './pages/ContactPage';
 import AnswersPage from './pages/AnswersPage';
 import OffersPage from './pages/OffersPage';
 import OfferPage from './pages/OfferPage';
+import CasesPage from './pages/CasesPage';
+import CasePage from './pages/CasePage';
 import AnswerPage from './pages/AnswerPage';
 
 // Админка: своя раскладка, свой вход. Данные защищает RLS в базе,
@@ -100,6 +102,8 @@ const AppRoutes = () => (
           разговора — обещание, которое нечем поддержать. */}
       <Route path="/uslugi" element={<OffersPage />} />
       <Route path="/uslugi/:slug" element={<OfferPage />} />
+      <Route path="/keysy" element={<CasesPage />} />
+      <Route path="/keysy/:slug" element={<CasePage />} />
     </Route>
 
     {/* Рабочая панель */}
