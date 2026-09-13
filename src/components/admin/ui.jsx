@@ -3,7 +3,7 @@
  * пережить обновление зависимостей публичного сайта, а её вид — три класса.
  */
 import React from 'react';
-import { Loader2 } from 'lucide-react';
+import Mark from '@/components/brand/Mark';
 
 export const cx = (...parts) => parts.filter(Boolean).join(' ');
 
@@ -95,9 +95,15 @@ export function Button({ variant = 'primary', className, disabled, children, ...
   );
 }
 
-export const Spinner = () => (
-  <div className="flex items-center justify-center gap-2 py-10 text-sm text-muted-foreground">
-    <Loader2 className="h-4 w-4 animate-spin" /> загружаем
+/**
+ * Загрузчик — не универсальное крутящееся колесо, а свой знак: губки тисков
+ * дышат, заготовка поджимается. Ожидание становится частью бренда, а не
+ * заимствованной иконкой из библиотеки.
+ */
+export const Spinner = ({ label = 'загружаем' }) => (
+  <div className="flex items-center justify-center gap-2.5 py-10 text-sm text-muted-foreground">
+    <Mark size={22} variant="loop" className="text-foreground/70" />
+    {label}
   </div>
 );
 

@@ -16,7 +16,7 @@ const ICONS = { Home, Sparkles, FolderKanban, Package, Workflow, Layers, Star, H
 function Logo({ onClick }) {
   return (
     <Link to="/" onClick={onClick} className="group flex items-center gap-3">
-      <Mark size={34} className="flex-shrink-0 text-white/85 transition-opacity duration-300 group-hover:opacity-80" title="Tinker" />
+      <Mark size={34} variant="reveal" className="flex-shrink-0 text-white/85 transition-opacity duration-300 group-hover:opacity-80" title="Tinker" />
       <div className="min-w-0">
         <p className="text-sm font-semibold text-white/85 tracking-tight leading-tight">Tinker</p>
         <p className="text-[10px] text-white/25 leading-tight">1С · интеграции · автоматизация</p>

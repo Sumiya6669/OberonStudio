@@ -120,6 +120,43 @@
 .glow-violet-strong { box-shadow: 0 0 40px hsl(252 100% 68% / 0.4), 0 0 80px hsl(252 100% 68% / 0.15); }
 .glow-text { text-shadow: 0 0 80px hsl(252 100% 68% / 0.4); }
 
+
+/* ── Знак Tinker ──────────────────────────────────────────────────────────
+ * Одна техника на логотип: губки сводятся, буква садится. Не «и то, и это».
+ * Геометрия знака не искажается: только сдвиг, РАВНОМЕРНЫЙ масштаб и прозрачность.
+ * Сплющивание по одной оси испортило бы букву, поэтому его здесь нет.
+ */
+.mark__jaw    { transform-origin: 100px 100px; }
+.mark__tee    { transform-origin: 100px 104px; }
+
+/* Появление: 0,85 с, один раз */
+.mark--reveal .mark__jaw--l { animation: jaw-in-l .45s cubic-bezier(.22,1,.36,1) both; }
+.mark--reveal .mark__jaw--r { animation: jaw-in-r .45s cubic-bezier(.22,1,.36,1) both; }
+.mark--reveal .mark__tee    { animation: tee-settle .5s cubic-bezier(.34,1.4,.64,1) .28s both; }
+
+@keyframes jaw-in-l  { from { transform: translateX(-20px); opacity: 0 } to { transform: none; opacity: 1 } }
+@keyframes jaw-in-r  { from { transform: translateX( 20px); opacity: 0 } to { transform: none; opacity: 1 } }
+@keyframes tee-settle{ from { transform: scale(.9);  opacity: 0 } to { transform: none; opacity: 1 } }
+
+/* Загрузчик: губки дышат, заготовка поджимается. Цикл замкнут — без рывка. */
+.mark--loop .mark__jaw--l { animation: jaw-grip-l 1.6s ease-in-out infinite; }
+.mark--loop .mark__jaw--r { animation: jaw-grip-r 1.6s ease-in-out infinite; }
+.mark--loop .mark__tee    { animation: tee-grip   1.6s ease-in-out infinite; }
+
+@keyframes jaw-grip-l { 0%,100% { transform: none } 45% { transform: translateX(7px) } }
+@keyframes jaw-grip-r { 0%,100% { transform: none } 45% { transform: translateX(-7px) } }
+@keyframes tee-grip   { 0%,100% { transform: none } 45% { transform: scale(.94) } }
+
+/* Кому движение мешает — тому сразу конечный кадр. */
+@media (prefers-reduced-motion: reduce) {
+  .mark--reveal .mark__jaw--l,
+  .mark--reveal .mark__jaw--r,
+  .mark--reveal .mark__tee,
+  .mark--loop .mark__jaw--l,
+  .mark--loop .mark__jaw--r,
+  .mark--loop .mark__tee { animation: none; transform: none; opacity: 1; }
+}
+
 /* ── Animations ── */
 @keyframes float-y {
   0%, 100% { transform: translateY(0); }
