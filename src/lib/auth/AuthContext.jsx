@@ -6,16 +6,20 @@
  */
 import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { isSupabaseConfigured, supabase } from '@/lib/supabase/client';
-import { fetchMe, linkMe } from '@/lib/supabase/queries';
+import { fetchMe, fetchMyRoles, linkMe } from '@/lib/supabase/queries';
 
 const AuthContext = createContext({
-  session: null, person: null, loading: true, configured: false,
+  session: null, person: null, roles: [], isOwner: false, loading: true, configured: false,
   signIn: async () => {}, signOut: async () => {},
 });
 
 export function AuthProvider({ children }) {
   const [session, setSession] = useState(null);
   const [person, setPerson] = useState(null);
+  // Роли спрашиваем у базы, а не выводим из чего-то на клиенте: доступ всё
+  // равно решает база, и знать здесь надо ровно то, что решила она —
+  // иначе меню и права разойдутся, и разойдутся молча.
+  const [roles, setRoles] = useState([]);
   const [loading, setLoading] = useState(isSupabaseConfigured);
 
   useEffect(() => {
@@ -28,7 +32,7 @@ export function AuthProvider({ children }) {
 
     const { data: sub } = supabase.auth.onAuthStateChange((_event, next) => {
       setSession(next ?? null);
-      if (!next) setPerson(null);
+      if (!next) { setPerson(null); setRoles([]); }
     });
     return () => { alive = false; sub.subscription.unsubscribe(); };
   }, []);
@@ -45,7 +49,9 @@ export function AuthProvider({ children }) {
           await linkMe(session.user.email, session.user.email?.split('@')[0] || 'Владелец');
           me = await fetchMe(session.user.id);
         }
-        if (alive) setPerson(me);
+        if (!alive) return;
+        setPerson(me);
+        setRoles(await fetchMyRoles());
       } catch (error) {
         console.error('Не удалось определить пользователя:', error.message);
       }
@@ -56,6 +62,8 @@ export function AuthProvider({ children }) {
   const value = useMemo(() => ({
     session,
     person,
+    roles,
+    isOwner: roles.includes('owner'),
     loading,
     configured: isSupabaseConfigured,
     signIn: async (email, password) => {
@@ -63,7 +71,7 @@ export function AuthProvider({ children }) {
       if (error) throw new Error(error.message);
     },
     signOut: async () => { await supabase.auth.signOut(); },
-  }), [session, person, loading]);
+  }), [session, person, roles, loading]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

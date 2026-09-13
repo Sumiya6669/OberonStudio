@@ -7,35 +7,119 @@
  *
  * Это платная опция: каждый диалог расходует токены. Ключ берётся здесь:
  * https://console.anthropic.com → API Keys.
+ *
+ * ── Откуда консультант знает, что мы делаем ────────────────────────────────
+ *
+ * Раньше знал из строки прямо в этом файле. Строка пережила смену всего:
+ * студия называлась Oberon, продавала CRM и онлайн-запись для салонов и
+ * ссылалась на «20 проектов в портфолио». Сайт давно про 1С, а консультант
+ * на том же сайте предлагал посетителю расписание для косметолога и называл
+ * число, которое никто не проверял.
+ *
+ * Так и должно было случиться: знание, записанное во втором месте, рано или
+ * поздно разойдётся с первым. Поэтому теперь оно ровно одно — опубликованное
+ * содержимое сайта, то же самое, которое видит посетитель. Опубликовали новую
+ * работу в панели — консультант знает о ней со следующего запроса.
  */
 
 const MODEL = 'claude-sonnet-4-6';
 const MAX_HISTORY = 12;
 
-const SYSTEM_PROMPT = `Ты — консультант студии Oberon Studio из Казахстана. Общаешься на сайте студии с потенциальными клиентами.
+/** Содержимое сайта кешируется: дёргать базу на каждую реплику незачем. */
+const BRIEF_TTL_MS = 5 * 60 * 1000;
+let briefCache = { at: 0, text: null };
 
-ЧТО ДЕЛАЕТ СТУДИЯ:
-- CRM под процесс клиента: воронка, карточка клиента, задачи менеджерам, KPI, отчётность
-- AI-агенты в Telegram и WhatsApp: приём и квалификация заявок, первая линия поддержки
-- Интеграции с 1С: Kaspi.kz, Wildberries, OZON, платёжные сервисы, склад, синхронизация остатков и цен
-- Аналитика и дашборды: продажи, прибыль, остатки, прогноз выручки, выгрузка в Excel
-- Онлайн-запись для клиник, салонов, фитнеса: расписание, напоминания в WhatsApp
-- Обработка документов: распознавание PDF, счетов, накладных с занесением в 1С и CRM
-- Сайты и интернет-магазины, связанные с CRM и 1С
+async function loadBrief() {
+  const now = Date.now();
+  if (briefCache.text && now - briefCache.at < BRIEF_TTL_MS) return briefCache.text;
 
-Стек: React, Next.js, Python (FastAPI), Node.js, PostgreSQL, OpenAI, LangChain.
-В портфолио 20 проектов: рестораны с iiko, гостиницы, CRM для спортсекций и косметологии, маркетплейсы, AI-агенты, образовательные платформы.
+  const url = process.env.VITE_SUPABASE_URL;
+  const key = process.env.VITE_SUPABASE_ANON_KEY;
+  if (!url || !key) return null;
+
+  try {
+    const response = await fetch(`${url}/rest/v1/rpc/site_content`, {
+      method: 'POST',
+      headers: {
+        apikey: key,
+        Authorization: `Bearer ${key}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ p_locale: 'ru' }),
+      signal: AbortSignal.timeout(8000),
+    });
+    if (!response.ok) return briefCache.text;
+
+    const text = buildBrief(await response.json());
+    briefCache = { at: now, text };
+    return text;
+  } catch {
+    // Сеть подвела — отвечаем по прошлому слепку, если он есть.
+    return briefCache.text;
+  }
+}
+
+const list = (items, render) => (items || [])
+  .filter((item) => item?.slug)
+  .map(render)
+  .filter(Boolean)
+  .join('\n');
+
+/** Короткая справка о студии из того, что опубликовано на сайте. */
+function buildBrief(content) {
+  const settings = content?.settings || {};
+  const collections = content?.collections || {};
+
+  const offers = list(collections.offer, (item) => {
+    const price = Number(item.props?.price_from) > 0
+      ? ` — от ${Number(item.props.price_from).toLocaleString('ru-RU')} ₸${item.props?.unit ? ` ${item.props.unit}` : ''}`
+      : ' — цена по запросу';
+    return `- ${item.text?.title || item.slug}${price}: ${item.text?.tagline || ''} (/uslugi/${item.slug})`;
+  });
+
+  const answers = list(collections.answer, (item) =>
+    `- ${item.text?.title || item.slug}: ${item.text?.question || ''} (/1c/${item.slug})`);
+
+  const cases = list(collections.case, (item) =>
+    `- ${item.text?.title || item.slug}: ${item.text?.tagline || ''} (/keysy/${item.slug})`);
+
+  const contacts = [
+    settings.telegram_url && `Telegram: ${settings.telegram_url}`,
+    settings.whatsapp_url && `WhatsApp: ${settings.whatsapp_url}`,
+    settings.phone && `Телефон: ${settings.phone}`,
+    settings.email && `Почта: ${settings.email}`,
+  ].filter(Boolean).join(', ');
+
+  return [
+    offers && `РАБОТЫ, КОТОРЫЕ МОЖНО ЗАКАЗАТЬ (цены опубликованы на сайте, называть их можно):\n${offers}`,
+    answers && `РАЗБОРЫ ЧАСТЫХ ПРОБЛЕМ 1С (можно сослаться на страницу):\n${answers}`,
+    cases && `КЕЙСЫ — работы, которые действительно были:\n${cases}`,
+    contacts && `КОНТАКТЫ: ${contacts}`,
+  ].filter(Boolean).join('\n\n');
+}
+
+/**
+ * Правила разговора. Здесь — только они: что студия делает, консультант
+ * узнаёт из справки выше, а не отсюда.
+ */
+const RULES = `Ты — Keen, консультант студии Tinker из Казахстана. Студия занимается 1С: разработка, сопровождение, интеграции, аудит конфигураций. Общаешься на сайте студии с потенциальными клиентами.
 
 КАК ОТВЕЧАТЬ:
 - Пиши на языке собеседника (русский, казахский или английский)
 - Коротко: 2–4 предложения, без списков и заголовков, живым языком
 - Задавай один уточняющий вопрос в конце, чтобы понять задачу — как делает живой менеджер
-- Цены НЕ называй никогда. Объясняй, что стоимость зависит от интеграций, ролей, миграции данных и объёма AI-логики, и предлагай бесплатный расчёт
-- Сроки конкретными датами не обещай, пока не разобрана задача
-- Не выдумывай факты, кейсы, имена клиентов и цифры. Не знаешь — скажи прямо и предложи связаться с командой
-- Если задача вне компетенций студии — честно скажи об этом
-- Когда клиент готов обсуждать предметно, предложи оставить контакт или написать в Telegram @DeveloperAI0 либо WhatsApp +7 776 550 96 86
-- Не обещай того, что студия не подтверждала: гарантий результата, конкретных процентов роста, сроков в днях`;
+- Про 1С отвечай по существу: спроси конфигурацию, типовая она или доработанная, какая версия платформы
+- Цены называй ТОЛЬКО те, что перечислены в справке ниже, и только как «от». Точную стоимость работы обещать нельзя: она зависит от состояния конкретной базы
+- Сроки конкретными датами не обещай, пока задача не разобрана
+- НИЧЕГО не выдумывай: ни кейсов, ни имён клиентов, ни числа проектов, ни сроков, ни процентов. Нет в справке — значит, не знаешь; так и скажи
+- Если задача вне 1С и автоматизации — честно скажи, что это не к нам
+- Когда клиент готов обсуждать предметно, предложи оставить контакт прямо в чате или написать по контактам из справки
+- Не обещай гарантий результата и процентов роста`;
+
+async function systemPrompt() {
+  const brief = await loadBrief();
+  return brief ? `${RULES}\n\n${brief}` : RULES;
+}
 
 export default async function handler(request, response) {
   if (request.method !== 'POST') {
@@ -75,7 +159,7 @@ export default async function handler(request, response) {
       body: JSON.stringify({
         model: MODEL,
         max_tokens: 400,
-        system: SYSTEM_PROMPT,
+        system: await systemPrompt(),
         messages,
       }),
     });

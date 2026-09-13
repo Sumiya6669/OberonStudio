@@ -33,7 +33,10 @@ export const NAV_GROUPS = [
     ],
   },
   {
-    code: 'money', label: 'Бух учет', icon: Wallet,
+    // Деньги закрыты в базе политикой, а не здесь: скрытый пункт меню
+    // достаётся одним запросом мимо меню. Здесь только чтобы невладелец не
+    // ходил по разделам, которые всё равно отдадут пустоту.
+    code: 'money', label: 'Бух учет', icon: Wallet, ownerOnly: true,
     items: [
       { to: '/admin/money', end: true, label: 'Деньги', icon: Wallet },
       { to: '/admin/money/docs', label: 'Счета и акты', icon: FileText },
@@ -86,11 +89,30 @@ const linkClass = ({ isActive }) => cx(
   isActive ? 'bg-violet/10 text-violet' : 'text-muted-foreground hover:bg-white/5 hover:text-foreground',
 );
 
+const ROLE_TITLES = {
+  owner: 'владелец', approver: 'подтверждающий',
+  operator: 'исполнитель', viewer: 'наблюдатель',
+};
+const roleTitle = (code) => ROLE_TITLES[code] || code;
+
 export default function AdminLayout() {
-  const { person, session, signOut } = useAuth();
+  const { person, session, signOut, isOwner, roles } = useAuth();
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const current = activeGroup(pathname);
+
+  // Пока роли не пришли, разделы для владельца не показываем: мелькнувший
+  // и исчезнувший пункт меню выглядит как сбой, а не как забота о правах.
+  const groups = React.useMemo(
+    () => NAV_GROUPS.filter((group) => !group.ownerOnly || isOwner),
+    [isOwner],
+  );
+
+  // Адрес можно набрать руками. Без этой проверки невладелец увидел бы не
+  // отказ, а пустые таблицы — и решил бы, что в системе ничего нет.
+  const forbidden = NAV_GROUPS.some(
+    (group) => group.code === current && group.ownerOnly && !isOwner,
+  );
   const [open, setOpen] = React.useState(current);
 
   // Переход в другой раздел раскрывает его: иначе после перехода по ссылке
@@ -109,11 +131,14 @@ export default function AdminLayout() {
             </div>
             <div className="mt-0.5 truncate text-xs text-muted-foreground">
               {person?.full_name || session?.user?.email || 'панель'}
+              {roles.length > 0 && (
+                <span className="ml-1 opacity-60">· {roles.map(roleTitle).join(', ')}</span>
+              )}
             </div>
           </div>
 
           <nav className="flex-1 space-y-1 overflow-y-auto p-2">
-            {NAV_GROUPS.map((group) => {
+            {groups.map((group) => {
               const Icon = group.icon;
               const expanded = open === group.code;
               return (
@@ -160,7 +185,7 @@ export default function AdminLayout() {
           {/* На узком экране: сначала разделы, потом экраны выбранного раздела. */}
           <header className="border-b border-line lg:hidden">
             <div className="flex items-center gap-1 overflow-x-auto px-3 py-2">
-              {NAV_GROUPS.map((group) => (
+              {groups.map((group) => (
                 <button key={group.code}
                   onClick={() => navigate(group.items[0].to)}
                   className={cx('whitespace-nowrap rounded-lg px-3 py-1.5 text-xs font-medium',
@@ -170,7 +195,7 @@ export default function AdminLayout() {
               ))}
             </div>
             <div className="flex items-center gap-1 overflow-x-auto border-t border-line/60 px-3 py-2">
-              {(NAV_GROUPS.find((g) => g.code === current) || NAV_GROUPS[0]).items.map(
+              {(groups.find((g) => g.code === current) || groups[0] || { items: [] }).items.map(
                 ({ to, label, end }) => (
                   <NavLink key={to} to={to} end={end}
                     className={({ isActive }) => cx('whitespace-nowrap rounded-lg px-2.5 py-1 text-xs',
@@ -183,7 +208,17 @@ export default function AdminLayout() {
           </header>
 
           <main className="min-w-0 flex-1 p-4 lg:p-6">
-            <Outlet />
+            {forbidden ? (
+              <div className="mx-auto mt-16 max-w-md rounded-xl border border-line bg-surface/40 p-6 text-center">
+                <p className="text-sm font-medium">Раздел доступен владельцу</p>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  Ставки, счета и прибыль видит только владелец. Это правило
+                  базы, а не настройка панели.
+                </p>
+              </div>
+            ) : (
+              <Outlet />
+            )}
           </main>
         </div>
       </div>

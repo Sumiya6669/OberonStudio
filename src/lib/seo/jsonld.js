@@ -22,6 +22,32 @@ const clean = (obj) => {
   return out;
 };
 
+/**
+ * Даты для разметки.
+ *
+ * Свежесть — один из немногих признаков, по которым поиск и модель решают,
+ * брать ли ответ отсюда или у соседа. Но дата — это утверждение, и ставить
+ * сегодняшнюю только потому, что страницу открыли сегодня, нельзя. Поэтому
+ * берётся то, что записано в базе, а если там пусто — поля просто нет.
+ */
+function dates(item) {
+  const published = item?.publishedAt || null;
+  let updated = item?.updatedAt || published || null;
+
+  // «Изменено раньше, чем опубликовано» — невозможное утверждение, и
+  // проверяльщики разметки на нём ругаются. В базе так получается, если
+  // запись перенесли или правили дату руками; страница за это отвечать
+  // не должна.
+  if (published && updated && new Date(updated) < new Date(published)) {
+    updated = published;
+  }
+
+  return {
+    datePublished: published || undefined,
+    dateModified: updated || undefined,
+  };
+}
+
 /** Кто мы. Ссылки на мессенджеры — из настроек сайта, а не из головы. */
 export function organizationLd(settings = {}) {
   // sameAs — «это та же организация, что и вон там». Карточки в 2ГИС и
@@ -245,17 +271,25 @@ export function answerLd(answer) {
     ? `${answer.lead}\n\nЧто проверить: ${steps.join('; ')}.`
     : answer.lead;
 
-  return {
+  const d = dates(answer);
+  return clean({
     '@context': 'https://schema.org',
     '@type': 'QAPage',
-    mainEntity: {
+    ...d,
+    mainEntity: clean({
       '@type': 'Question',
       name: answer.question,
       text: answer.title || answer.question,
       answerCount: 1,
-      acceptedAnswer: { '@type': 'Answer', text },
-    },
-  };
+      dateCreated: d.datePublished,
+      dateModified: d.dateModified,
+      acceptedAnswer: clean({
+        '@type': 'Answer',
+        text,
+        dateCreated: d.datePublished,
+      }),
+    }),
+  });
 }
 
 /** Список разборов — обычный перечень ссылок, без обещаний. */
@@ -303,6 +337,7 @@ export function offerLd(offer) {
   return clean({
     '@context': 'https://schema.org',
     '@type': 'Service',
+    ...dates(offer),
     name: offer.title,
     description: offer.seoDesc || offer.tagline || offer.lead,
     serviceType: '1С: разработка и сопровождение',
@@ -320,17 +355,18 @@ export function offerLd(offer) {
  */
 export function caseLd(item) {
   if (!item?.title) return null;
-  return {
+  return clean({
     '@context': 'https://schema.org',
     '@type': 'Article',
     headline: item.title,
     description: item.seoDesc || item.tagline || '',
     articleSection: 'Кейсы',
     inLanguage: 'ru',
+    ...dates(item),
     url: `${SITE_URL}/keysy/${item.slug}`,
     author: { '@type': 'Organization', name: SITE_NAME, url: `${SITE_URL}/` },
     publisher: { '@type': 'Organization', name: SITE_NAME, url: `${SITE_URL}/` },
-  };
+  });
 }
 
 /** Список кейсов — перечень ссылок, без обещаний и без оценок. */

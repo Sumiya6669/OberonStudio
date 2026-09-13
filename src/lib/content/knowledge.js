@@ -114,11 +114,11 @@ export const TOPICS = [
   {
     id: 'cases',
     keywords: ['кейс', 'портфоли', 'пример', 'проект', 'опыт', 'работ', 'делали', 'case', 'portfolio', 'example', 'тәжірибе'],
-    link: '/projects',
+    link: '/keysy',
     answer: L(
-      'В портфолио 20 проектов: рестораны с iiko, гостиницы, CRM для спортивных секций и косметологии, интеграции 1С с Kaspi и маркетплейсами, AI-агенты в Telegram и WhatsApp, обработка документов, образовательные платформы. По каждому указаны отрасль, стек и что получилось.\n\nОткрыть можно в разделе «Проекты». Какая отрасль вам ближе — покажу похожий кейс.',
-      'Портфолиода 20 жоба бар: мейрамханалар, қонақ үйлер, CRM, 1С интеграциялары, Telegram мен WhatsApp-тағы AI-агенттер. Әрқайсысында сала, стек және нәтиже көрсетілген.\n\n«Жобалар» бөлімінен қараңыз. Сізге қай сала жақын?',
-      'The portfolio holds 20 projects: restaurants on iiko, hotels, CRM for sports clubs and beauty clinics, 1C integrations with Kaspi and marketplaces, AI agents on Telegram and WhatsApp, document processing, education platforms.\n\nOpen the Projects page. Which industry is closest to yours?',
+      'Разобранные работы лежат в разделе «Кейсы»: что было, что сделали, что получилось и чего работа не закрывает. Там же видно, с какими системами имели дело — оборудование, маркетплейсы, доработанные конфигурации.\n\nКакая у вас отрасль? Подскажу, есть ли похожий разбор.',
+      'Талданған жұмыстар «Кейстер» бөлімінде: не болды, не істедік, нәтиже қандай және жұмыс нені жаппайды.\n\nСіздің салаңыз қандай? Ұқсас талдау бар-жоғын айтамын.',
+      'Worked-through jobs live on the Cases page: what happened, what we did, what came of it and what the job does not cover.\n\nWhich industry are you in? I will say whether a similar case exists.',
     ),
   },
   {
@@ -196,16 +196,16 @@ export const SMALL_TALK = [
 
 /** Быстрые подсказки под полем ввода. */
 export const QUICK_REPLIES = L(
-  ['Нужна CRM', 'AI-агент для заявок', 'Интеграция с 1С', 'Сколько стоит?', 'Покажите проекты'],
-  ['CRM керек', 'Өтінімге AI-агент', '1С интеграциясы', 'Бағасы қанша?', 'Жобаларды көрсетіңіз'],
-  ['I need a CRM', 'AI agent for leads', '1C integration', 'How much?', 'Show me projects'],
+  ['Не проводится документ', 'Встал обмен с банком', 'Сколько стоит сопровождение', 'Обновить доработанную 1С', 'Kaspi в 1С'],
+  ['Құжат өткізілмейді', 'Банкпен алмасу тоқтады', 'Сүйемелдеу қанша тұрады', 'Өңделген 1С жаңарту', '1С-те Kaspi'],
+  ['Document will not post', 'Bank exchange stopped', 'Cost of support', 'Update a customised 1C', 'Kaspi in 1C'],
 );
 
 /** Ответ, когда вопрос не распознан: не выдумываем, а уточняем. */
 export const FALLBACK = L(
-  'Чтобы ответить точно, мне не хватает контекста. Расскажите в двух словах: чем занимается бизнес и какой процесс отнимает больше всего времени?\n\nМы делаем CRM, AI-агентов для заявок и поддержки, интеграции с 1С и маркетплейсами, аналитику и онлайн-запись. Если задача за пределами этого — честно скажу.',
-  'Дәл жауап беру үшін контекст жетіспейді. Бизнесіңіз немен айналысады және қай процесс көп уақыт алады?\n\nБіз CRM, AI-агенттер, 1С интеграциялары, аналитика және онлайн жазылу жасаймыз.',
-  'I need a bit more context to answer properly. In short: what does the business do, and which process eats the most time?\n\nWe build CRM, AI agents for leads and support, 1C and marketplace integrations, analytics and online booking. If your task falls outside that, I will say so.',
+  'Чтобы ответить точно, мне не хватает контекста. Расскажите в двух словах, что происходит: что именно не работает или что хочется изменить.\n\nМы занимаемся 1С: сопровождение, аудит конфигурации перед обновлением, обмены с банком и маркетплейсами, ЭСФ и СНТ, отчёты и доработки. Если задача за пределами этого — честно скажу.',
+  'Дәл жауап беру үшін контекст жетіспейді. Не болып жатқанын қысқаша айтыңыз: не істемейді немесе нені өзгерткіңіз келеді?\n\nБіз 1С-пен айналысамыз: сүйемелдеу, конфигурация аудиті, банк пен маркетплейстермен алмасу, ЭСФ және СНТ, есептер мен өңдеулер.',
+  'I need a bit more context to answer properly. In short: what is not working, or what would you like to change?\n\nWe work with 1C: support, configuration audit before an upgrade, bank and marketplace exchanges, ESF and SNT, reports and customisations. If your task falls outside that, I will say so.',
 );
 
 /** Просьба оставить контакт — показывается после нескольких реплик. */
@@ -239,6 +239,214 @@ const CONTACT_PATTERNS = [
 /** Есть ли в сообщении телефон, ник или почта. */
 export function containsContact(text) {
   return CONTACT_PATTERNS.some(pattern => pattern.test(text));
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+ * Ответы по опубликованному содержимому
+ *
+ * Всё, что выше, — это знание, записанное в коде. Оно устаревает молча:
+ * опубликовали в панели новый разбор — консультант о нём не узнает, потому
+ * что о нём здесь не написано. А посетитель спрашивает ровно про то, что на
+ * сайте есть.
+ *
+ * Поэтому сначала ищем среди работ, разборов и кейсов — то есть среди того
+ * же, что человек увидит, открыв меню. И только если не нашлось, отвечаем
+ * заготовкой.
+ *
+ * Эти разделы существуют только по-русски, поэтому для казахского и
+ * английского поиск не делается: сослаться на страницу, которой на языке
+ * собеседника нет, — не помощь.
+ * ────────────────────────────────────────────────────────────────────────── */
+
+/**
+ * Слова, по которым не отличишь один разбор от другого.
+ *
+ * Список слов, а не основ, и это принципиально: основы считаются тем же
+ * кодом, что и для остального текста. Пока список был из основ, «нужна»
+ * в нём стояла, а обрезка давала «нужн» — и слово проходило мимо фильтра.
+ * На «нужна консультация» консультант уверенно показывал разбор про
+ * печатную форму: совпало единственное слово, и то пустое.
+ */
+const STOP_WORDS = [
+  'делать', 'делает', 'сделать', 'сделано', 'который', 'которая', 'которые',
+  'просто', 'нужно', 'нужна', 'нужен', 'может', 'можно', 'после', 'через',
+  'когда', 'почему', 'зачем', 'чтобы', 'самое', 'такое', 'этого', 'этому',
+  'вашей', 'вашего', 'вообще', 'сейчас', 'очень', 'если', 'этот', 'скажите',
+  'подскажите', 'хотелось', 'хотите', 'работа', 'работы', 'вопрос', 'проблема',
+];
+
+/**
+ * Названия, которые пишут и латиницей, и кириллицей. «Каспи» и «Kaspi» —
+ * одно и то же слово, но по буквам не совпадают ни в одном знаке, и без
+ * этого списка вопрос «подключить каспи к 1с» не находил ничего.
+ */
+const SPELLINGS = [
+  [/каспи\w*/g, 'kaspi'], [/эсф/g, 'esf'], [/снт/g, 'snt'],
+  [/вайлдберриз|вайлдбериз/g, 'wildberries'], [/озон/g, 'ozon'],
+  [/битрикс/g, 'bitrix'],
+];
+
+/** Названия систем: короткие, но говорят о теме больше длинной фразы. */
+const BRANDS = new Set(['kaspi', 'esf', 'snt', 'wildbe', 'ozon', 'bitrix', 'halyk', 'iiko']);
+
+const normalise = (text) => SPELLINGS.reduce(
+  (acc, [from, to]) => acc.replace(from, to),
+  String(text || '').toLowerCase(),
+);
+
+/**
+ * Отбрасывание окончания.
+ *
+ * Без него «отчёт» и «отчёты» — разные основы: обрезка до шести знаков даёт
+ * «отчёт» и «отчёты», и вопрос «нужен отчёт для директора» не находил работу
+ * с названием «Отчёты, которых нет в типовой». Сначала снимаем окончание,
+ * потом обрезаем — тогда падеж перестаёт мешать, а разные слова с общим
+ * началом («заказы» и «заказать») по-прежнему не смешиваются.
+ *
+ * Это не морфология, а грубое правило, и оно таким и задумано: полный
+ * разбор русского здесь стоил бы больше, чем даёт.
+ */
+const ENDINGS = [
+  'ями', 'ами', 'ого', 'его', 'ему', 'ому', 'ыми', 'ими', 'ия', 'ие',
+  'ей', 'ой', 'ев', 'ов', 'ах', 'ях', 'ам', 'ям', 'ые', 'ая', 'ое', 'ую',
+  'ий', 'ый', 'ь', 'и', 'ы', 'а', 'я', 'е', 'у', 'ю', 'о',
+];
+
+function root(word) {
+  for (const ending of ENDINGS) {
+    if (word.length - ending.length >= 4 && word.endsWith(ending)) {
+      return word.slice(0, -ending.length);
+    }
+  }
+  return word;
+}
+
+const STOP_STEMS = new Set(STOP_WORDS.map((word) => root(word).slice(0, 6)));
+
+/**
+ * Значимые основы слова и их вес.
+ *
+ * Основа фиксированной длины, а не «слово минус два знака»: при переменной
+ * длине одно и то же слово в разных падежах давало разные основы —
+ * «документ», «документы», «документов» превращались в «документ»,
+ * «докумен», «докуме». Совпадения считались трижды, и разбор, где слово
+ * просто встречается почаще, обходил тот, который про это слово и написан:
+ * на вопрос «не проводится документ» консультант отвечал про пропавшие
+ * документы. Теперь основа одна на слово и считается один раз.
+ */
+function stems(text) {
+  const out = new Map();
+  for (const word of normalise(text).match(/[\p{L}\p{N}]+/gu) || []) {
+    // Название системы значимо само по себе, какой бы короткой ни была
+    // запись: «снт» — три знака, но спрашивают именно про него.
+    if (BRANDS.has(word)) {
+      out.set(word, 2);
+      continue;
+    }
+    if (word.length < 5) continue;
+    const stem = root(word).slice(0, 6);
+    if (STOP_STEMS.has(stem)) continue;
+    out.set(stem, Math.max(out.get(stem) || 0, word.length >= 8 ? 2 : 1));
+  }
+  return out;
+}
+
+/**
+ * Насколько запись отвечает на вопрос.
+ *
+ * Поля взвешены, и это важнее самой меры сходства. Раньше всё содержимое
+ * записи шло в один мешок, и на «обновление доработанной конфигурации»
+ * выигрывало сопровождение: у него эти слова перечислены в составе услуги,
+ * а у нужной работы они стоят прямо в названии. Название — это заявление
+ * «страница про это», состав — только перечисление; вес должен отличаться.
+ *
+ * @param {Array<[string, number]>} fields пары «текст, во сколько раз весомее»
+ */
+function overlap(fields, message) {
+  const asked = stems(message);
+  let score = 0;
+  const counted = new Set();
+
+  for (const [text, factor] of fields) {
+    for (const [stem, weight] of stems(text)) {
+      if (!asked.has(stem) || counted.has(stem)) continue;
+      counted.add(stem);
+      score += weight * factor;
+    }
+  }
+  return score;
+}
+
+const money = (value) => Number(value).toLocaleString('ru-RU');
+
+/**
+ * Ищет ответ среди опубликованного.
+ * @param {string} message  сообщение посетителя
+ * @param {{answers?: Array, offers?: Array, cases?: Array}} content
+ * @returns {{id: string, text: string, link: string, matched: true}|null}
+ */
+export function findInContent(message, content = {}) {
+  const candidates = [];
+
+  for (const item of content.answers || []) {
+    if (!item?.slug || !item.lead) continue;
+    candidates.push({
+      score: overlap([
+        [item.title, 3], [item.question, 2],
+        [(item.symptoms || []).join(' '), 1],
+      ], message),
+      id: `answer:${item.slug}`,
+      link: `/1c/${item.slug}`,
+      build: () => {
+        const steps = (item.steps || []).filter(Boolean).slice(0, 3);
+        return steps.length
+          ? `${item.lead}\n\nС чего начать: ${steps.join('; ')}.`
+          : item.lead;
+      },
+    });
+  }
+
+  for (const item of content.offers || []) {
+    if (!item?.slug || !(item.lead || item.tagline)) continue;
+    candidates.push({
+      score: overlap([
+        [item.title, 3], [item.tagline, 2],
+        [(item.included || []).join(' '), 1],
+      ], message),
+      id: `offer:${item.slug}`,
+      link: `/uslugi/${item.slug}`,
+      build: () => {
+        const price = Number(item.priceFrom) > 0
+          ? `\n\nОт ${money(item.priceFrom)} ₸${item.unit ? ` ${item.unit}` : ''} — точная сумма зависит от состояния базы.`
+          : '';
+        const term = item.term ? `\nСрок: ${item.term}.` : '';
+        return `${item.lead || item.tagline}${price}${term}`;
+      },
+    });
+  }
+
+  for (const item of content.cases || []) {
+    if (!item?.slug || !(item.situation || item.tagline)) continue;
+    candidates.push({
+      score: overlap([
+        [item.title, 3], [item.tagline, 2], [item.who, 1],
+      ], message),
+      id: `case:${item.slug}`,
+      link: `/keysy/${item.slug}`,
+      build: () => `${item.tagline}\n\n${item.situation || ''}`.trim(),
+    });
+  }
+
+  let best = null;
+  for (const c of candidates) if (!best || c.score > best.score) best = c;
+
+  // Порог не случайный: одно короткое совпадение — это почти всегда общее
+  // слово вроде «отчёт», и по нему уверенно отвечать нельзя. Лучше уточнить,
+  // чем бодро ответить не о том. Три очка набирает либо название системы,
+  // либо длинное слово из заголовка, либо два слова помельче.
+  if (!best || best.score < 3) return null;
+
+  return { id: best.id, text: best.build(), link: best.link, matched: true };
 }
 
 const matcherCache = new Map();

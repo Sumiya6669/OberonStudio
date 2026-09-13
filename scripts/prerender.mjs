@@ -61,6 +61,17 @@ const AI_CRAWLERS = [
   'CCBot', 'YandexAdditional', 'Bytespider', 'meta-externalagent',
 ];
 
+/**
+ * Разделы, которые существуют только по-русски: разборы, работы, кейсы.
+ * Список нужен и сборке страниц, и карте сайта, и llms.txt — поэтому он
+ * здесь, а не внутри main(): три копии однажды разойдутся.
+ */
+const RU_SECTIONS = [
+  { base: '/1c',     collection: 'answer' },
+  { base: '/uslugi', collection: 'offer' },
+  { base: '/keysy',  collection: 'case' },
+];
+
 const log = (line) => process.stdout.write(`  ${line}\n`);
 
 /**
@@ -125,10 +136,45 @@ function outFile(url) {
     : path.join(DIST, url.replace(/^\//, ''), 'index.html');
 }
 
+/**
+ * Дата последней правки для каждого адреса.
+ *
+ * Раньше здесь стояла одна дата на всю карту — наибольшая по всему
+ * содержимому. Поправили цену в одной работе, и карта заявляла, что за
+ * сегодня изменились все сорок страниц. Обходчик такое замечает довольно
+ * быстро и перестаёт верить lastmod вообще, то есть поле начинает работать
+ * против сайта. Теперь у страницы своя дата, а у раздела — наибольшая из
+ * дат его записей, что и правда означает «в разделе что-то новое».
+ */
+function buildLastmodMap(content) {
+  const day = (value) => (value ? new Date(value).toISOString().slice(0, 10) : null);
+  const map = new Map();
+
+  for (const page of content?.pages || []) {
+    const d = day(page.updated_at || page.published_at);
+    if (page.slug && d) map.set(page.slug, d);
+  }
+
+  for (const { base, collection } of RU_SECTIONS) {
+    let newest = null;
+    for (const item of content?.collections?.[collection] || []) {
+      const d = day(item.updated_at || item.published_at);
+      if (!item?.slug || !d) continue;
+      map.set(`${base}/${item.slug}`, d);
+      if (!newest || d > newest) newest = d;
+    }
+    if (newest) map.set(base, newest);
+  }
+
+  return map;
+}
+
 function buildSitemap(routes, content, ruOnly = []) {
-  const lastmod = content?.updated_at
+  const fallback = content?.updated_at
     ? new Date(content.updated_at).toISOString().slice(0, 10)
     : new Date().toISOString().slice(0, 10);
+  const byUrl = buildLastmodMap(content);
+  const lastmodOf = (route) => byUrl.get(route) || fallback;
 
   // Главная важнее внутренних, контакты — реже остальных. Числа тут не
   // магические: это подсказка обходчику, а не обещание.
@@ -149,7 +195,7 @@ function buildSitemap(routes, content, ruOnly = []) {
         '  <url>',
         `    <loc>${SITE_URL}${localeUrl(prefix, route)}</loc>`,
         ...alternates,
-        `    <lastmod>${lastmod}</lastmod>`,
+        `    <lastmod>${lastmodOf(route)}</lastmod>`,
         `    <priority>${weight(route)}</priority>`,
         '  </url>',
       ].join('\n'));
@@ -162,7 +208,7 @@ function buildSitemap(routes, content, ruOnly = []) {
     entries.push([
       '  <url>',
       `    <loc>${SITE_URL}${url}</loc>`,
-      `    <lastmod>${lastmod}</lastmod>`,
+      `    <lastmod>${lastmodOf(url)}</lastmod>`,
       '    <priority>0.7</priority>',
       '  </url>',
     ].join('\n'));
@@ -199,29 +245,46 @@ Sitemap: ${SITE_URL}/sitemap.xml
 /** Короткая карта сайта для агентов: складывающаяся, но дешёвая договорённость. */
 function buildLlmsTxt(content) {
   const settings = content?.settings || {};
-  const answers = (content?.collections?.answer || [])
+
+  // Дата у записи — не украшение. Модель, выбирая между двумя ответами про
+  // одну и ту же ошибку 1С, смотрит в том числе на то, когда их писали.
+  const day = (value) => (value ? new Date(value).toISOString().slice(0, 10) : '');
+  const line = (item, base, tail) => {
+    const title = item.text?.title || item.slug;
+    const d = day(item.updated_at || item.published_at);
+    const note = [tail, d && `обновлено ${d}`].filter(Boolean).join('; ');
+    return `- [${title}](${SITE_URL}${base}/${item.slug})${note ? `: ${note}` : ''}`;
+  };
+
+  const section = (collection, base, tailOf) => (content?.collections?.[collection] || [])
     .filter((item) => item?.slug)
-    .map((item) => `- [${item.text?.title || item.slug}](${SITE_URL}/1c/${item.slug}): ${item.text?.question || ''}`)
+    .map((item) => line(item, base, tailOf(item)))
     .join('\n');
-  const offers = (content?.collections?.offer || [])
-    .filter((item) => item?.slug)
-    .map((item) => `- [${item.text?.title || item.slug}](${SITE_URL}/uslugi/${item.slug}): ${item.text?.tagline || ''}`)
-    .join('\n');
+
+  const offers = section('offer', '/uslugi', (i) => i.text?.tagline || '');
+  const answers = section('answer', '/1c', (i) => i.text?.question || '');
+  const cases = section('case', '/keysy', (i) => i.text?.tagline || '');
+
   const contacts = [
     settings.telegram_url && `- Telegram: ${settings.telegram_url}`,
     settings.whatsapp_url && `- WhatsApp: ${settings.whatsapp_url}`,
     settings.email && `- Почта: ${settings.email}`,
   ].filter(Boolean).join('\n');
 
+  const updated = day(content?.updated_at);
+
   return `# Tinker
 
 > Разработка и сопровождение 1С, AI-агенты и автоматизация бизнес-процессов.
-> Казахстан.
+> Казахстан.${updated ? `\n> Содержимое сайта обновлялось ${updated}.` : ''}
 
 ## Страницы
 
 - [Главная](${SITE_URL}/): о студии и подходе
 - [Услуги](${SITE_URL}/services): что разрабатывается
+- [Работы и цены](${SITE_URL}/uslugi): что можно заказать, со сроками и стоимостью
+- [Ответы по 1С](${SITE_URL}/1c): разборы частых проблем
+- [Кейсы](${SITE_URL}/keysy): что уже делалось
 - [Проекты](${SITE_URL}/projects): реализованные работы
 - [Готовые решения](${SITE_URL}/products): CRM, агенты, онлайн-запись
 - [Процесс](${SITE_URL}/process): как проходит работа
@@ -232,6 +295,7 @@ function buildLlmsTxt(content) {
 
 ${offers.length ? `## Что можно заказать\n\n${offers}\n` : ''}
 ${answers.length ? `## Разборы частых проблем 1С\n\n${answers}\n` : ''}
+${cases.length ? `## Кейсы\n\n${cases}\n` : ''}
 ${contacts ? `## Связаться\n\n${contacts}\n` : ''}`;
 }
 
@@ -324,12 +388,6 @@ async function main() {
   // коде. Добавили запись в панели — она появится на сайте следующей
   // сборкой сама, и её не надо нигде дублировать.
   const ru = contentByLang.ru;
-  const RU_SECTIONS = [
-    { base: '/1c',     collection: 'answer' },
-    { base: '/uslugi', collection: 'offer' },
-    { base: '/keysy',  collection: 'case' },
-  ];
-
   const ruOnlyUrls = [];
   for (const { base, collection } of RU_SECTIONS) {
     const slugs = (ru?.collections?.[collection] || [])

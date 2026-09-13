@@ -4,10 +4,11 @@ import { X, Send, ArrowUpRight, MessageCircle, Phone } from 'lucide-react';
 import { LocaleLink as Link } from '@/components/nav/LocaleLink';
 import { useLang } from '@/lib/i18n/LangContext';
 import { SITE_SETTINGS } from '@/lib/content/site';
-import { useSettings } from '@/lib/site/SiteContentContext';
+import { useAnswers, useCases, useOffers, useSettings } from '@/lib/site/SiteContentContext';
+import KeenFace from './KeenFace';
 import { submitLead } from '@/lib/leads';
 import {
-  findAnswer, containsContact,
+  findAnswer, findInContent, containsContact,
   QUICK_REPLIES, LEAD_PROMPT, LEAD_DONE, LEAD_FAILED, LINK_LABELS,
 } from '@/lib/content/knowledge';
 
@@ -43,6 +44,17 @@ export default function Consultant() {
 
   const quickReplies = QUICK_REPLIES[lang] || QUICK_REPLIES.ru;
   const linkLabel = LINK_LABELS[lang] || LINK_LABELS.ru;
+
+  // Опубликованное содержимое сайта: работы, разборы, кейсы. Разделы есть
+  // только по-русски, поэтому искать в них имеет смысл только по-русски —
+  // сослаться на страницу, которой на языке собеседника нет, не помощь.
+  const answers = useAnswers();
+  const offers = useOffers();
+  const cases = useCases();
+  const published = React.useMemo(
+    () => (lang === 'ru' ? { answers, offers, cases } : null),
+    [lang, answers, offers, cases],
+  );
 
   // Диалог начинается заново при смене языка — иначе половина реплик на другом.
   useEffect(() => {
@@ -114,8 +126,14 @@ export default function Consultant() {
       return;
     }
 
+    // Порядок важен. Сначала модель: она видит весь разговор. Если ключа нет
+    // или она не ответила — ищем среди опубликованного на сайте, и только в
+    // последнюю очередь берём заготовку из кода. Заготовка последняя именно
+    // потому, что она единственная, которая устаревает молча.
     const fromModel = await askModel(history);
-    const local = fromModel ? null : findAnswer(text, lang);
+    const local = fromModel
+      ? null
+      : (published && findInContent(text, published)) || findAnswer(text, lang);
     const reply = fromModel || local.text;
 
     await new Promise(resolve => setTimeout(resolve, thinkingDelay(reply)));
@@ -130,7 +148,7 @@ export default function Consultant() {
       ...(shouldAskLead ? [{ role: 'assistant', content: LEAD_PROMPT[lang] || LEAD_PROMPT.ru }] : []),
     ]);
     if (shouldAskLead) setLeadAsked(true);
-  }, [messages, lang, leadAsked, leadSent, askModel, sendLead]);
+  }, [messages, lang, leadAsked, leadSent, askModel, sendLead, published]);
 
   const send = (value) => {
     const text = (value ?? input).trim();
@@ -157,13 +175,17 @@ export default function Consultant() {
             <div className="flex items-center gap-3 px-5 py-4 border-b border-white/[0.06]">
               <div className="relative">
                 <div className="w-8 h-8 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center">
-                  <span className="text-xs font-bold text-primary">AG</span>
+                  <KeenFace size={20} className="text-primary" />
                 </div>
                 <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-400 border-2 border-background" />
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-semibold text-white">{ct.title}</p>
-                <p className="text-[10px] text-emerald-400/80">{ct.online}</p>
+                <p className="text-[10px] text-white/35 truncate">
+                  {ct.role}
+                  {' · '}
+                  <span className="text-emerald-400/80">{ct.online}</span>
+                </p>
               </div>
               <button
                 onClick={() => setOpen(false)}

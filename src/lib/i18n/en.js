@@ -220,10 +220,12 @@ const en = {
   },
   // Consultant
   consultant: {
-    title: 'Tinker consultant',
+    name: 'Keen',
+    title: 'Keen',
+    role: 'Tinker consultant for 1C',
     online: 'online',
-    placeholder: 'Describe your task...',
-    greeting: 'Hello. Happy to work out which solution fits your case.\n\nWhat does your business do, and what would you like to automate?',
+    placeholder: 'Describe what happened...',
+    greeting: 'Hello, I am Keen — the Tinker consultant. I answer about 1C: what broke, what a job costs, what it includes.\n\nTell me what is happening — and which configuration you run, if you know.',
     disclaimer: 'Answered by a bot. The team gives exact estimates.',
   },
 

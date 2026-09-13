@@ -145,6 +145,17 @@ export const fetchJobTypes = async () =>
 export const fetchMe = async (authUserId) =>
   unwrap(await coreDb.from('person').select('*').eq('auth_user_id', authUserId).maybeSingle());
 
+/**
+ * Роли вошедшего — те же, по которым база решает, что ему показывать.
+ * Спрашиваем их у базы, чтобы меню и доступ не разошлись: если здесь
+ * ошибиться, человек увидит раздел, который всё равно отдаст пустоту.
+ */
+export const fetchMyRoles = async () => {
+  const { data, error } = await supabase.rpc('my_roles');
+  if (error) return [];
+  return Array.isArray(data) ? data : [];
+};
+
 export const linkMe = async (email, name) =>
   unwrap(await supabase.rpc('link_me', { p_email: email, p_name: name }));
 
