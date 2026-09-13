@@ -108,7 +108,7 @@ export default function MoneyReports() {
                     <Legend wrapperStyle={{ fontSize: 12 }} />
                     <RBar name="доход" dataKey="income" fill="#10d4a8" radius={[4, 4, 0, 0]} />
                     <RBar name="расход" dataKey="expenses" fill="#f0a020" radius={[4, 4, 0, 0]} />
-                    <RBar name="прибыль" dataKey="profit" fill="#4d7fff" radius={[4, 4, 0, 0]} />
+                    <RBar name="прибыль" dataKey="profit" fill="#7C5CFF" radius={[4, 4, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
               </div>

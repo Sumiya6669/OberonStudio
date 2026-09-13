@@ -85,7 +85,7 @@ export function breadcrumbLd(path, title, parents = []) {
 
   // Промежуточные шаги нужны там, где страница лежит в разделе: разбор в
   // «Ответах по 1С», работа в «Работах и ценах». Без них выдача показывает
-  // путь «Oberon Studio → Обмен с банком встал», как будто раздела нет, а
+  // путь «Tinker → Обмен с банком встал», как будто раздела нет, а
   // человеку из поиска полезнее видеть, что рядом есть другие разборы.
   const steps = [
     { name: SITE_NAME, item: `${SITE_URL}/` },
@@ -339,7 +339,7 @@ export function casesListLd(items) {
   return {
     '@context': 'https://schema.org',
     '@type': 'ItemList',
-    name: 'Кейсы Oberon Studio',
+    name: 'Кейсы Tinker',
     itemListElement: items.slice(0, 50).map((c, i) => ({
       '@type': 'ListItem',
       position: i + 1,

@@ -169,9 +169,9 @@ export const SMALL_TALK = [
     id: 'greeting',
     keywords: ['привет', 'здравств', 'добрый день', 'добрый вечер', 'доброе утро', 'салам', 'сәлем', 'hello', 'hi ', 'hey'],
     answer: L(
-      'Здравствуйте. Я консультант Oberon Studio — помогу разобраться, что из наших решений подходит под вашу задачу.\n\nЧем занимается ваш бизнес и что хотите автоматизировать?',
-      'Сәлеметсіз бе. Мен Oberon Studio кеңесшісімін — қай шешім сізге келетінін анықтауға көмектесемін.\n\nБизнесіңіз немен айналысады және нені автоматтандырғыңыз келеді?',
-      'Hello. I am the Oberon Studio consultant — happy to work out which of our solutions fits your case.\n\nWhat does your business do, and what would you like to automate?',
+      'Здравствуйте. Я консультант Tinker — помогу разобраться, что из наших решений подходит под вашу задачу.\n\nЧем занимается ваш бизнес и что хотите автоматизировать?',
+      'Сәлеметсіз бе. Мен Tinker кеңесшісімін — қай шешім сізге келетінін анықтауға көмектесемін.\n\nБизнесіңіз немен айналысады және нені автоматтандырғыңыз келеді?',
+      'Hello. I am the Tinker consultant — happy to work out which of our solutions fits your case.\n\nWhat does your business do, and what would you like to automate?',
     ),
   },
   {
@@ -187,9 +187,9 @@ export const SMALL_TALK = [
     id: 'who',
     keywords: ['кто ты', 'ты бот', 'человек', 'живой', 'робот', 'who are you', 'are you a bot', 'нейросет'],
     answer: L(
-      'Я бот-консультант на сайте Oberon Studio: отвечаю по нашим решениям и проектам, помогаю сформулировать задачу. Договориться о деталях и получить расчёт лучше у живой команды — оставьте контакт или напишите в Telegram.',
-      'Мен Oberon Studio сайтындағы бот-кеңесшімін: шешімдер мен жобалар бойынша жауап беремін. Нақты есеп үшін тірі командаға жазыңыз.',
-      'I am the consultant bot on the Oberon Studio site: I answer about our solutions and projects. For details and an estimate, the live team is better — leave a contact or write to Telegram.',
+      'Я бот-консультант на сайте Tinker: отвечаю по нашим решениям и проектам, помогаю сформулировать задачу. Договориться о деталях и получить расчёт лучше у живой команды — оставьте контакт или напишите в Telegram.',
+      'Мен Tinker сайтындағы бот-кеңесшімін: шешімдер мен жобалар бойынша жауап беремін. Нақты есеп үшін тірі командаға жазыңыз.',
+      'I am the consultant bot on the Tinker site: I answer about our solutions and projects. For details and an estimate, the live team is better — leave a contact or write to Telegram.',
     ),
   },
 ];

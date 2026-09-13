@@ -12,7 +12,7 @@ export const SITE_SETTINGS = {
   telegram_url: 'https://t.me/DeveloperAI0',
   whatsapp: '+7 776 550 96 86',
   whatsapp_url: 'https://wa.me/77765509686',
-  email: 'hello@oberon.studio',
+  email: 'hello@tinker.kz',
 };
 
 /**
@@ -22,12 +22,12 @@ export const SITE_SETTINGS = {
  */
 export const PRODUCTS = [
   {
-    id: 'oberon-crm',
-    name: 'Oberon CRM',
+    id: 'tinker-crm',
+    name: 'Tinker CRM',
     tagline: 'CRM с AI-воронкой под ваш процесс',
     description: 'Кастомная CRM вместо коробочных шаблонов: воронка продаж, задачи менеджеров, история клиента, автоматические follow-up и отчётность. Интегрируется с мессенджерами и 1С.',
     icon: '📊',
-    color: '#4d7fff',
+    color: '#7C5CFF',
     categories: ['CRM'],
     price: null,
     subscription: null,
@@ -105,7 +105,7 @@ export const PRODUCTS = [
     tagline: 'Все метрики в одном экране',
     description: 'Сводная аналитика продаж, прибыли и остатков: данные в реальном времени, сегментация клиентов, прогноз выручки и экспорт отчётов в Excel.',
     icon: '📈',
-    color: '#4d7fff',
+    color: '#7C5CFF',
     categories: ['Analytics'],
     price: null,
     subscription: null,

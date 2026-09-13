@@ -103,7 +103,7 @@ export default function MoneyExpenses() {
       />
 
       <Panel title="Расходные документы"
-             action={<Link to="/admin/money/entries" className="text-xs text-blue hover:underline">
+             action={<Link to="/admin/money/entries" className="text-xs text-violet hover:underline">
                Все документы учёта →
              </Link>}>
         {list.loading ? <Spinner /> : (

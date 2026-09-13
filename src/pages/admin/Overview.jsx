@@ -58,7 +58,7 @@ export default function Overview() {
               Ответы по устаревшему индексу помечаются автоматически, но лучше переиндексировать.
             </p>
           )}
-          <Link to="/admin/configs" className="mt-3 inline-block text-xs text-blue hover:underline">
+          <Link to="/admin/configs" className="mt-3 inline-block text-xs text-violet hover:underline">
             Открыть конфигурации →
           </Link>
         </Panel>
@@ -83,7 +83,7 @@ export default function Overview() {
 
       {sla.data?.length > 0 && (
         <Panel title={`Обещания просрочены: ${sla.data.length}`}
-               action={<Link to="/admin/subscriptions" className="text-xs text-blue hover:underline">
+               action={<Link to="/admin/subscriptions" className="text-xs text-violet hover:underline">
                  Сроки и абонементы →
                </Link>}>
           <ul className="space-y-2">
@@ -93,7 +93,7 @@ export default function Overview() {
                 <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
                     <Clock className="h-3.5 w-3.5 shrink-0 text-red-400" />
-                    <Link to={`/admin/tickets/${t.id}`} className="truncate text-sm hover:text-blue">
+                    <Link to={`/admin/tickets/${t.id}`} className="truncate text-sm hover:text-violet">
                       {t.subject}
                     </Link>
                     <span className="text-xs text-muted-foreground">{t.company || 'без компании'}</span>
@@ -146,7 +146,7 @@ export default function Overview() {
       )}
 
       <Panel title="Последние заявки"
-             action={<Link to="/admin/tickets" className="text-xs text-blue hover:underline">Все заявки →</Link>}>
+             action={<Link to="/admin/tickets" className="text-xs text-violet hover:underline">Все заявки →</Link>}>
         {tickets.loading ? <Spinner /> : !tickets.data?.length ? (
           <Empty>Заявок пока нет. Форма на сайте пишет сюда напрямую.</Empty>
         ) : (
@@ -165,7 +165,7 @@ export default function Overview() {
                 {tickets.data.map((t) => (
                   <tr key={t.id} className="border-t border-line/60">
                     <td className="py-2 pr-3">
-                      <Link to={`/admin/tickets/${t.id}`} className="text-foreground hover:text-blue">
+                      <Link to={`/admin/tickets/${t.id}`} className="text-foreground hover:text-violet">
                         {t.subject}
                       </Link>
                     </td>

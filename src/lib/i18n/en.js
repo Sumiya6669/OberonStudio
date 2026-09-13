@@ -220,7 +220,7 @@ const en = {
   },
   // Consultant
   consultant: {
-    title: 'Oberon consultant',
+    title: 'Tinker consultant',
     online: 'online',
     placeholder: 'Describe your task...',
     greeting: 'Hello. Happy to work out which solution fits your case.\n\nWhat does your business do, and what would you like to automate?',

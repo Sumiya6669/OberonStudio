@@ -33,7 +33,7 @@ function RotatingWord({ words }) {
   };
 
   return (
-    <span className="text-gradient-blue" style={style}>
+    <span className="text-gradient-violet" style={style}>
       {words[idx]}
     </span>
   );
@@ -51,7 +51,7 @@ function DashboardMockup() {
             <div className="w-2.5 h-2.5 rounded-full bg-white/10" />
           </div>
           <div className="flex-1 mx-3 h-5 rounded-md bg-white/[0.04] flex items-center px-2">
-            <span className="text-[9px] text-white/20">oberon.studio/admin</span>
+            <span className="text-[9px] text-white/20">tinker.kz/admin</span>
           </div>
           <div className="w-6 h-5 rounded bg-white/[0.04]" />
         </div>
@@ -86,7 +86,7 @@ function DashboardMockup() {
                   animate={{ scaleY: 1 }}
                   transition={{ delay: 1.2 + i * 0.05, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
                   className="flex-1 rounded-sm origin-bottom"
-                  style={{ height: `${h}%`, background: i === 11 ? 'hsl(220 100% 60%)' : `hsl(220 100% 60% / ${0.15 + (i / 11) * 0.25})` }}
+                  style={{ height: `${h}%`, background: i === 11 ? 'hsl(252 100% 68%)' : `hsl(252 100% 68% / ${0.15 + (i / 11) * 0.25})` }}
                 />
               ))}
             </div>
@@ -133,7 +133,7 @@ export default function Hero() {
   return (
     <section ref={ref} className="relative min-h-screen flex items-center overflow-hidden">
       <div className="absolute inset-0 grid-bg opacity-100" />
-      <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse 80% 50% at 50% 0%, hsl(220 100% 60% / 0.08) 0%, transparent 70%)' }} />
+      <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse 80% 50% at 50% 0%, hsl(252 100% 68% / 0.08) 0%, transparent 70%)' }} />
       <div className="absolute inset-0"><NeuralCanvas /></div>
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-background" />
       <div className="absolute inset-0 bg-gradient-to-r from-background via-transparent to-background opacity-60" />
@@ -162,8 +162,8 @@ export default function Hero() {
                   <h1 className="text-[clamp(2.5rem,6vw,5rem)] font-black leading-[1.0] tracking-[-0.04em] mb-6">
                     <span className="text-gradient-white block">{h.headline1} <RotatingWord words={h.words} /></span>
                     <span className="text-gradient-white block">{h.headline2}</span>
-                    <span className="text-gradient-blue block">{h.headline3}</span>
-                    <span className="text-gradient-blue block">{h.headline4}</span>
+                    <span className="text-gradient-violet block">{h.headline3}</span>
+                    <span className="text-gradient-violet block">{h.headline4}</span>
                   </h1>
                 )}
               </motion.div>

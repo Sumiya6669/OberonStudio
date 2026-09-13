@@ -157,9 +157,9 @@ export function useStack() {
     label: it.text?.title || '',
     note: it.text?.note || '',
     icon: it.props?.icon || '•',
-    color: it.props?.color || '#4d7fff',
+    color: it.props?.color || '#7C5CFF',
     items: (it.text?.items || []).map((name) => ({
-      name, color: it.props?.color || '#4d7fff',
+      name, color: it.props?.color || '#7C5CFF',
     })),
   })), [items]);
 }
@@ -173,7 +173,7 @@ export function useProducts() {
     description: it.text?.description || '',
     features: it.text?.features || [],
     icon: it.props?.icon || '📦',
-    color: it.props?.color || '#4d7fff',
+    color: it.props?.color || '#7C5CFF',
     categories: it.props?.categories || [],
     price: it.props?.price ?? null,
     subscription: it.props?.subscription ?? null,

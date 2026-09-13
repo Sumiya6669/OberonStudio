@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { LocaleLink as Link } from '@/components/nav/LocaleLink';
 import { Search, BarChart2 } from 'lucide-react';
 import Reveal from '../core/Reveal';
-import OberonCore from './products/OberonCore';
+import TinkerCore from './products/TinkerCore';
 import ProductCard from './products/ProductCard';
 import ProductCompare from './products/ProductCompare';
 import DemoModal from './products/DemoModal';
@@ -11,7 +11,7 @@ import { PRODUCTS } from '@/lib/content/site';
 import { useProducts } from '@/lib/site/SiteContentContext';
 import { CONTACT_PATH } from '@/lib/routes';
 
-export default function OberonProducts() {
+export default function TinkerProducts() {
   const [search, setSearch] = useState('');
   const [activeCategory, setActiveCategory] = useState('Все');
   const [showCompare, setShowCompare] = useState(false);
@@ -38,16 +38,16 @@ export default function OberonProducts() {
       <div className="absolute inset-0 bg-gradient-to-b from-background via-surface/30 to-background" />
       <div className="absolute inset-0 grid-bg opacity-15" />
       <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[900px] h-[400px] rounded-full pointer-events-none"
-        style={{ background: 'radial-gradient(ellipse, hsl(220 100% 60% / 0.04) 0%, transparent 70%)' }} />
+        style={{ background: 'radial-gradient(ellipse, hsl(252 100% 68% / 0.04) 0%, transparent 70%)' }} />
 
       <div className="relative z-10 max-w-7xl mx-auto px-5">
         {/* Section header */}
         <Reveal>
           <div className="text-center mb-16">
-            <p className="text-xs tracking-[0.3em] text-white/20 uppercase mb-5">Oberon Solutions Marketplace</p>
+            <p className="text-xs tracking-[0.3em] text-white/20 uppercase mb-5">Tinker Solutions</p>
             <h2 className="text-[clamp(2.2rem,5vw,4.5rem)] font-black tracking-[-0.04em] leading-[1.05] text-white mb-4">
               Готовые AI и CRM решения<br />
-              <span className="text-gradient-blue">для быстрого внедрения в бизнес</span>
+              <span className="text-gradient-violet">для быстрого внедрения в бизнес</span>
             </h2>
             <p className="text-base text-white/35 max-w-xl mx-auto leading-relaxed">
               Одна платформа, много отраслевых решений. Выбирайте модуль, адаптируйте под процесс и запускайте быстрее классической разработки.
@@ -64,8 +64,8 @@ export default function OberonProducts() {
           </div>
         </Reveal>
 
-        {/* Oberon Core platform */}
-        <OberonCore />
+        {/* Tinker Core platform */}
+        <TinkerCore />
 
         {/* Filters & Search */}
         <Reveal>
@@ -140,7 +140,7 @@ export default function OberonProducts() {
                   className="px-7 py-3.5 rounded-2xl bg-primary text-white font-bold text-sm hover:bg-primary/80 transition-all shadow-[0_0_30px_hsl(220_100%_60%/0.3)]">
                   Получить консультацию
                 </Link>
-                <button onClick={() => setDemoProduct({ name: 'Oberon Products', icon: '🚀' })}
+                <button onClick={() => setDemoProduct({ name: 'Tinker Products', icon: '🚀' })}
                   className="px-7 py-3.5 rounded-2xl border border-white/10 text-white/60 font-semibold text-sm hover:text-white hover:border-white/20 transition-all">
                   Запросить демо
                 </button>

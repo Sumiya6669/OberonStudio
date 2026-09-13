@@ -263,7 +263,7 @@ export default function SysHealth() {
 function Row({ label, value, to, warn }) {
   return (
     <li className="flex items-center justify-between gap-3">
-      <Link to={to} className="text-muted-foreground hover:text-blue">{label}</Link>
+      <Link to={to} className="text-muted-foreground hover:text-violet">{label}</Link>
       <span className={cx('tabular-nums font-medium', warn ? 'text-amber-400' : 'text-foreground')}>
         {num(value)}
       </span>

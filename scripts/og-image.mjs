@@ -50,9 +50,7 @@ const HTML = `<!doctype html>
   }
   .row { display: flex; align-items: center; gap: 20px; position: relative; }
   .mark {
-    width: 76px; height: 76px; border-radius: 20px; background: #4d7fff;
-    display: flex; align-items: center; justify-content: center;
-    font-weight: 900; font-size: 32px; letter-spacing: -1px; color: #fff;
+    width: 92px; height: 92px; display: flex; align-items: center; justify-content: center;
     box-shadow: 0 12px 40px rgba(77,127,255,.42);
   }
   .brand { font-size: 34px; font-weight: 800; letter-spacing: -.6px; }
@@ -61,7 +59,7 @@ const HTML = `<!doctype html>
   h1 { position: relative; font-size: 50px; line-height: 1.18; font-weight: 800;
        letter-spacing: -1.3px; }
   h1 span { display: block; white-space: nowrap; }
-  h1 em { font-style: normal; color: #4d7fff; }
+  h1 em { font-style: normal; color: #7C5CFF; }
   .tags { position: relative; display: flex; gap: 12px; margin-top: 34px; }
   .tag { border: 1px solid rgba(247,247,247,.14); border-radius: 999px;
          padding: 9px 18px; font-size: 19px; color: rgba(247,247,247,.78); }
@@ -73,14 +71,19 @@ const HTML = `<!doctype html>
   <div class="glow"></div><div class="glow2"></div>
 
   <div class="row">
-    <div class="mark">OS</div>
-    <div class="brand">Oberon Studio<small>AI · CRM · 1C</small></div>
+    <div class="mark"><svg viewBox="0 0 200 200" width="92" height="92" fill="none">
+      <path d="M44 40L26 40L26 160L44 160" fill="none" stroke="#A78BFA" stroke-width="16" stroke-linejoin="round" stroke-linecap="round"/>
+      <path d="M156 40L174 40L174 160L156 160" fill="none" stroke="#A78BFA" stroke-width="16" stroke-linejoin="round" stroke-linecap="round"/>
+      <path d="M48 58L152 58" stroke="#F7F7F7" stroke-width="22" stroke-linecap="round"/>
+      <path d="M100 58L100 150" stroke="#F7F7F7" stroke-width="22" stroke-linecap="round"/>
+    </svg></div>
+    <div class="brand">Tinker<small>1С · интеграции · автоматизация</small></div>
   </div>
 
   <div>
     <h1>
       <span>Разработка и сопровождение <em>1С</em></span>
-      <span>AI-агенты и автоматизация бизнеса</span>
+      <span>интеграции и автоматизация бизнеса</span>
     </h1>
     <div class="tags">
       <div class="tag">Доработки и обмены</div>
@@ -91,7 +94,7 @@ const HTML = `<!doctype html>
 
   <div class="foot">
     <div>Казахстан · ответ в течение часа</div>
-    <div><b>oberon-studio.vercel.app</b></div>
+    <div><b>tinker.kz</b></div>
   </div>
 </body></html>`;
 

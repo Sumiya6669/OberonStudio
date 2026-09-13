@@ -77,7 +77,7 @@ export default function TimeSheet() {
                   <tr key={r.id} className="border-t border-line/60">
                     <td className="py-2 pr-3 text-muted-foreground">{dateOnly(r.started_at)}</td>
                     <td className="py-2 pr-3">
-                      <Link to={`/admin/tickets/${r.ticket_id}`} className="hover:text-blue">
+                      <Link to={`/admin/tickets/${r.ticket_id}`} className="hover:text-violet">
                         {r.ticket?.subject || `№${r.ticket_id}`}
                       </Link>
                     </td>

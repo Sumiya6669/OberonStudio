@@ -15,11 +15,11 @@ const COMPARE_FEATURES = [
 
 const COLUMNS = [
   {
-    label: 'Oberon',
+    label: 'Tinker',
     sub: 'Готовое решение',
     highlight: true,
     values: [true, true, true, true, true, true, true, true],
-    color: '#4d7fff',
+    color: '#7C5CFF',
   },
   {
     label: 'Заказная разработка',
@@ -57,7 +57,7 @@ export default function ProductCompare({ onClose }) {
         <div className="flex items-center justify-between px-6 py-5 border-b border-line">
           <div>
             <h3 className="font-bold text-white">Сравнение подходов</h3>
-            <p className="text-xs text-white/30 mt-0.5">Почему Oberon — лучший выбор</p>
+            <p className="text-xs text-white/30 mt-0.5">Почему Tinker — лучший выбор</p>
           </div>
           <button onClick={onClose} className="text-white/25 hover:text-white/70 transition-colors text-xl">✕</button>
         </div>
@@ -97,7 +97,7 @@ export default function ProductCompare({ onClose }) {
         </div>
 
         <div className="px-6 py-5 border-t border-line flex items-center justify-between gap-4">
-          <p className="text-xs text-white/25">Oberon — единственный вариант, где все критерии соответствуют ✓</p>
+          <p className="text-xs text-white/25">Tinker — единственный вариант, где все критерии соответствуют ✓</p>
           <button onClick={onClose} className="px-5 py-2.5 rounded-xl bg-primary text-white text-sm font-semibold hover:bg-primary/80 transition-colors flex-shrink-0">
             Выбрать решение
           </button>

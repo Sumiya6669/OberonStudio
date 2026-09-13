@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Reveal from '../core/Reveal';
 import { useLang } from '@/lib/i18n/LangContext';
 
-const STEP_COLORS = ['#4d7fff','#10d4a8','#f0a020','#a855f7','#4d7fff','#10d4a8','#f0a020','#4d7fff','#10d4a8'];
+const STEP_COLORS = ['#7C5CFF','#10d4a8','#f0a020','#a855f7','#7C5CFF','#10d4a8','#f0a020','#7C5CFF','#10d4a8'];
 
 export default function Process() {
   const { t } = useLang();

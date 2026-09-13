@@ -239,8 +239,8 @@ export default function AiRights() {
                 <button key={mode} disabled={busy} onClick={() => apply(mode)}
                   className={cx('flex w-full items-center justify-between rounded-lg border px-3 py-2 text-left text-sm transition',
                     edit.mode === mode
-                      ? 'border-blue/50 bg-blue/10'
-                      : 'border-line hover:border-blue/40')}>
+                      ? 'border-violet/50 bg-violet/10'
+                      : 'border-line hover:border-violet/40')}>
                   <span className={cls}>{label}</span>
                   <span className="text-xs text-muted-foreground">
                     {mode === 'deny' && 'не может даже предложить'}

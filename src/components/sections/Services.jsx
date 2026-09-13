@@ -5,7 +5,7 @@ import { useLang } from '@/lib/i18n/LangContext';
 import { useServices } from '@/lib/site/SiteContentContext';
 
 const servicesMeta = [
-  { num: '01', tag: 'FLAGSHIP', tagColor: 'text-primary border-primary/30 bg-primary/5', accent: 'hsl(220 100% 60%)', price: 'от 500 000 ₸' },
+  { num: '01', tag: 'FLAGSHIP', tagColor: 'text-primary border-primary/30 bg-primary/5', accent: 'hsl(252 100% 68%)', price: 'от 500 000 ₸' },
   { num: '02', tag: 'PREMIUM', tagColor: 'text-gold border-gold/30 bg-gold/5', accent: 'hsl(43 74% 58%)', price: 'от 700 000 ₸' },
   { num: '03', tag: 'POPULAR', tagColor: 'text-emerald-400 border-emerald-400/30 bg-emerald-400/5', accent: 'hsl(160 80% 55%)', price: 'от 800 000 ₸' },
   { num: '04', tag: 'EXPERT', tagColor: 'text-violet-400 border-violet-400/30 bg-violet-400/5', accent: 'hsl(270 80% 65%)', price: 'от 20 000 ₸/час' },
@@ -60,7 +60,7 @@ export default function Services() {
                     <span className="text-xs font-mono text-white/15 pt-1 w-6 flex-shrink-0">{meta.num}</span>
                     <div className="flex-1 min-w-0">
                       <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-2">
-                        <h3 className="text-lg font-semibold text-white group-hover:text-gradient-blue transition-all duration-300">{item.title}</h3>
+                        <h3 className="text-lg font-semibold text-white group-hover:text-gradient-violet transition-all duration-300">{item.title}</h3>
                         <span className={`self-start text-[10px] font-medium tracking-widest px-2 py-0.5 rounded-full border ${meta.tagColor}`}>{item.category || meta.tag}</span>
                       </div>
                       <AnimatePresence>

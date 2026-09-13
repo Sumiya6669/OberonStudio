@@ -38,14 +38,14 @@ export function Stat({ label, value, hint, tone = 'default' }) {
 }
 
 const BADGE_TONES = {
-  new: 'bg-blue/15 text-blue border-blue/30',
-  triaged: 'bg-blue/10 text-blue border-blue/20',
+  new: 'bg-violet/15 text-violet border-violet/30',
+  triaged: 'bg-violet/10 text-violet border-violet/20',
   estimated: 'bg-gold/15 text-gold border-gold/30',
   approved: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30',
   in_work: 'bg-violet-500/15 text-violet-300 border-violet-500/30',
   done: 'bg-white/5 text-muted-foreground border-line',
   cancelled: 'bg-white/5 text-muted-foreground border-line',
-  queued: 'bg-blue/10 text-blue border-blue/20',
+  queued: 'bg-violet/10 text-violet border-violet/20',
   leased: 'bg-violet-500/15 text-violet-300 border-violet-500/30',
   failed: 'bg-amber-500/15 text-amber-400 border-amber-500/30',
   dead: 'bg-red-500/15 text-red-400 border-red-500/30',
@@ -76,12 +76,12 @@ export function Field({ label, hint, children }) {
 
 export const inputClass =
   'w-full rounded-lg border border-line bg-background px-3 py-2 text-sm text-foreground ' +
-  'placeholder:text-muted-foreground/60 outline-none focus:border-blue/60';
+  'placeholder:text-muted-foreground/60 outline-none focus:border-violet/60';
 
 export function Button({ variant = 'primary', className, disabled, children, ...rest }) {
   const styles = {
-    primary: 'bg-blue text-white hover:bg-blue/90',
-    ghost: 'border border-line text-foreground hover:border-blue/40 hover:text-blue',
+    primary: 'bg-violet text-white hover:bg-violet/90',
+    ghost: 'border border-line text-foreground hover:border-violet/40 hover:text-violet',
     danger: 'border border-red-500/30 text-red-400 hover:bg-red-500/10',
   };
   return (
@@ -247,7 +247,7 @@ export function Tabs({ items, value, onChange }) {
       {items.map((it) => (
         <button key={it.value} onClick={() => onChange(it.value)}
           className={cx('rounded-lg px-3 py-1.5 text-xs font-medium transition',
-            value === it.value ? 'bg-blue/15 text-blue' : 'text-muted-foreground hover:text-foreground')}>
+            value === it.value ? 'bg-violet/15 text-violet' : 'text-muted-foreground hover:text-foreground')}>
           {it.label}{it.count !== undefined && <span className="ml-1.5 opacity-60">{it.count}</span>}
         </button>
       ))}
@@ -258,7 +258,7 @@ export function Tabs({ items, value, onChange }) {
 /** Полоса заполнения. tone считается по значению, а не задаётся снаружи. */
 export function Bar({ value, max, label }) {
   const share = max > 0 ? Math.min(100, (100 * value) / max) : 0;
-  const color = share >= 100 ? 'bg-red-500' : share >= 80 ? 'bg-amber-400' : 'bg-blue';
+  const color = share >= 100 ? 'bg-red-500' : share >= 80 ? 'bg-amber-400' : 'bg-violet';
   return (
     <div>
       {label && (

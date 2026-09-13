@@ -22,7 +22,7 @@ export default function Tickets() {
         {STATUS_GROUPS.map((g) => (
           <button key={g.key} onClick={() => setGroup(g.key)}
             className={cx('rounded-lg border px-3 py-1.5 text-xs transition',
-              group === g.key ? 'border-blue/40 bg-blue/10 text-blue'
+              group === g.key ? 'border-violet/40 bg-violet/10 text-violet'
                               : 'border-line text-muted-foreground hover:text-foreground')}>
             {g.label}
           </button>
@@ -54,7 +54,7 @@ export default function Tickets() {
                   <tr key={t.id} className="border-t border-line/60 hover:bg-white/[0.02]">
                     <td className="py-2 pr-3 tabular-nums text-muted-foreground">{t.id}</td>
                     <td className="py-2 pr-3">
-                      <Link to={`/admin/tickets/${t.id}`} className="hover:text-blue">{t.subject}</Link>
+                      <Link to={`/admin/tickets/${t.id}`} className="hover:text-violet">{t.subject}</Link>
                       {t.system && <div className="text-[11px] text-muted-foreground">{t.system}</div>}
                     </td>
                     <td className="py-2 pr-3 text-muted-foreground">{t.company_title || '—'}</td>

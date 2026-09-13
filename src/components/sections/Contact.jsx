@@ -65,7 +65,7 @@ export default function Contact() {
       <div className="absolute inset-0 grid-bg opacity-20" />
       <div
         className="absolute w-[700px] h-[700px] rounded-full pointer-events-none transition-transform duration-700 ease-out"
-        style={{ background: 'radial-gradient(circle, hsl(220 100% 60% / 0.06) 0%, transparent 60%)', left: '50%', top: '50%', transform: `translate(calc(-50% + ${mousePos.x}px), calc(-50% + ${mousePos.y}px))` }}
+        style={{ background: 'radial-gradient(circle, hsl(252 100% 68% / 0.06) 0%, transparent 60%)', left: '50%', top: '50%', transform: `translate(calc(-50% + ${mousePos.x}px), calc(-50% + ${mousePos.y}px))` }}
       />
       <div
         className="absolute w-[400px] h-[400px] rounded-full pointer-events-none transition-transform duration-1000 ease-out"
@@ -80,7 +80,7 @@ export default function Contact() {
               <h2 className="text-[clamp(2.5rem,8vw,6.5rem)] font-black tracking-[-0.04em] leading-[1.0] text-white mb-4">{ct.line1}</h2>
             </Reveal>
             <Reveal delay={0.2}>
-              <h2 className="text-[clamp(2.5rem,8vw,6.5rem)] font-black tracking-[-0.04em] leading-[1.0] text-gradient-blue mb-8">{ct.line2}</h2>
+              <h2 className="text-[clamp(2.5rem,8vw,6.5rem)] font-black tracking-[-0.04em] leading-[1.0] text-gradient-violet mb-8">{ct.line2}</h2>
             </Reveal>
             <Reveal delay={0.3}>
               <h2 className="text-[clamp(2.5rem,8vw,6.5rem)] font-black tracking-[-0.04em] leading-[1.0] text-white mb-12">{ct.line3}</h2>

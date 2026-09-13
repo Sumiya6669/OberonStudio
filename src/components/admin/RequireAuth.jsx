@@ -18,8 +18,8 @@ export default function RequireAuth({ children }) {
       <div className="mx-auto max-w-lg px-6 py-24 text-center">
         <h1 className="text-lg font-semibold">Панель не настроена</h1>
         <p className="mt-3 text-sm text-muted-foreground">
-          Задайте <code className="text-blue">VITE_SUPABASE_URL</code> и{' '}
-          <code className="text-blue">VITE_SUPABASE_ANON_KEY</code> в переменных окружения
+          Задайте <code className="text-violet">VITE_SUPABASE_URL</code> и{' '}
+          <code className="text-violet">VITE_SUPABASE_ANON_KEY</code> в переменных окружения
           и пересоберите сайт. Публичная часть работает без них.
         </p>
       </div>

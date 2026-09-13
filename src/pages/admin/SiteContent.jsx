@@ -120,7 +120,7 @@ export default function SiteContent() {
                 render: (r) => <StatusBadge value={r.status} dict={cmsStatusLabel} /> },
               { key: 'revisions', title: 'Правок', align: 'right',
                 render: (r) => Number(r.revisions)
-                  ? <button className="text-blue hover:underline"
+                  ? <button className="text-violet hover:underline"
                             onClick={() => setHistory(r)}>{num(r.revisions)}</button>
                   : <span className="text-muted-foreground">—</span> },
               { key: 'updated_at', title: 'Изменено', align: 'right',

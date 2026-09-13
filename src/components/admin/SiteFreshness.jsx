@@ -63,7 +63,7 @@ export default function SiteFreshness({ reason = 'publish', compact = false }) {
             Сайт собран {built ? `${dateTime(built)} · ${ago(built)}` : '— сборок ещё не было'}
           </span>
         )}
-        {note && <div className="mt-1 text-xs text-blue">{note}</div>}
+        {note && <div className="mt-1 text-xs text-violet">{note}</div>}
         {error && <div className="mt-1 text-xs text-red-400">{error}</div>}
       </div>
       <Button variant={stale ? 'primary' : 'ghost'} onClick={run} disabled={busy}>

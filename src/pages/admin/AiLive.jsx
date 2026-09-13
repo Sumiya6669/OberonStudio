@@ -201,7 +201,7 @@ export default function AiLive() {
         </Panel>
 
         <Panel title="Лента шагов" className="xl:col-span-2"
-               action={<Link to="/admin/ai/queue" className="text-xs text-blue hover:underline">
+               action={<Link to="/admin/ai/queue" className="text-xs text-violet hover:underline">
                  Журнал целиком →
                </Link>}>
           {!steps.length ? (
@@ -244,7 +244,7 @@ export default function AiLive() {
 
       <div className="grid gap-4 lg:grid-cols-2">
         <Panel title="Расход"
-               action={<Link to="/admin/ai/spend" className="text-xs text-blue hover:underline">Подробно →</Link>}>
+               action={<Link to="/admin/ai/spend" className="text-xs text-violet hover:underline">Подробно →</Link>}>
           <div className="grid grid-cols-3 gap-3">
             <Stat label="Сегодня" value={usd(p.spend?.today_usd)} />
             <Stat label="За месяц" value={usd(p.spend?.month_usd)} />
@@ -270,7 +270,7 @@ export default function AiLive() {
         </Panel>
 
         <Panel title="Очередь"
-               action={<Link to="/admin/ai/queue" className="text-xs text-blue hover:underline">Все задания →</Link>}>
+               action={<Link to="/admin/ai/queue" className="text-xs text-violet hover:underline">Все задания →</Link>}>
           <Table
             empty="Живых заданий нет."
             cols={[

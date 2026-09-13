@@ -80,7 +80,7 @@ export default function AiRobot() {
           <h2 className="text-[clamp(2.2rem,6vw,4.5rem)] font-black tracking-[-0.04em] leading-[1.02] text-white mb-6">
             {at.aiTitle}
             <br />
-            <span className="text-gradient-blue">{at.aiTitle2}</span>
+            <span className="text-gradient-violet">{at.aiTitle2}</span>
           </h2>
 
           <p className="text-base text-white/40 leading-relaxed mb-10 max-w-md">{at.aiSub}</p>

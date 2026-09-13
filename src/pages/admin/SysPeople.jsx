@@ -240,7 +240,7 @@ export default function SysPeople() {
                         roles: on ? form.roles.filter((c) => c !== r.code) : [...form.roles, r.code],
                       })}
                       className={`rounded-lg border px-2.5 py-1 text-xs ${
-                        on ? 'border-blue/50 bg-blue/10 text-blue' : 'border-line text-muted-foreground'}`}>
+                        on ? 'border-violet/50 bg-violet/10 text-violet' : 'border-line text-muted-foreground'}`}>
                       {r.title}
                     </button>
                   );

@@ -12,23 +12,23 @@
     --card-foreground: 0 0% 97%;
     --popover: 0 0% 5%;
     --popover-foreground: 0 0% 97%;
-    --primary: 220 100% 60%;
+    --primary: 252 100% 68%;
     --primary-foreground: 0 0% 100%;
     --secondary: 0 0% 8%;
     --secondary-foreground: 0 0% 97%;
     --muted: 0 0% 8%;
     --muted-foreground: 0 0% 45%;
-    --accent: 220 100% 60%;
+    --accent: 252 100% 68%;
     --accent-foreground: 0 0% 100%;
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 98%;
     --border: 0 0% 10%;
     --input: 0 0% 10%;
-    --ring: 220 100% 60%;
+    --ring: 252 100% 68%;
     --radius: 0.75rem;
 
-    --blue: 220 100% 60%;
-    --blue-dim: 220 80% 40%;
+    --violet: 252 100% 68%;
+    --violet-dim: 252 85% 52%;
     --gold: 43 74% 58%;
     --surface: 0 0% 6%;
     --surface-2: 0 0% 9%;
@@ -48,7 +48,7 @@
     text-rendering: optimizeLegibility;
   }
   ::selection {
-    background: hsl(220 100% 60% / 0.3);
+    background: hsl(252 100% 68% / 0.3);
     color: white;
   }
 }
@@ -56,8 +56,8 @@
 /* ── Scrollbar ── */
 ::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: hsl(220 100% 60% / 0.2); border-radius: 4px; }
-::-webkit-scrollbar-thumb:hover { background: hsl(220 100% 60% / 0.4); }
+::-webkit-scrollbar-thumb { background: hsl(252 100% 68% / 0.2); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: hsl(252 100% 68% / 0.4); }
 
 /* Скрытый скроллбар — боковое меню, ленты фильтров */
 .scrollbar-none { scrollbar-width: none; -ms-overflow-style: none; }
@@ -66,8 +66,8 @@
 /* ── Grid overlay ── */
 .grid-bg {
   background-image:
-    linear-gradient(hsl(220 100% 60% / 0.04) 1px, transparent 1px),
-    linear-gradient(90deg, hsl(220 100% 60% / 0.04) 1px, transparent 1px);
+    linear-gradient(hsl(252 100% 68% / 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, hsl(252 100% 68% / 0.04) 1px, transparent 1px);
   background-size: 60px 60px;
 }
 
@@ -96,8 +96,8 @@
 }
 
 /* ── Gradient text ── */
-.text-gradient-blue {
-  background: linear-gradient(135deg, #fff 0%, #6b9fff 40%, #4d7fff 100%);
+.text-gradient-violet {
+  background: linear-gradient(135deg, #fff 0%, #B9A6FF 40%, #7C5CFF 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -116,9 +116,9 @@
 }
 
 /* ── Glow ── */
-.glow-blue { box-shadow: 0 0 60px hsl(220 100% 60% / 0.15), 0 0 120px hsl(220 100% 60% / 0.05); }
-.glow-blue-strong { box-shadow: 0 0 40px hsl(220 100% 60% / 0.4), 0 0 80px hsl(220 100% 60% / 0.15); }
-.glow-text { text-shadow: 0 0 80px hsl(220 100% 60% / 0.4); }
+.glow-violet { box-shadow: 0 0 60px hsl(252 100% 68% / 0.15), 0 0 120px hsl(252 100% 68% / 0.05); }
+.glow-violet-strong { box-shadow: 0 0 40px hsl(252 100% 68% / 0.4), 0 0 80px hsl(252 100% 68% / 0.15); }
+.glow-text { text-shadow: 0 0 80px hsl(252 100% 68% / 0.4); }
 
 /* ── Animations ── */
 @keyframes float-y {

@@ -13,8 +13,8 @@ module.exports = {
       colors: {
         background: 'hsl(var(--background))',
         foreground: 'hsl(var(--foreground))',
-        blue: 'hsl(var(--blue))',
-        'blue-dim': 'hsl(var(--blue-dim))',
+        violet: 'hsl(var(--violet))',
+        'violet-dim': 'hsl(var(--violet-dim))',
         gold: 'hsl(var(--gold))',
         surface: 'hsl(var(--surface))',
         'surface-2': 'hsl(var(--surface-2))',
@@ -30,7 +30,7 @@ module.exports = {
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',
         ring: 'hsl(var(--ring))',
-        chart: { '1': 'hsl(var(--blue))', '2': 'hsl(var(--gold))', '3': 'hsl(220 60% 50%)', '4': 'hsl(280 60% 60%)', '5': 'hsl(340 70% 55%)' },
+        chart: { '1': 'hsl(var(--violet))', '2': 'hsl(var(--gold))', '3': 'hsl(252 60% 58%)', '4': 'hsl(280 60% 60%)', '5': 'hsl(340 70% 55%)' },
       },
       keyframes: {
         'accordion-down': { from: { height: '0' }, to: { height: 'var(--radix-accordion-content-height)' } },

@@ -112,7 +112,7 @@ export default function AiSpend() {
                                   borderRadius: 12, fontSize: 12 }}
                   formatter={(value) => [usd(value), 'расход']} />
                 <RBar dataKey="cost" radius={[4, 4, 0, 0]}>
-                  {byDay.map((d) => <Cell key={d.day} fill="#4d7fff" />)}
+                  {byDay.map((d) => <Cell key={d.day} fill="#7C5CFF" />)}
                 </RBar>
               </BarChart>
             </ResponsiveContainer>

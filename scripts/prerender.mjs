@@ -213,7 +213,7 @@ function buildLlmsTxt(content) {
     settings.email && `- Почта: ${settings.email}`,
   ].filter(Boolean).join('\n');
 
-  return `# Oberon Studio
+  return `# Tinker
 
 > Разработка и сопровождение 1С, AI-агенты и автоматизация бизнес-процессов.
 > Казахстан.

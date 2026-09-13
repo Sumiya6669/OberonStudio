@@ -22,7 +22,7 @@ export const SITE_URL = (
   import.meta?.env?.VITE_SITE_URL || 'https://oberon-studio.vercel.app'
 ).replace(/\/$/, '');
 
-export const SITE_NAME = 'Oberon Studio';
+export const SITE_NAME = 'Tinker';
 
 /** Картинка для превью ссылки в мессенджере и соцсети. */
 export const OG_IMAGE = `${SITE_URL}/og.png`;

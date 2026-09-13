@@ -58,11 +58,11 @@ function Input({ field, value, onChange }) {
     case 'color':
       return (
         <div className="flex items-center gap-2">
-          <input type="color" value={value || '#4d7fff'}
+          <input type="color" value={value || '#7C5CFF'}
                  onChange={(e) => onChange(e.target.value)}
                  className="h-9 w-12 cursor-pointer rounded border border-line bg-background" />
           <input className={inputClass} value={value ?? ''}
-                 onChange={(e) => onChange(e.target.value)} placeholder="#4d7fff" />
+                 onChange={(e) => onChange(e.target.value)} placeholder="#7C5CFF" />
         </div>
       );
     case 'image':

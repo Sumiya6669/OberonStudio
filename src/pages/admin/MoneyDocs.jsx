@@ -140,7 +140,7 @@ export default function MoneyDocs() {
                   <div className="flex flex-wrap gap-1">
                     {r.ticket_ids.slice(0, 4).map((id) => (
                       <Link key={id} to={`/admin/tickets/${id}`}
-                            className="rounded border border-line px-1.5 text-xs text-blue hover:underline">
+                            className="rounded border border-line px-1.5 text-xs text-violet hover:underline">
                         #{id}
                       </Link>
                     ))}

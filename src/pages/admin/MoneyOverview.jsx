@@ -71,7 +71,7 @@ export default function MoneyOverview() {
 
       {Number(drafts.data?.length) > 0 && (
         <Panel title={`Черновики учёта: ${drafts.data.length}`}
-               action={<Link to="/admin/money/entries" className="text-xs text-blue hover:underline">
+               action={<Link to="/admin/money/entries" className="text-xs text-violet hover:underline">
                  Разобрать →
                </Link>}>
           <p className="mb-3 text-xs text-muted-foreground">
@@ -97,7 +97,7 @@ export default function MoneyOverview() {
 
       <div className="grid gap-4 lg:grid-cols-2">
         <Panel title="Кто сколько должен"
-               action={<Link to="/admin/money/docs" className="text-xs text-blue hover:underline">Счета →</Link>}>
+               action={<Link to="/admin/money/docs" className="text-xs text-violet hover:underline">Счета →</Link>}>
           <Table
             empty="Счетов ещё не выставлено."
             rowKey={(r) => r.company_id}
@@ -121,7 +121,7 @@ export default function MoneyOverview() {
         </Panel>
 
         <Panel title="Отработано, но не выставлено"
-               action={<Link to="/admin/money/docs" className="text-xs text-blue hover:underline">
+               action={<Link to="/admin/money/docs" className="text-xs text-violet hover:underline">
                  Выставить счёт →
                </Link>}>
           {!unbilled.data?.length ? (
@@ -146,7 +146,7 @@ export default function MoneyOverview() {
       </div>
 
       <Panel title="Сальдо по счетам"
-             action={<Link to="/admin/money/reports" className="text-xs text-blue hover:underline">
+             action={<Link to="/admin/money/reports" className="text-xs text-violet hover:underline">
                Оборотно-сальдовая →
              </Link>}>
         <Table

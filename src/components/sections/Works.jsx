@@ -7,7 +7,7 @@ import { buildFallbackProjects } from '@/lib/content/portfolio';
 import { useProjects } from '@/lib/site/SiteContentContext';
 import WorkModal from './WorkModal';
 
-const COLORS = ['#4d7fff', '#f0a020', '#10d4a8', '#a855f7', '#f472b6', '#06b6d4'];
+const COLORS = ['#7C5CFF', '#f0a020', '#10d4a8', '#a855f7', '#f472b6', '#06b6d4'];
 
 function WorkCard({ item, color, onOpen }) {
   const [hover, setHover] = useState(false);
@@ -66,7 +66,7 @@ function WorkCard({ item, color, onOpen }) {
       <div className="p-5 flex flex-col flex-1">
         <div className="flex items-start justify-between mb-1.5">
           <h3 className="text-sm font-semibold text-white/80 group-hover:text-white transition-colors">{item.title}</h3>
-          <span className="text-[10px] text-white/20 ml-2 flex-shrink-0">{item.client_name || 'Oberon'}</span>
+          <span className="text-[10px] text-white/20 ml-2 flex-shrink-0">{item.client_name || 'Tinker'}</span>
         </div>
         <p className="text-xs text-white/35 leading-relaxed mb-3 line-clamp-2">{item.description}</p>
         <div className="flex flex-wrap gap-1 mb-3">

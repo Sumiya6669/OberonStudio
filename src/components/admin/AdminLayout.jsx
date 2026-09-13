@@ -7,6 +7,7 @@
  * двадцать одинаковых ссылок в столбик перестают читаться на пятой.
  */
 import React from 'react';
+import Mark from '@/components/brand/Mark';
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import {
   Bot, Building2, Clock, Database, ExternalLink, FileText, Globe, Inbox,
@@ -82,7 +83,7 @@ function activeGroup(pathname) {
 
 const linkClass = ({ isActive }) => cx(
   'flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm transition',
-  isActive ? 'bg-blue/10 text-blue' : 'text-muted-foreground hover:bg-white/5 hover:text-foreground',
+  isActive ? 'bg-violet/10 text-violet' : 'text-muted-foreground hover:bg-white/5 hover:text-foreground',
 );
 
 export default function AdminLayout() {
@@ -99,11 +100,13 @@ export default function AdminLayout() {
   return (
     <div className="min-h-screen bg-background font-inter text-foreground">
       {/* Панель в поиске не нужна и не должна там оказаться. */}
-      <Seo title="Oberon Core" noindex />
+      <Seo title="Tinker Core" noindex />
       <div className="flex min-h-screen">
         <aside className="hidden w-60 shrink-0 border-r border-line bg-surface/40 lg:flex lg:flex-col">
           <div className="border-b border-line px-4 py-4">
-            <div className="text-sm font-semibold tracking-tight">Oberon Core</div>
+            <div className="flex items-center gap-2 text-sm font-semibold tracking-tight">
+              <Mark size={20} /> Tinker Core
+            </div>
             <div className="mt-0.5 truncate text-xs text-muted-foreground">
               {person?.full_name || session?.user?.email || 'панель'}
             </div>
@@ -161,7 +164,7 @@ export default function AdminLayout() {
                 <button key={group.code}
                   onClick={() => navigate(group.items[0].to)}
                   className={cx('whitespace-nowrap rounded-lg px-3 py-1.5 text-xs font-medium',
-                    current === group.code ? 'bg-blue/15 text-blue' : 'text-muted-foreground')}>
+                    current === group.code ? 'bg-violet/15 text-violet' : 'text-muted-foreground')}>
                   {group.label}
                 </button>
               ))}

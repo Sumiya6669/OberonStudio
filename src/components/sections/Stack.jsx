@@ -7,7 +7,7 @@ import { useStack } from '@/lib/site/SiteContentContext';
 const BUILT_IN_CATEGORIES = [
   {
     icon: '🧠',
-    color: '#4d7fff',
+    color: '#7C5CFF',
     items: [
       { name: 'OpenAI GPT-4o', color: '#10A37F' },
       { name: 'Claude 3.5 Sonnet', color: '#D97757' },
@@ -16,7 +16,7 @@ const BUILT_IN_CATEGORIES = [
       { name: 'LangGraph', color: '#2E86AB' },
       { name: 'RAG', color: '#6366F1' },
       { name: 'Vector DB', color: '#8B5CF6' },
-      { name: 'AI Agents', color: '#4d7fff' },
+      { name: 'AI Agents', color: '#7C5CFF' },
     ],
   },
   {

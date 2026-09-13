@@ -3,20 +3,20 @@ import { motion } from 'framer-motion';
 import Reveal from '../../core/Reveal';
 
 const CORE_MODULES = [
-  { label: 'CRM', icon: '📊', color: '#4d7fff' },
+  { label: 'CRM', icon: '📊', color: '#7C5CFF' },
   { label: 'Финансы', icon: '💰', color: '#f0a020' },
   { label: 'Клиенты', icon: '👥', color: '#10d4a8' },
   { label: 'Склад', icon: '📦', color: '#a855f7' },
   { label: 'Посещаемость', icon: '📅', color: '#06b6d4' },
   { label: 'Бронирование', icon: '🗓️', color: '#f472b6' },
-  { label: 'AI агент', icon: '🤖', color: '#4d7fff' },
+  { label: 'AI агент', icon: '🤖', color: '#7C5CFF' },
   { label: 'WhatsApp', icon: '💬', color: '#10d4a8' },
-  { label: 'Telegram', icon: '✈️', color: '#4d7fff' },
+  { label: 'Telegram', icon: '✈️', color: '#7C5CFF' },
   { label: 'Отчёты', icon: '📋', color: '#a855f7' },
   { label: 'Аналитика', icon: '📈', color: '#f0a020' },
 ];
 
-export default function OberonCore() {
+export default function TinkerCore() {
   const [hovered, setHovered] = useState(null);
 
   return (
@@ -33,18 +33,18 @@ export default function OberonCore() {
                   <div className="w-8 h-8 rounded-xl bg-primary/15 border border-primary/25 flex items-center justify-center">
                     <span className="text-sm">⚙️</span>
                   </div>
-                  <span className="text-xs font-bold tracking-[0.2em] text-primary uppercase">Oberon Core</span>
+                  <span className="text-xs font-bold tracking-[0.2em] text-primary uppercase">Tinker Core</span>
                 </div>
                 <h3 className="text-2xl font-black text-white mb-3 tracking-tight">Одна платформа, много отраслевых решений</h3>
                 <p className="text-sm text-white/40 leading-relaxed">
-                  Все решения работают на единой платформе <span className="text-white/60">Oberon Core</span>. Вместо создания десятков отдельных систем 
+                  Все решения работают на единой платформе <span className="text-white/60">Tinker Core</span>. Вместо создания десятков отдельных систем 
                   мы используем единую архитектуру и набор модулей — это позволяет внедрять быстрее, дешевле и надёжнее.
                 </p>
               </div>
               <div className="flex gap-6 flex-shrink-0">
                 {[['3x', 'Быстрее'], ['60%', 'Дешевле'], ['99.9%', 'Uptime']].map(([v, l]) => (
                   <div key={l} className="text-center">
-                    <p className="text-2xl font-black text-gradient-blue">{v}</p>
+                    <p className="text-2xl font-black text-gradient-violet">{v}</p>
                     <p className="text-[10px] text-white/25 mt-1">{l}</p>
                   </div>
                 ))}

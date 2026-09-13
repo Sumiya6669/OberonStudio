@@ -44,14 +44,14 @@ export default function CursorGlow() {
         ref={glowRef}
         className="pointer-events-none fixed top-0 left-0 z-0 w-[600px] h-[600px] rounded-full opacity-[0.06]"
         style={{
-          background: 'radial-gradient(circle, hsl(220 100% 60%) 0%, transparent 70%)',
+          background: 'radial-gradient(circle, hsl(252 100% 68%) 0%, transparent 70%)',
           willChange: 'transform',
         }}
       />
       {/* Ring cursor */}
       <div
         ref={ringRef}
-        className="pointer-events-none fixed top-0 left-0 z-50 w-10 h-10 rounded-full border border-blue/30"
+        className="pointer-events-none fixed top-0 left-0 z-50 w-10 h-10 rounded-full border border-violet/30"
         style={{ willChange: 'transform' }}
       />
     </>

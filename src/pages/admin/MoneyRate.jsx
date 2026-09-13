@@ -169,7 +169,7 @@ export default function MoneyRate() {
                 </div>
                 <div className="flex items-baseline justify-between gap-4 border-t border-line pt-3">
                   <span className="text-sm">Ставка, чтобы получить желаемое</span>
-                  <span className="text-2xl font-semibold tabular-nums text-blue">
+                  <span className="text-2xl font-semibold tabular-nums text-violet">
                     {money(calc.needRate)}
                   </span>
                 </div>

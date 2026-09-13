@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import Mark from '@/components/brand/Mark';
 import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/lib/auth/AuthContext';
 import { Button, ErrorNote, Field, inputClass } from '@/components/admin/ui';
@@ -32,7 +33,9 @@ export default function AdminLogin() {
     <div className="flex min-h-screen items-center justify-center bg-background px-4 font-inter">
       <form onSubmit={onSubmit} className="w-full max-w-sm space-y-4 rounded-2xl border border-line bg-surface/60 p-6">
         <div>
-          <h1 className="text-lg font-semibold tracking-tight">Oberon Core</h1>
+          <h1 className="flex items-center gap-2 text-lg font-semibold tracking-tight">
+            <Mark size={24} /> Tinker Core
+          </h1>
           <p className="mt-1 text-xs text-muted-foreground">Вход в рабочую панель</p>
         </div>
 

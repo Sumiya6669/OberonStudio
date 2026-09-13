@@ -31,7 +31,7 @@ export default function Queue() {
         {FILTERS.map((f) => (
           <button key={f.key} onClick={() => setFilter(f.key)}
             className={cx('rounded-lg border px-3 py-1.5 text-xs transition',
-              filter === f.key ? 'border-blue/40 bg-blue/10 text-blue'
+              filter === f.key ? 'border-violet/40 bg-violet/10 text-violet'
                                : 'border-line text-muted-foreground hover:text-foreground')}>
             {f.label}
           </button>

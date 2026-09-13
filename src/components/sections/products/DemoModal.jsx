@@ -15,9 +15,9 @@ export default function DemoModal({ product, onClose }) {
     try {
       await submitLead({
         ...form,
-        service: product?.name || 'Oberon demo',
+        service: product?.name || 'Tinker demo',
         source: 'demo_modal',
-        message: `Запрос демо: ${product?.name || 'Oberon Products'}`,
+        message: `Запрос демо: ${product?.name || 'Tinker Products'}`,
       });
       setSent(true);
     } catch (err) {

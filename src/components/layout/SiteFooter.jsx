@@ -1,4 +1,5 @@
 import React from 'react';
+import Mark from '@/components/brand/Mark';
 import { LocaleLink as Link } from '@/components/nav/LocaleLink';
 import Reveal from '../core/Reveal';
 import { useLang } from '@/lib/i18n/LangContext';
@@ -19,11 +20,9 @@ export default function SiteFooter() {
         <Reveal>
           <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-10 mb-10">
             <Link to="/" className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-surface-2 border border-line flex items-center justify-center">
-                <span className="text-xs font-black text-gradient-blue">OS</span>
-              </div>
+              <Mark size={30} className="text-white/70" title="Tinker" />
               <div>
-                <p className="text-sm font-semibold text-white/70">Oberon Studio</p>
+                <p className="text-sm font-semibold text-white/70">Tinker</p>
                 <p className="text-xs text-white/25">{ft.subtitle}</p>
               </div>
             </Link>

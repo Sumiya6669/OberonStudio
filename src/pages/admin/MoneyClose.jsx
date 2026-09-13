@@ -163,7 +163,7 @@ export default function MoneyClose() {
                 <div className="text-xs text-muted-foreground">{s.done ? s.ok : s.bad}</div>
               </div>
               {s.to && !s.done && (
-                <Link to={s.to} className="shrink-0 text-xs text-blue hover:underline">Открыть →</Link>
+                <Link to={s.to} className="shrink-0 text-xs text-violet hover:underline">Открыть →</Link>
               )}
             </li>
           ))}
@@ -199,7 +199,7 @@ export default function MoneyClose() {
               ) },
               { key: 'act', title: '', render: (r) => (
                 r.invoice_id ? (
-                  <Link to="/admin/money/docs" className="text-xs text-blue hover:underline">
+                  <Link to="/admin/money/docs" className="text-xs text-violet hover:underline">
                     Открыть →
                   </Link>
                 ) : (
@@ -217,7 +217,7 @@ export default function MoneyClose() {
       </Panel>
 
       <Panel title="Часы без абонемента"
-             action={<Link to="/admin/money/docs" className="text-xs text-blue hover:underline">
+             action={<Link to="/admin/money/docs" className="text-xs text-violet hover:underline">
                Счета и акты →
              </Link>}>
         {hoursOnly.loading ? <Spinner /> : !hoursOnly.data?.length ? (

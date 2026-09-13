@@ -9,21 +9,17 @@ import {
 import { useLang } from '@/lib/i18n/LangContext';
 import { SITE_ROUTES, CONTACT_PATH } from '@/lib/routes';
 import LangSwitcher from './LangSwitcher';
+import Mark from '@/components/brand/Mark';
 
 const ICONS = { Home, Sparkles, FolderKanban, Package, Workflow, Layers, Star, HelpCircle, Mail };
 
 function Logo({ onClick }) {
   return (
     <Link to="/" onClick={onClick} className="group flex items-center gap-3">
-      <div className="relative w-9 h-9 flex-shrink-0">
-        <div className="absolute inset-0 rounded-xl bg-primary opacity-20 group-hover:opacity-50 blur-md transition-opacity duration-500" />
-        <div className="relative w-9 h-9 rounded-xl bg-surface-2 border border-line flex items-center justify-center">
-          <span className="text-xs font-black text-gradient-blue">OS</span>
-        </div>
-      </div>
+      <Mark size={34} className="flex-shrink-0 text-white/85 transition-opacity duration-300 group-hover:opacity-80" title="Tinker" />
       <div className="min-w-0">
-        <p className="text-sm font-semibold text-white/85 tracking-tight leading-tight">Oberon Studio</p>
-        <p className="text-[10px] text-white/25 leading-tight">AI · CRM · 1C</p>
+        <p className="text-sm font-semibold text-white/85 tracking-tight leading-tight">Tinker</p>
+        <p className="text-[10px] text-white/25 leading-tight">1С · интеграции · автоматизация</p>
       </div>
     </Link>
   );

@@ -8,7 +8,7 @@ export default function PageNotFound() {
   return (
     <div className="min-h-screen flex items-center justify-center p-6 bg-background font-inter">
       <div className="max-w-md w-full text-center">
-        <p className="text-[clamp(4rem,15vw,8rem)] font-black tracking-[-0.05em] text-gradient-blue leading-none">404</p>
+        <p className="text-[clamp(4rem,15vw,8rem)] font-black tracking-[-0.05em] text-gradient-violet leading-none">404</p>
         <div className="h-px w-16 bg-line mx-auto my-8" />
 
         <h1 className="text-2xl font-black text-white mb-3">Страница не найдена</h1>

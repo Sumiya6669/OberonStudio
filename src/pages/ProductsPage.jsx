@@ -1,6 +1,6 @@
 import React from 'react';
-import OberonProducts from '../components/sections/OberonProducts';
+import TinkerProducts from '../components/sections/TinkerProducts';
 
 export default function ProductsPage() {
-  return <OberonProducts />;
+  return <TinkerProducts />;
 }
