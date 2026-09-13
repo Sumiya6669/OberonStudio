@@ -135,7 +135,7 @@ export default function TicketDetail() {
         <div className="space-y-4">
           <Panel title="Оценка">
             {estimates.loading ? <Spinner /> : !estimates.data?.length ? (
-              <Empty>Оценки нет. Поставьте задание Оценщику или впишите вручную.</Empty>
+              <Empty>Оценки пока нет. Оценщик берётся за заявку сам, как только она разобрана; если раннер выключен, задание ждёт его в очереди.</Empty>
             ) : (
               <ul className="space-y-3">
                 {estimates.data.map((e) => (
