@@ -6,9 +6,26 @@
  * кончился суточный предел, заявка всё равно должна быть в системе.
  * Обратный порядок означает потерянные обращения, о которых никто не узнает.
  *
+ * ── Почему отсюда больше не пишут в Telegram в обычном случае ──────────────
+ *
+ * Уведомлением о новой заявке теперь занимается Вестник: запись в crm.ticket
+ * ставит ему задание в той же транзакции, и он доставляет карточку с номером,
+ * сроком ответа и экранированным текстом — каждому владельцу, а не в один
+ * зашитый чат, с повтором при сбое и с эскалацией, если человек не нажал
+ * «Старт» у бота.
+ *
+ * Пока эта функция слала своё сообщение тоже, на одну заявку приходило два —
+ * а два уведомления об одном событии приучают их не читать.
+ *
+ * Остался ровно один случай, когда писать отсюда всё-таки надо: база не
+ * приняла заявку. Тогда о ней не знает никто, включая Вестника, потому что
+ * задание ставит как раз запись в базу. Это последняя линия, и она не
+ * дублирует Вестника, а закрывает дыру, где заявка исчезла бы совсем.
+ *
  * Переменные окружения (Vercel → Settings → Environment Variables):
- *   TELEGRAM_BOT_TOKEN — токен бота от @BotFather
- *   TELEGRAM_CHAT_ID   — id чата, куда слать заявки
+ *   TELEGRAM_BOT_TOKEN — токен бота от @BotFather. Нужен ТОЛЬКО для случая
+ *                        выше; в обычной работе не используется
+ *   TELEGRAM_CHAT_ID   — id чата для того же аварийного случая
  *   SUPABASE_URL       — адрес проекта Supabase
  *   SUPABASE_ANON_KEY  — публичный ключ. Ключ service_role здесь НЕ НУЖЕН:
  *                        запись идёт через функцию public.submit_lead
@@ -137,28 +154,30 @@ export default async function handler(request, response) {
     console.error('Не удалось записать заявку в базу:', error);
   }
 
+  // Заявка в базе — дальше дело Вестника. Здесь больше ничего не отправляем.
+  if (stored) {
+    return response.status(200).json({
+      ok: true, ticketId, delivered: true,
+      ref: receipt?.ref ?? null, reactBy: receipt?.react_by ?? null,
+    });
+  }
+
+  // Сюда попадаем, только если база заявку не приняла.
   const token = process.env.TELEGRAM_BOT_TOKEN;
   const chatId = process.env.TELEGRAM_CHAT_ID;
 
   if (!token || !chatId) {
-    if (stored) {
-      return response.status(200).json({
-        ok: true, ticketId, delivered: false,
-        ref: receipt?.ref ?? null, reactBy: receipt?.react_by ?? null,
-      });
-    }
-    console.error('Telegram credentials are not configured');
-    return response.status(500).json({ error: 'Форма не настроена. Напишите нам в Telegram.' });
+    console.error('База не приняла заявку, а запасной канал не настроен');
+    return response.status(500).json({
+      error: 'Не удалось принять заявку. Напишите нам в Telegram — ответим сразу.',
+    });
   }
 
-  const lines = [
-    ticketId ? `<b>Новая заявка №${ticketId}</b>` : '<b>Новая заявка с сайта</b>',
-    '',
-  ];
+  const lines = ['<b>⚠ Заявка НЕ записана в базу</b>', ''];
   for (const [key, label] of Object.entries(FIELD_LABELS)) {
     if (cleaned[key]) lines.push(`<b>${label}:</b> ${escapeHtml(cleaned[key])}`);
   }
-  if (!stored) lines.push('', '<i>⚠ В базу не записана — проверьте настройки Supabase</i>');
+  lines.push('', '<i>Это запасной канал: заявки нет ни в панели, ни у Вестника.</i>');
   lines.push('', `<i>${new Date().toLocaleString('ru-RU', { timeZone: 'Asia/Almaty' })}</i>`);
 
   try {
@@ -174,30 +193,20 @@ export default async function handler(request, response) {
     });
 
     if (!telegram.ok) {
-      const details = await telegram.text();
-      console.error('Telegram API error:', telegram.status, details);
-      // Заявка в базе — значит она не потеряна, и клиенту не за что извиняться.
-      if (stored) {
-        return response.status(200).json({
-          ok: true, ticketId, delivered: false,
-          ref: receipt?.ref ?? null, reactBy: receipt?.react_by ?? null,
-        });
-      }
-      return response.status(502).json({ error: 'Не удалось доставить заявку. Напишите нам в Telegram.' });
-    }
-
-    return response.status(200).json({
-      ok: true, ticketId, delivered: true,
-      ref: receipt?.ref ?? null, reactBy: receipt?.react_by ?? null,
-    });
-  } catch (error) {
-    console.error('Lead delivery failed:', error);
-    if (stored) {
-      return response.status(200).json({
-        ok: true, ticketId, delivered: false,
-        ref: receipt?.ref ?? null, reactBy: receipt?.react_by ?? null,
+      console.error('Telegram API error:', telegram.status, await telegram.text());
+      // Ни базы, ни Telegram. Врать «принято» нельзя: заявки нет нигде.
+      return response.status(502).json({
+        error: 'Не удалось принять заявку. Напишите нам в Telegram — ответим сразу.',
       });
     }
-    return response.status(500).json({ error: 'Не удалось отправить заявку. Попробуйте позже.' });
+
+    // Заявка ушла в запасной канал, но в системе её нет. delivered: true
+    // здесь было бы обещанием, которого система не держит.
+    return response.status(200).json({ ok: true, ticketId: null, delivered: false, ref: null, reactBy: null });
+  } catch (error) {
+    console.error('Запасной канал тоже не сработал:', error);
+    return response.status(500).json({
+      error: 'Не удалось принять заявку. Напишите нам в Telegram — ответим сразу.',
+    });
   }
 }
