@@ -184,12 +184,11 @@ const en = {
     sub: "If your question isn't here, message me on Telegram — I reply within the hour.",
     cta: 'Get in Touch Directly',
     items: [
-      { q: 'What are the typical timelines?', a: 'Prototype delivery in 7 days. Full projects typically range from 4 to 16 weeks depending on scope. I work in weekly iterations with live demos, so you always know where things stand.' },
-      { q: 'How does payment work?', a: '30% upfront to begin, 40% on prototype approval, 30% on delivery. For larger projects, monthly milestone-based payments are available.' },
-      { q: 'Do you work with international clients?', a: 'Yes. I work with clients in Kazakhstan, Russia, the CIS, and internationally. Communication takes place via Telegram, Notion, and Zoom.' },
-      { q: 'Can AI be integrated into an existing 1C setup?', a: "Yes — this is one of my core specialisations. I can add an AI layer on top of any existing 1C configuration: automation, predictive analytics, voice interfaces." },
-      { q: 'What does post-launch support include?', a: '24/7 monitoring, AI model updates, bug fixes, and feature development. I offer support packages starting at 50,000 ₸/month.' },
-      { q: 'Do you provide any guarantees?', a: 'Yes. All work carries a 6-month guarantee. If the system doesn\'t behave as agreed, I fix it at no charge. I also offer a KPI agreement for AI projects.' },
+      { q: 'Can we work under a contract?', a: 'Yes. The contract is signed with me as a private individual: I have no legal entity. The scope of work, deadlines, amount and acceptance procedure are fixed in writing before the work starts.' },
+      { q: 'How does payment work?', a: 'By bank transfer or to a card. The usual order: part at the start, the rest on acceptance; for longer work — by stages. The amount is named before the work begins and does not change without agreement.' },
+      { q: 'Will there be closing documents?', a: 'A work completion act is signed at the end, if you need it for your internal accounting. Proof of payment is always provided. A VAT invoice is not possible when the contractor is a private individual — that is a separate arrangement, see the next question.' },
+      { q: 'We need a bank transfer with VAT. Is that possible?', a: "It is possible through a partner's sole proprietorship. In that case the contract, invoice and closing documents come from them, while I do the work. This is agreed before the work starts, so that your accounting is not left unable to process the payment." },
+      { q: 'Who is responsible for the result if there is no company?', a: 'The contractor under the agreement is responsible — that is, me personally. Liability and the procedure for fixing defects are written into that same contract. The absence of a legal entity cancels neither the obligations nor the guarantee on what was done.' },
     ],
   },
 

@@ -35,11 +35,16 @@ export default function Contact() {
     return () => window.removeEventListener('mousemove', fn);
   }, []);
 
+  // Плитка канала рисуется только тогда, когда у канала есть и адрес, и ссылка.
+  // Правило общее, не про почту одну: канал без адреса — это не «пустая
+  // подпись», это ссылка в никуда (раньше при пустом email получалось
+  // mailto:undefined). Пустое поле честнее битой ссылки, поэтому канал без
+  // адреса просто исчезает из списка.
   const channels = [
     { label: 'Telegram', sub: settings.telegram, href: settings.telegram_url, icon: MessageCircle },
     { label: 'WhatsApp', sub: settings.whatsapp, href: settings.whatsapp_url, icon: Phone },
-    { label: 'Email', sub: settings.email, href: `mailto:${settings.email}`, icon: Mail },
-  ];
+    { label: 'Email', sub: settings.email, href: settings.email ? `mailto:${settings.email}` : '', icon: Mail },
+  ].filter(c => String(c.sub || '').trim() && String(c.href || '').trim());
 
   const submit = async (event) => {
     event.preventDefault();
@@ -110,6 +115,38 @@ export default function Contact() {
                 })}
               </div>
             </Reveal>
+
+            {(ct.hours || ct.terms?.length || ct.vat) && (
+              <Reveal delay={0.5}>
+                <div className="mt-10 rounded-3xl border border-line bg-surface/60 backdrop-blur-2xl p-6 lg:p-7 text-left space-y-6">
+                  {ct.hours && (
+                    <div>
+                      {ct.hoursTitle && (
+                        <p className="text-[10px] tracking-[0.25em] text-primary/60 uppercase mb-2">{ct.hoursTitle}</p>
+                      )}
+                      <p className="text-sm leading-relaxed text-white/45">{ct.hours}</p>
+                    </div>
+                  )}
+
+                  {ct.terms?.length > 0 && (
+                    <div>
+                      {ct.termsTitle && (
+                        <p className="text-[10px] tracking-[0.25em] text-primary/60 uppercase mb-2">{ct.termsTitle}</p>
+                      )}
+                      <div className="space-y-3">
+                        {ct.terms.map((item, i) => (
+                          <p key={i} className="text-sm leading-relaxed text-white/45">{item}</p>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {ct.vat && (
+                    <p className="text-sm leading-relaxed text-white/30 border-t border-line pt-5">{ct.vat}</p>
+                  )}
+                </div>
+              </Reveal>
+            )}
           </div>
 
           <Reveal delay={0.2}>
