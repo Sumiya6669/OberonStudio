@@ -98,6 +98,13 @@ export default function ProductCard({ product, index, onDemo, onOrder }) {
             </div>
           </div>
 
+          {/* Пометка к цене: у продукта, который ещё никто не внедрял,
+              цена другая, и говорить об этом надо на карточке, а не в
+              переписке — иначе она читается как обычный прайс. */}
+          {product.note && (
+            <p className="-mt-3 mb-4 text-[10px] text-white/25 text-center">{product.note}</p>
+          )}
+
           {/* Buttons */}
           <div className="flex gap-2">
             <button

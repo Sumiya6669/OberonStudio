@@ -59,7 +59,7 @@ const en = {
         title: '1C Development',
         tag: 'EXPERT',
         desc: 'Senior 1C Architect. Custom configuration development, integration with external systems, performance optimization, and AI extensions for 1C.',
-        items: ['Custom configurations', 'AI integration', 'Performance optimization', '24/7 technical support'],
+        items: ['Custom configurations', 'AI integration', 'Performance optimization', 'Support and updates'],
       },
       {
         title: 'Websites & Apps',
@@ -84,7 +84,7 @@ const en = {
     emptyText: 'Projects in this category will appear here.',
     title: 'Selected',
     title2: 'Projects',
-    sub: '120+ projects over 5 years. Here are the highlights.',
+    sub: 'Problems I have solved. A selection.',
     tabs: ['All', 'AI Agent', 'CRM', 'Automation', 'Integration', 'Analytics', 'AI Platform', 'Full Stack'],
     footer: (count) => `Showing ${count} projects · Full portfolio available on request`,
     projects: [
@@ -133,7 +133,7 @@ const en = {
       { title: 'Integrations: WhatsApp, Telegram, 1C, Kaspi, Halyk, iiko', sub: 'Connection · 3–10 days', tag: 'Integrations', desc: 'I connect the solution to your full ecosystem — messengers, payment gateways, ERP, POS systems, CRMs and external APIs. Everything works as a single, unified organism.' },
       { title: 'Testing & Approval', sub: 'QA · 3–7 days', tag: 'QA', desc: 'Full end-to-end testing of all scenarios, load conditions, and edge cases. We review the results together — nothing goes live without your explicit approval.' },
       { title: 'Launch', sub: 'Go Live', tag: 'Launch', desc: 'Zero-downtime deployment. Team onboarding and training. The first two weeks are under close monitoring.' },
-      { title: 'Support & Ongoing Development', sub: '24/7 · continuous', tag: 'Support', desc: 'System monitoring, rapid fixes, AI model updates, and feature expansions. As your business grows, the system scales with it.' },
+      { title: 'Support & Ongoing Development', sub: 'by agreement', tag: 'Support', desc: 'System monitoring, rapid fixes, AI model updates, and feature expansions. As your business grows, the system scales with it.' },
     ],
   },
 

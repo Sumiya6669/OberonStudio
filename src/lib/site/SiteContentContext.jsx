@@ -177,6 +177,7 @@ export function useProducts() {
     categories: it.props?.categories || [],
     price: it.props?.price ?? null,
     subscription: it.props?.subscription ?? null,
+    note: it.props?.note || '',
     popular: Boolean(it.props?.popular),
   })), [items]);
 }

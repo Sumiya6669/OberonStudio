@@ -46,15 +46,16 @@ export default function TinkerProducts() {
           <div className="text-center mb-16">
             <p className="text-xs tracking-[0.3em] text-white/20 uppercase mb-5">Tinker Solutions</p>
             <h2 className="text-[clamp(2.2rem,5vw,4.5rem)] font-black tracking-[-0.04em] leading-[1.05] text-white mb-4">
-              Готовые AI и CRM решения<br />
-              <span className="text-gradient-violet">для быстрого внедрения в бизнес</span>
+              Расширения 1С, которые<br />
+              <span className="text-gradient-violet">делают рутину за бухгалтера</span>
             </h2>
             <p className="text-base text-white/35 max-w-xl mx-auto leading-relaxed">
-              Одна платформа, много отраслевых решений. Выбирайте модуль, адаптируйте под процесс и запускайте быстрее классической разработки.
+              Каждое работает в «Бухгалтерии для Казахстана 3.0» и «Комплексной автоматизации 2.4»
+              и ставится без снятия типовой конфигурации с поддержки. Обновления 1С ничего не сносят.
             </p>
             {/* Quick stats */}
             <div className="flex flex-wrap justify-center gap-6 mt-8">
-              {[['20+', 'готовых продуктов'], ['120+', 'реализованных проектов'], ['15+', 'отраслей'], ['99.9%', 'uptime SLA']].map(([v, l]) => (
+              {[['5', 'продуктов'], ['2', 'конфигурации 1С'], ['216', 'автотестов'], ['0', 'снятий с поддержки']].map(([v, l]) => (
                 <div key={l} className="text-center">
                   <p className="text-xl font-black text-white">{v}</p>
                   <p className="text-[10px] text-white/25 mt-0.5">{l}</p>
