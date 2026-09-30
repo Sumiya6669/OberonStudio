@@ -79,7 +79,7 @@ export default function TinkerCore() {
                 </span>
               </div>
               <h3 className="text-2xl font-black text-white mb-3 tracking-tight">
-                Что общего у всех двенадцати продуктов
+                Что общего у всех расширений 1С
               </h3>
               <p className="text-sm text-white/40 leading-relaxed max-w-2xl">
                 Это не платформа, которую надо внедрять отдельно. Каждый продукт — самостоятельное

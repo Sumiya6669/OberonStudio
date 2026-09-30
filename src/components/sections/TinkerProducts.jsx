@@ -11,6 +11,28 @@ import { PRODUCTS } from '@/lib/content/site';
 import { useProducts } from '@/lib/site/SiteContentContext';
 import { CONTACT_PATH } from '@/lib/routes';
 
+/**
+ * Две группы, а не одна сетка.
+ *
+ * Расширения 1С и разработка под заказ продаются по-разному и устроены
+ * по-разному: у первых есть файл .cfe, установка в базу и всё, что
+ * перечислено в блоке «Одинаково у всех»; у вторых ничего этого нет.
+ * Смешать их в одну сетку значило бы пообещать, что лендинг тоже не
+ * снимает конфигурацию с поддержки.
+ */
+const GRUPPY = [
+  {
+    key: '1c',
+    title: 'Расширения 1С',
+    note: 'Ставятся в вашу базу, типовую конфигурацию не меняют. Всё, что написано выше, относится к ним.',
+  },
+  {
+    key: 'custom',
+    title: 'Разработка под заказ',
+    note: 'Сайты, приложения и CRM. Делаются под вашу задачу с нуля, поэтому цена — нижняя граница: точную называю после разбора, до начала работ.',
+  },
+];
+
 export default function TinkerProducts() {
   const [search, setSearch] = useState('');
   const [activeCategory, setActiveCategory] = useState('Все');
@@ -46,17 +68,17 @@ export default function TinkerProducts() {
           <div className="text-center mb-16">
             <p className="text-xs tracking-[0.3em] text-white/20 uppercase mb-5">Tinker Solutions</p>
             <h2 className="text-[clamp(2.2rem,5vw,4.5rem)] font-black tracking-[-0.04em] leading-[1.05] text-white mb-4">
-              Расширения 1С, которые<br />
-              <span className="text-gradient-violet">делают рутину за бухгалтера</span>
+              Софт, который делает<br />
+              <span className="text-gradient-violet">рутину за вас</span>
             </h2>
             <p className="text-base text-white/35 max-w-xl mx-auto leading-relaxed">
-              Работают в «Бухгалтерии для Казахстана» и «Комплексной автоматизации», на остальные
-              конфигурации переносим под заказ. Ставятся без снятия типовой с поддержки —
-              обновления 1С ничего не сносят.
+              Двенадцать готовых расширений 1С и разработка под заказ: сайты, мобильные и
+              десктоп-приложения, CRM. Расширения ставятся без снятия типовой конфигурации
+              с поддержки — обновления 1С ничего не сносят.
             </p>
             {/* Quick stats */}
             <div className="flex flex-wrap justify-center gap-6 mt-8">
-              {[['12', 'продуктов'], ['8', 'конфигураций 1С'], ['16%', 'НДС с 2026 учтён'], ['0', 'снятий с поддержки']].map(([v, l]) => (
+              {[['20', 'продуктов'], ['12', 'расширений 1С'], ['8', 'конфигураций 1С'], ['0', 'снятий с поддержки']].map(([v, l]) => (
                 <div key={l} className="text-center">
                   <p className="text-xl font-black text-white">{v}</p>
                   <p className="text-[10px] text-white/25 mt-0.5">{l}</p>
@@ -115,11 +137,24 @@ export default function TinkerProducts() {
                   {filtered.length === products.length ? `${products.length} продуктов` : `${filtered.length} из ${products.length}`}
                 </p>
               </div>
-              <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-5 items-stretch">
-                {filtered.map((p, i) => (
-                  <ProductCard key={p.id} product={p} index={i} onDemo={setDemoProduct} onOrder={handleOrder} />
-                ))}
-              </div>
+
+              {GRUPPY.map(({ key, title, note }) => {
+                const gruppa = filtered.filter(p => (p.group || '1c') === key);
+                if (gruppa.length === 0) return null;
+                return (
+                  <div key={key} className="mb-14 last:mb-0">
+                    <div className="mb-5">
+                      <h3 className="text-xl font-black text-white tracking-tight">{title}</h3>
+                      <p className="text-xs text-white/30 mt-1.5 max-w-2xl leading-relaxed">{note}</p>
+                    </div>
+                    <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-5 items-stretch">
+                      {gruppa.map((p, i) => (
+                        <ProductCard key={p.id} product={p} index={i} onDemo={setDemoProduct} onOrder={handleOrder} />
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
             </>
           )}
         </div>
