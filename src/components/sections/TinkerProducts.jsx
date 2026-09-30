@@ -47,12 +47,22 @@ export default function TinkerProducts() {
 
   useEffect(() => {
     setActiveCategory(izAdresa || 'Все');
-    // К сетке прокручиваем только по приходу из меню: при первой загрузке
-    // страницы человек должен увидеть её с начала, а не с середины.
-    if (pervyyRaz.current) { pervyyRaz.current = false; return; }
-    if (izAdresa && setka.current) {
-      setka.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
+    const bylPervym = pervyyRaz.current;
+    pervyyRaz.current = false;
+
+    // Без раздела в адресе страница открывается с начала — как обычно.
+    if (!izAdresa) return undefined;
+
+    // С разделом из меню прокручиваем к сетке: иначе человек нажал
+    // «Сайты» и оказался в шапке каталога, а карточки где-то через два
+    // экрана вниз. При первом заходе ждём, пока закончится переход между
+    // страницами: он сам ставит скролл в ноль на 350-й миллисекунде, и
+    // без паузы две прокрутки спорили бы друг с другом.
+    const zaderzhka = bylPervym ? 620 : 0;
+    const t = setTimeout(() => {
+      if (setka.current) setka.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, zaderzhka);
+    return () => clearTimeout(t);
   }, [izAdresa]);
 
   const vybrat = (cat) => {
@@ -171,11 +181,19 @@ export default function TinkerProducts() {
                       <h3 className="text-xl font-black text-white tracking-tight">{title}</h3>
                       <p className="text-xs text-white/30 mt-1.5 max-w-2xl leading-relaxed">{note}</p>
                     </div>
-                    <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-5 items-stretch">
+                    {/* key по фильтру: при смене раздела карточки проявляются
+                        заново, а не подменяются в кадре. */}
+                    <motion.div
+                      key={activeCategory + search}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+                      className="grid sm:grid-cols-2 xl:grid-cols-3 gap-5 items-stretch"
+                    >
                       {gruppa.map((p, i) => (
                         <ProductCard key={p.id} product={p} index={i} onDemo={setDemoProduct} onOrder={handleOrder} />
                       ))}
-                    </div>
+                    </motion.div>
                   </div>
                 );
               })}

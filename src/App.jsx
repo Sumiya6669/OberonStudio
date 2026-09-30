@@ -5,7 +5,6 @@ import PageNotFound from './lib/PageNotFound';
 import { LangProvider } from '@/lib/i18n/LangContext';
 import { AuthProvider } from '@/lib/auth/AuthContext';
 import { SiteContentProvider } from '@/lib/site/SiteContentContext';
-import ScrollToTop from '@/components/ScrollToTop';
 import SiteLayout from '@/components/layout/SiteLayout';
 import Home from './pages/Home';
 import ServicesPage from './pages/ServicesPage';
@@ -168,7 +167,6 @@ export function AppShell({ initialContent = null }) {
           вход не нужен, содержимое читается ключом anon через одну функцию. */}
       <SiteContentProvider initialContent={initialContent}>
         <AuthProvider>
-          <ScrollToTop />
           <AppRoutes />
           <Toaster />
         </AuthProvider>

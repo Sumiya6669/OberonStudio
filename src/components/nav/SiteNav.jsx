@@ -63,7 +63,7 @@ function schet(g) {
  * диагонали, и попасть в раздел мышью почти невозможно. Слева у панели
  * прозрачная полоса-мостик по той же причине.
  */
-function GruppyFlyout({ open, anchor, onEnter, onLeave }) {
+function GruppyFlyout({ open, anchor, onEnter, onLeave, onVybor }) {
   const [mesto, setMesto] = useState(null);
 
   useEffect(() => {
@@ -115,6 +115,7 @@ function GruppyFlyout({ open, anchor, onEnter, onLeave }) {
               >
                 <Link
                   to={`/products?cat=${encodeURIComponent(g.cat)}`}
+                  onClick={onVybor}
                   className="group/it flex items-center gap-3 rounded-xl px-3 py-2.5
                     text-white/45 hover:text-white hover:bg-white/[0.05] transition-colors duration-200"
                 >
@@ -165,6 +166,9 @@ function NavItems({ onNavigate, compact }) {
 
   const pokazat = () => { clearTimeout(tajmer.current); setGruppy(true); };
   const skryt = () => { clearTimeout(tajmer.current); tajmer.current = setTimeout(() => setGruppy(false), 140); };
+  // После выбора раздела панель должна уйти сразу: иначе она остаётся
+  // висеть поверх страницы, на которую человек только что перешёл.
+  const zakryt = () => { clearTimeout(tajmer.current); setGruppy(false); };
   useEffect(() => () => clearTimeout(tajmer.current), []);
 
   return (
@@ -236,7 +240,13 @@ function NavItems({ onNavigate, compact }) {
             onBlur={skryt}
           >
             {punkt}
-            <GruppyFlyout open={gruppy} anchor={yakor} onEnter={pokazat} onLeave={skryt} />
+            <GruppyFlyout
+              open={gruppy}
+              anchor={yakor}
+              onEnter={pokazat}
+              onLeave={skryt}
+              onVybor={zakryt}
+            />
           </div>
         );
       })}
