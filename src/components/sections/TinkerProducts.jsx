@@ -117,7 +117,7 @@ export default function TinkerProducts() {
             </p>
             {/* Quick stats */}
             <div className="flex flex-wrap justify-center gap-6 mt-8">
-              {[['23', 'продукта'], ['12', 'расширений 1С'], ['8', 'конфигураций 1С'], ['0', 'снятий с поддержки']].map(([v, l]) => (
+              {[['24', 'продукта'], ['12', 'расширений 1С'], ['8', 'конфигураций 1С'], ['0', 'снятий с поддержки']].map(([v, l]) => (
                 <div key={l} className="text-center">
                   <p className="text-xl font-black text-white">{v}</p>
                   <p className="text-[10px] text-white/25 mt-0.5">{l}</p>
