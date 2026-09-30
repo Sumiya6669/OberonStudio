@@ -114,7 +114,7 @@ export default function TinkerProducts() {
                   {filtered.length === products.length ? `${products.length} продуктов` : `${filtered.length} из ${products.length}`}
                 </p>
               </div>
-              <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+              <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-5 items-stretch">
                 {filtered.map((p, i) => (
                   <ProductCard key={p.id} product={p} index={i} onDemo={setDemoProduct} onOrder={handleOrder} />
                 ))}
