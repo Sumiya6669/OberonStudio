@@ -26,6 +26,7 @@ export const SITE_ROUTES = [
  */
 export const PRODUCT_GROUPS = [
   { cat: '1С',          label: 'Расширения 1С', hint: 'ЭСФ, СНТ, банк, НДС' },
+  { cat: 'Боты',        label: 'Боты и сервисы', hint: 'кадры, Kaspi, WhatsApp' },
   { cat: 'Сайты',       label: 'Сайты',         hint: 'от лендинга до магазина' },
   { cat: 'Приложения',  label: 'Приложения',    hint: 'мобильные и десктоп' },
   { cat: 'Мобильные',   label: 'Мобильные',     hint: 'iOS и Android' },
