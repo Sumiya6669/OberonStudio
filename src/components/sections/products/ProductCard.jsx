@@ -41,7 +41,7 @@ export default function ProductCard({ product, index, onDemo, onOrder }) {
               {product.popular && (
                 <span className="flex-shrink-0 flex items-center gap-1 text-[9px] font-bold px-2 py-0.5 rounded-full
                   bg-primary/15 text-primary border border-primary/25 uppercase tracking-wider whitespace-nowrap">
-                  <Zap className="w-2.5 h-2.5" /> Хит
+                  <Zap className="w-2.5 h-2.5" /> Флагман
                 </span>
               )}
             </div>

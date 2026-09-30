@@ -1,99 +1,107 @@
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
+import React from 'react';
 import Reveal from '../../core/Reveal';
 
-const CORE_MODULES = [
-  { label: 'CRM', icon: '📊', color: '#7C5CFF' },
-  { label: 'Финансы', icon: '💰', color: '#f0a020' },
-  { label: 'Клиенты', icon: '👥', color: '#10d4a8' },
-  { label: 'Склад', icon: '📦', color: '#a855f7' },
-  { label: 'Посещаемость', icon: '📅', color: '#06b6d4' },
-  { label: 'Бронирование', icon: '🗓️', color: '#f472b6' },
-  { label: 'AI агент', icon: '🤖', color: '#7C5CFF' },
-  { label: 'WhatsApp', icon: '💬', color: '#10d4a8' },
-  { label: 'Telegram', icon: '✈️', color: '#7C5CFF' },
-  { label: 'Отчёты', icon: '📋', color: '#a855f7' },
-  { label: 'Аналитика', icon: '📈', color: '#f0a020' },
+/**
+ * Одинаковое у всех продуктов.
+ *
+ * Здесь был блок «Tinker Core»: платформа, одиннадцать модулей и три
+ * цифры — «3x быстрее», «60% дешевле», «99.9% uptime». Ни платформы с
+ * такими модулями, ни замеров, из которых взялись бы эти проценты, не
+ * существует. Вместо них то, что у всех продуктов действительно общее
+ * и что клиент проверит в первую же установку.
+ */
+const OBSHCHEE = [
+  {
+    icon: '🧩',
+    title: 'Расширение, а не правка конфигурации',
+    text: 'Ставится как обычное расширение. Типовую конфигурацию не меняет и с поддержки не снимает — обновления 1С продолжают устанавливаться как обычно.',
+  },
+  {
+    icon: '🏠',
+    title: 'Работает внутри вашей 1С',
+    text: 'Отдельной программы и переноса данных в облако нет: проверки идут прямо в базе, результат — в рабочем месте в разделе «Tinker».',
+  },
+  {
+    icon: '📨',
+    title: 'Утренний дайджест в Telegram',
+    text: 'Главное за день коротким сообщением: что горит, сколько денег под риском, что сделать.',
+  },
+  {
+    icon: '🔒',
+    title: 'Данные только читаются',
+    text: 'Документы создаются по кнопке бухгалтера и черновиком, без проведения. В ИС ЭСФ, КГД и банк ничего не уходит без человека.',
+  },
+  {
+    icon: '🔑',
+    title: 'Секреты под замком',
+    text: 'Токены и ключи хранятся в безопасном хранилище 1С, а не в настройках, куда заглядывает любой пользователь.',
+  },
+  {
+    icon: '♻️',
+    title: 'Автообновление с откатом',
+    text: 'Новые версии приходят сами, с проверкой целостности и откатом при ошибке. Нормы 2026 года учтены: новый Налоговый кодекс РК и НДС 16 % с 01.01.2026.',
+  },
+];
+
+const TEHNICHESKOE = [
+  ['Конфигурации', 'Бухгалтерия для Казахстана 3.0 · Комплексная автоматизация 2.4'],
+  ['Платформа', '1С:Предприятие 8.3.27 и новее'],
+  ['Установка', 'Файл расширения .cfe, снять галку «Безопасный режим»'],
 ];
 
 export default function TinkerCore() {
-  const [hovered, setHovered] = useState(null);
-
   return (
     <div className="mb-20">
       <Reveal>
         <div className="rounded-3xl border border-line bg-surface overflow-hidden relative">
-          {/* Header */}
           <div className="relative px-8 py-10 border-b border-line">
             <div className="absolute inset-0 grid-bg opacity-30" />
             <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent" />
-            <div className="relative flex flex-col lg:flex-row gap-8 items-start lg:items-center">
-              <div className="flex-1 max-w-2xl">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-8 h-8 rounded-xl bg-primary/15 border border-primary/25 flex items-center justify-center">
-                    <span className="text-sm">⚙️</span>
-                  </div>
-                  <span className="text-xs font-bold tracking-[0.2em] text-primary uppercase">Tinker Core</span>
+            <div className="relative">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-8 h-8 rounded-xl bg-primary/15 border border-primary/25 flex items-center justify-center">
+                  <span className="text-sm">⚙️</span>
                 </div>
-                <h3 className="text-2xl font-black text-white mb-3 tracking-tight">Одна платформа, много отраслевых решений</h3>
-                <p className="text-sm text-white/40 leading-relaxed">
-                  Все решения работают на единой платформе <span className="text-white/60">Tinker Core</span>. Вместо создания десятков отдельных систем 
-                  мы используем единую архитектуру и набор модулей — это позволяет внедрять быстрее, дешевле и надёжнее.
-                </p>
+                <span className="text-xs font-bold tracking-[0.2em] text-primary uppercase">
+                  Одинаково у всех
+                </span>
               </div>
-              <div className="flex gap-6 flex-shrink-0">
-                {[['3x', 'Быстрее'], ['60%', 'Дешевле'], ['99.9%', 'Uptime']].map(([v, l]) => (
-                  <div key={l} className="text-center">
-                    <p className="text-2xl font-black text-gradient-violet">{v}</p>
-                    <p className="text-[10px] text-white/25 mt-1">{l}</p>
-                  </div>
-                ))}
-              </div>
+              <h3 className="text-2xl font-black text-white mb-3 tracking-tight">
+                Что общего у всех двенадцати продуктов
+              </h3>
+              <p className="text-sm text-white/40 leading-relaxed max-w-2xl">
+                Это не платформа, которую надо внедрять отдельно. Каждый продукт — самостоятельное
+                расширение, и всё перечисленное ниже одинаково верно для любого из них.
+              </p>
             </div>
           </div>
 
-          {/* Modules grid */}
           <div className="p-8">
-            <p className="text-[10px] tracking-[0.25em] text-white/20 uppercase mb-5">Модули платформы</p>
-            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2.5">
-              {CORE_MODULES.map((mod, i) => (
-                <motion.div
-                  key={mod.label}
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  whileInView={{ opacity: 1, scale: 1 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: i * 0.04, duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-                  onHoverStart={() => setHovered(mod.label)}
-                  onHoverEnd={() => setHovered(null)}
-                  className="relative rounded-2xl border border-line p-3 flex flex-col items-center gap-2 cursor-default transition-all duration-300 hover:border-white/15"
-                  style={{ background: hovered === mod.label ? `${mod.color}0a` : 'transparent' }}
-                >
-                  <span className="text-xl">{mod.icon}</span>
-                  <span className="text-[10px] text-white/40 text-center font-medium leading-tight">{mod.label}</span>
-                  {hovered === mod.label && (
-                    <motion.div
-                      layoutId="module-glow"
-                      className="absolute inset-0 rounded-2xl"
-                      style={{ boxShadow: `inset 0 0 20px ${mod.color}15` }}
-                    />
-                  )}
-                </motion.div>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+              {OBSHCHEE.map((item) => (
+                <div key={item.title} className="rounded-2xl border border-line bg-surface-2 p-5">
+                  <div className="text-lg mb-3">{item.icon}</div>
+                  <p className="text-sm font-bold text-white/85 mb-2 leading-snug">{item.title}</p>
+                  <p className="text-xs text-white/40 leading-relaxed">{item.text}</p>
+                </div>
               ))}
             </div>
 
-            {/* Connection line visual */}
-            <div className="mt-6 pt-6 border-t border-line flex items-center gap-3 flex-wrap">
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-                <span className="text-[10px] text-white/25">Все продукты используют общие модули</span>
-              </div>
-              <span className="text-white/10 hidden sm:block">·</span>
-              <span className="text-[10px] text-white/20">Единая база данных</span>
-              <span className="text-white/10 hidden sm:block">·</span>
-              <span className="text-[10px] text-white/20">API-first архитектура</span>
-              <span className="text-white/10 hidden sm:block">·</span>
-              <span className="text-[10px] text-white/20">Безопасность enterprise-уровня</span>
+            <div className="mt-6 rounded-2xl border border-line bg-surface-2 divide-y divide-line">
+              {TEHNICHESKOE.map(([label, value]) => (
+                <div key={label} className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-6 px-5 py-3.5">
+                  <p className="text-[10px] tracking-[0.2em] text-white/25 uppercase sm:w-36 flex-shrink-0">{label}</p>
+                  <p className="text-xs text-white/55 leading-relaxed">{value}</p>
+                </div>
+              ))}
             </div>
+
+            <p className="mt-5 text-xs text-white/30 leading-relaxed">
+              Цена у каждого продукта — внедрение разово плюс подписка помесячно, за одну базу 1С.
+              Внедрение: установка, настройка под вашу базу, первый прогон на копии и обучение бухгалтера.
+              Подписка: обновления под новые нормы и релизы 1С, техподдержка, ИИ-запросы в пределах лимита.
+              Цены без НДС — мы не плательщик НДС.
+            </p>
           </div>
         </div>
       </Reveal>
