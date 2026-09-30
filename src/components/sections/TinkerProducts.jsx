@@ -1,4 +1,5 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { LocaleLink as Link } from '@/components/nav/LocaleLink';
 import { Search, BarChart2 } from 'lucide-react';
@@ -34,8 +35,31 @@ const GRUPPY = [
 ];
 
 export default function TinkerProducts() {
+  // Раздел приходит из меню ссылкой /products?cat=Сайты. Держать его в
+  // адресе, а не только в состоянии, нужно чтобы ссылку можно было
+  // отправить в переписке и чтобы «назад» возвращал к прежнему фильтру.
+  const [params, setParams] = useSearchParams();
+  const izAdresa = params.get('cat');
   const [search, setSearch] = useState('');
-  const [activeCategory, setActiveCategory] = useState('Все');
+  const [activeCategory, setActiveCategory] = useState(izAdresa || 'Все');
+  const setka = useRef(null);
+  const pervyyRaz = useRef(true);
+
+  useEffect(() => {
+    setActiveCategory(izAdresa || 'Все');
+    // К сетке прокручиваем только по приходу из меню: при первой загрузке
+    // страницы человек должен увидеть её с начала, а не с середины.
+    if (pervyyRaz.current) { pervyyRaz.current = false; return; }
+    if (izAdresa && setka.current) {
+      setka.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, [izAdresa]);
+
+  const vybrat = (cat) => {
+    setActiveCategory(cat);
+    if (cat === 'Все') setParams({}, { replace: true });
+    else setParams({ cat }, { replace: true });
+  };
   const [showCompare, setShowCompare] = useState(false);
   const [demoProduct, setDemoProduct] = useState(undefined);
   const fromDb = useProducts();
@@ -115,7 +139,7 @@ export default function TinkerProducts() {
             {categories.map(cat => (
               <button
                 key={cat}
-                onClick={() => setActiveCategory(cat)}
+                onClick={() => vybrat(cat)}
                 className={`flex-shrink-0 px-4 py-2 rounded-xl text-xs font-semibold transition-all border ${activeCategory === cat ? 'bg-primary/10 text-primary border-primary/25' : 'text-white/30 border-line hover:text-white/60 bg-surface'}`}
               >
                 {cat}
@@ -125,7 +149,7 @@ export default function TinkerProducts() {
         </Reveal>
 
         {/* Products grid */}
-        <div className="mb-16">
+        <div className="mb-16 scroll-mt-24" ref={setka}>
           {filtered.length === 0 ? (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center py-20 text-white/20 text-sm">
               Продукты не найдены. Попробуйте изменить фильтр.
