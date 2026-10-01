@@ -12,8 +12,11 @@
  */
 const KEY = 'ag_campaign';
 
+// fbclid и yclid — метки клика, которые ставят сами Meta и Яндекс. Без них
+// маркетолог не может сообщить площадке, что лид стал клиентом: сопоставить
+// событие ей не с чем, а контакты лида площадкам мы не передаём.
 const UTM_KEYS = [
-  'utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term',
+  'utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term', 'fbclid', 'yclid',
 ];
 
 export function captureCampaign() {
