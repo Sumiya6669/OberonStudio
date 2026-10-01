@@ -22,7 +22,27 @@
  * работу в панели — консультант знает о ней со следующего запроса.
  */
 
-const MODEL = 'claude-sonnet-4-6';
+// Модель — актуальная, как во всех продуктах Tinker; поменять без выкладки кода — CONSULTANT_MODEL в Vercel.
+const MODEL = process.env.CONSULTANT_MODEL || 'claude-opus-5';
+
+/**
+ * Цена ответа в $ — та же таблица, что в Products for AI Tinker (tinker1c.usage), сверена 01.10.2026:
+ * $ за 1 млн токенов — вход, выход, чтение кэша (0 → 0,1 × входа); запись в кэш — 1,25 × входа.
+ * Строка `llm_usage` уходит в логи Vercel: по ним видно, сколько стоит консультант за день и месяц.
+ */
+const PRICES = {
+  'claude-fable-5-1': [10, 50, 0.25], 'claude-fable-5': [10, 50, 1], 'claude-opus-5-5': [4, 20, 0.2],
+  'claude-opus-5': [5, 25, 0], 'claude-sonnet-5': [2, 10, 0], 'claude-haiku-4-5': [1, 5, 0],
+};
+
+function costUsd(model, usage = {}) {
+  const name = Object.keys(PRICES).sort((a, b) => b.length - a.length)
+    .find((k) => model === k || String(model).startsWith(`${k}-`)) || 'claude-opus-5';
+  const [inp, out, read] = PRICES[name];
+  const n = (k) => Number(usage[k]) || 0;
+  return (n('input_tokens') * inp + n('output_tokens') * out + n('cache_creation_input_tokens') * inp * 1.25
+    + n('cache_read_input_tokens') * (read || inp * 0.1)) / 1e6;
+}
 const MAX_HISTORY = 12;
 
 /** Содержимое сайта кешируется: дёргать базу на каждую реплику незачем. */
@@ -105,6 +125,7 @@ function buildBrief(content) {
 const RULES = `Ты — Keen, консультант студии Tinker из Казахстана. Студия занимается 1С: разработка, сопровождение, интеграции, аудит конфигураций. Общаешься на сайте студии с потенциальными клиентами.
 
 КАК ОТВЕЧАТЬ:
+- Ты — ИИ, а не человек. Не выдавай себя за человека; если спросят — прямо скажи, что ты ИИ-консультант (закон РК об ИИ, ст. 21)
 - Пиши на языке собеседника (русский, казахский или английский)
 - Коротко: 2–4 предложения, без списков и заголовков, живым языком
 - Задавай один уточняющий вопрос в конце, чтобы понять задачу — как делает живой менеджер
@@ -227,6 +248,13 @@ export default async function handler(request, response) {
     }
 
     const data = await result.json();
+    const usage = data.usage || {};
+    console.log(JSON.stringify({
+      event: 'llm_usage', product: 'site-consultant', model: data.model || MODEL,
+      input: usage.input_tokens || 0, output: usage.output_tokens || 0,
+      cache_read: usage.cache_read_input_tokens || 0, cache_write: usage.cache_creation_input_tokens || 0,
+      usd: Number(costUsd(data.model || MODEL, usage).toFixed(6)),
+    }));
     const reply = (data.content || [])
       .filter(block => block.type === 'text')
       .map(block => block.text)
