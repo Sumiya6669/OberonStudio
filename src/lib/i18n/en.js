@@ -224,7 +224,7 @@ const en = {
     role: 'Tinker consultant for 1C',
     online: 'online',
     placeholder: 'Describe what happened...',
-    greeting: 'Hello, I am Keen — the Tinker consultant. I answer about 1C: what broke, what a job costs, what it includes.\n\nTell me what is happening — and which configuration you run, if you know.',
+    greeting: 'Hello, I am Keen — the Tinker AI consultant (an AI answers; a person confirms prices and dates). I answer about 1C: what broke, what a job costs, what it includes.\n\nTell me what is happening — and which configuration you run, if you know.',
     disclaimer: 'Answered by a bot. The team gives exact estimates.',
   },
 
