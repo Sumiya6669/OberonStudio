@@ -46,7 +46,8 @@ export default function MoneyOverview() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-lg font-semibold tracking-tight">Деньги</h1>
         <span className="text-xs text-muted-foreground">
-          Управленческий учёт. Налоговая отчётность и ЭСФ здесь не ведутся — это дело 1С.
+          Управленческий учёт. Налоги ИП, ЭСФ и 910.00 — в разделе{' '}
+          <Link to="/admin/money/tax" className="text-violet hover:underline">«Налоги ИП»</Link>.
         </span>
       </div>
       <ErrorNote error={balance.error || pnl.error} />
