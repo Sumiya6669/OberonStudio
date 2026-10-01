@@ -44,6 +44,8 @@ import MoneyEntries from './pages/admin/MoneyEntries';
 import MoneyReports from './pages/admin/MoneyReports';
 import MoneyRate from './pages/admin/MoneyRate';
 import MoneyClose from './pages/admin/MoneyClose';
+import MoneyTax from './pages/admin/MoneyTax';
+import Funnel from './pages/admin/Funnel';
 import AiLive from './pages/admin/AiLive';
 import AiSpend from './pages/admin/AiSpend';
 import AiRights from './pages/admin/AiRights';
@@ -113,6 +115,7 @@ const AppRoutes = () => (
       <Route path="tickets" element={<Tickets />} />
       <Route path="tickets/:id" element={<TicketDetail />} />
       <Route path="companies" element={<Companies />} />
+      <Route path="funnel" element={<Funnel />} />
       <Route path="configs" element={<DevConfigs />} />
       <Route path="time" element={<TimeSheet />} />
       <Route path="sources" element={<Sources />} />
@@ -127,6 +130,7 @@ const AppRoutes = () => (
       <Route path="money/reports" element={<MoneyReports />} />
       <Route path="money/rate" element={<MoneyRate />} />
       <Route path="money/close" element={<MoneyClose />} />
+      <Route path="money/tax" element={<MoneyTax />} />
 
       {/* ИИ */}
       <Route path="ai" element={<AiLive />} />

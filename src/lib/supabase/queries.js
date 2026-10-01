@@ -554,3 +554,52 @@ export const fetchMonthCloseHours = async (month = null) =>
  */
 export const fetchDbHygiene = async () =>
   unwrap(await appDb.from('v_db_hygiene').select('*').maybeSingle());
+
+/* ── Налоги ИП (схема tax, миграция 049) ───────────────────────────────── */
+
+/**
+ * Схема tax в API не открыта: читаем витрины app.v_tax_*, пишем функциями
+ * app.tax_* (security invoker — права те же, только владелец). Считает доход,
+ * 910.00 и соцплатежи Python-бухгалтер; экран показывает и принимает отметки.
+ */
+export const fetchTaxProfile = async () =>
+  unwrap(await appDb.from('v_tax_profile').select('*').maybeSingle());
+
+export const saveTaxProfile = async (p) =>
+  unwrap(await appDb.rpc('tax_profile_save', { p }));
+
+export const fetchTaxActs = async () =>
+  unwrap(await appDb.from('v_tax_acts').select('*').order('issued_on', { ascending: false }));
+
+export const saveTaxAct = async (docId, p) =>
+  unwrap(await appDb.rpc('tax_act_save', { p_doc: docId, p }));
+
+export const saveCompanyKind = async (companyId, kind) =>
+  unwrap(await appDb.rpc('tax_company_kind_save', { p_company: companyId, p_kind: kind }));
+
+export const fetchTaxIncome = async ({ from, to } = {}) => {
+  let q = appDb.from('v_tax_income').select('*').order('income_date');
+  if (from) q = q.gte('income_date', from);
+  if (to) q = q.lte('income_date', to);
+  return unwrap(await q);
+};
+
+export const fetchTaxEsf = async () =>
+  unwrap(await appDb.from('v_tax_esf').select('*').order('esf_deadline'));
+
+export const fetchTaxBank = async ({ onlyOpen = true, limit = 200 } = {}) => {
+  let q = appDb.from('v_tax_bank').select('*').order('line_date', { ascending: false }).limit(limit);
+  if (onlyOpen) q = q.eq('confirmed', false);
+  return unwrap(await q);
+};
+
+export const setBankLine = async (id, kind, confirm = false) =>
+  unwrap(await appDb.rpc('tax_bank_line_set', { p_id: id, p_kind: kind, p_confirm: confirm }));
+
+/* ── Воронка продаж (crm.deal, миграция 050) ───────────────────────────── */
+
+export const fetchDeals = async () =>
+  unwrap(await appDb.from('v_deal_funnel').select('*').order('updated_at', { ascending: false }).limit(500));
+
+export const updateDeal = async (id, patch) =>
+  unwrap(await crmDb.from('deal').update(patch).eq('id', id).select().single());

@@ -13,7 +13,7 @@ import {
   Bot, Building2, Clock, Database, ExternalLink, FileText, Globe, Inbox,
   LayoutDashboard, ListTodo, LogOut, Receipt, Settings, ShieldCheck, Users,
   Wallet, Activity, Coins, BookOpen, PieChart, HeartPulse, Boxes, Compass,
-  Repeat, Gauge, CalendarCheck,
+  Repeat, Gauge, CalendarCheck, Landmark, Filter,
 } from 'lucide-react';
 import { useAuth } from '@/lib/auth/AuthContext';
 import { cx } from './ui';
@@ -25,6 +25,7 @@ export const NAV_GROUPS = [
     items: [
       { to: '/admin', end: true, label: 'Обзор', icon: LayoutDashboard },
       { to: '/admin/tickets', label: 'Заявки', icon: Inbox },
+      { to: '/admin/funnel', label: 'Воронка', icon: Filter },
       { to: '/admin/companies', label: 'Компании', icon: Building2 },
       { to: '/admin/time', label: 'Время', icon: Clock },
       { to: '/admin/subscriptions', label: 'Абонементы и сроки', icon: Repeat },
@@ -46,6 +47,7 @@ export const NAV_GROUPS = [
       { to: '/admin/money/reports', label: 'Отчёты', icon: PieChart },
       { to: '/admin/money/rate', label: 'Ставка и безубыточность', icon: Gauge },
       { to: '/admin/money/close', label: 'Закрытие месяца', icon: CalendarCheck },
+      { to: '/admin/money/tax', label: 'Налоги ИП', icon: Landmark },
     ],
   },
   {
