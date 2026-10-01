@@ -595,3 +595,11 @@ export const fetchTaxBank = async ({ onlyOpen = true, limit = 200 } = {}) => {
 
 export const setBankLine = async (id, kind, confirm = false) =>
   unwrap(await appDb.rpc('tax_bank_line_set', { p_id: id, p_kind: kind, p_confirm: confirm }));
+
+/* ── Воронка продаж (crm.deal, миграция 050) ───────────────────────────── */
+
+export const fetchDeals = async () =>
+  unwrap(await appDb.from('v_deal_funnel').select('*').order('updated_at', { ascending: false }).limit(500));
+
+export const updateDeal = async (id, patch) =>
+  unwrap(await crmDb.from('deal').update(patch).eq('id', id).select().single());

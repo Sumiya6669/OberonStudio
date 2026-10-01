@@ -7,6 +7,7 @@ import { SITE_SETTINGS } from '@/lib/content/site';
 import { useAnswers, useCases, useOffers, useSettings } from '@/lib/site/SiteContentContext';
 import KeenFace from './KeenFace';
 import { submitLead } from '@/lib/leads';
+import { readCampaign } from '@/lib/analytics/campaign';
 import {
   findAnswer, findInContent, containsContact,
   QUICK_REPLIES, LEAD_PROMPT, LEAD_DONE, LEAD_FAILED, LINK_LABELS,
@@ -18,6 +19,28 @@ const LEAD_AFTER = 3;
 /** Пауза перед ответом — мгновенный отклик выглядит роботизированно. */
 function thinkingDelay(text) {
   return Math.min(1600, 500 + text.length * 6);
+}
+
+/**
+ * Идентификатор разговора для ИИ-продажника: один на вкладку, как и метки
+ * кампании. Это не слежка между визитами — закрыл вкладку, разговор новый.
+ */
+function chatSession() {
+  try {
+    let id = sessionStorage.getItem('tk_chat_session');
+    if (!id) {
+      id = (crypto.randomUUID?.() || `${Date.now()}${Math.random()}`).replace(/[^A-Za-z0-9]/g, '').slice(0, 32);
+      sessionStorage.setItem('tk_chat_session', id);
+    }
+    return id;
+  } catch {
+    return '';
+  }
+}
+
+function campaignSource() {
+  const { utm, referrer, landing } = readCampaign();
+  return { ...utm, ...(referrer ? { referrer } : {}), ...(landing ? { page: landing } : {}) };
 }
 
 function TelegramIcon(props) {
@@ -39,6 +62,9 @@ export default function Consultant() {
   const [typing, setTyping] = useState(false);
   const [leadAsked, setLeadAsked] = useState(false);
   const [leadSent, setLeadSent] = useState(false);
+  // Разговор ведёт ИИ-продажник: согласие, карточку и контакт собирает он, а
+  // не виджет. Узнаём это по первому ответу /api/chat.
+  const [agentMode, setAgentMode] = useState(false);
   const scrollRef = useRef(null);
   const inputRef = useRef(null);
 
@@ -71,19 +97,28 @@ export default function Consultant() {
     if (open) inputRef.current?.focus();
   }, [open]);
 
-  /** Пробует ответить через языковую модель; если она не настроена — null. */
-  const askModel = useCallback(async (history) => {
+  /**
+   * Пробует ответить через продажника или языковую модель; если ни того, ни
+   * другого нет — null. `raw` — то, что уходит продажнику (id кнопки согласия
+   * вместо её надписи).
+   */
+  const askModel = useCallback(async (history, raw) => {
     try {
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           messages: history.map(m => ({ role: m.role, content: m.content })),
+          session: chatSession(),
+          text: raw,
+          source: campaignSource(),
         }),
       });
+      const data = await response.json().catch(() => ({}));
+      if (data.agent) setAgentMode(true);
       if (!response.ok) return null;
-      const data = await response.json();
-      return data.reply?.trim() || null;
+      if (data.agent) return { text: data.reply?.trim() || '', buttons: data.buttons || [], agent: true };
+      return data.reply?.trim() ? { text: data.reply.trim(), buttons: [] } : null;
     } catch {
       return null;
     }
@@ -110,14 +145,16 @@ export default function Consultant() {
     }
   }, []);
 
-  const respond = useCallback(async (text) => {
-    const userMessage = { role: 'user', content: text };
-    const history = [...messages, userMessage];
+  const respond = useCallback(async (text, label) => {
+    const userMessage = { role: 'user', content: label || text };
+    // кнопки под прошлыми ответами больше не нужны: выбор сделан
+    const history = [...messages.map(m => (m.buttons ? { ...m, buttons: undefined } : m)), userMessage];
     setMessages(history);
     setTyping(true);
 
     // Клиент оставил телефон, ник или почту — передаём заявку команде.
-    if (!leadSent && containsContact(text)) {
+    // С продажником этого не делаем: контакт он берёт сам и только после согласия.
+    if (!agentMode && !leadSent && containsContact(text)) {
       const ok = await sendLead(text, history);
       const reply = ok ? (LEAD_DONE[lang] || LEAD_DONE.ru) : (LEAD_FAILED[lang] || LEAD_FAILED.ru);
       setLeadSent(ok);
@@ -130,25 +167,29 @@ export default function Consultant() {
     // или она не ответила — ищем среди опубликованного на сайте, и только в
     // последнюю очередь берём заготовку из кода. Заготовка последняя именно
     // потому, что она единственная, которая устаревает молча.
-    const fromModel = await askModel(history);
+    const fromModel = await askModel(history, text);
+    if (fromModel?.agent && !fromModel.text) {    // диалог у человека, продажник промолчал
+      setTyping(false);
+      return;
+    }
     const local = fromModel
       ? null
       : (published && findInContent(text, published)) || findAnswer(text, lang);
-    const reply = fromModel || local.text;
+    const reply = fromModel?.text || local.text;
 
     await new Promise(resolve => setTimeout(resolve, thinkingDelay(reply)));
 
     const userTurns = history.filter(m => m.role === 'user').length;
-    const shouldAskLead = !leadAsked && !leadSent && userTurns >= LEAD_AFTER;
+    const shouldAskLead = !agentMode && !fromModel?.agent && !leadAsked && !leadSent && userTurns >= LEAD_AFTER;
 
     setTyping(false);
     setMessages(prev => [
       ...prev,
-      { role: 'assistant', content: reply, link: local?.link },
+      { role: 'assistant', content: reply, link: local?.link, buttons: fromModel?.buttons?.length ? fromModel.buttons : undefined },
       ...(shouldAskLead ? [{ role: 'assistant', content: LEAD_PROMPT[lang] || LEAD_PROMPT.ru }] : []),
     ]);
     if (shouldAskLead) setLeadAsked(true);
-  }, [messages, lang, leadAsked, leadSent, askModel, sendLead, published]);
+  }, [messages, lang, leadAsked, leadSent, agentMode, askModel, sendLead, published]);
 
   const send = (value) => {
     const text = (value ?? input).trim();
@@ -216,6 +257,20 @@ export default function Consultant() {
                       >
                         {linkLabel} <ArrowUpRight className="w-3 h-3" />
                       </Link>
+                    )}
+                    {m.buttons?.length > 0 && (
+                      <div className="mt-2.5 flex flex-wrap gap-1.5">
+                        {m.buttons.map(b => (
+                          <button
+                            key={b.id}
+                            onClick={() => !typing && respond(b.id, b.label)}
+                            className="text-[11px] px-2.5 py-1.5 rounded-full border border-primary/30 text-white/80
+                              hover:text-white hover:bg-primary/10 transition-all duration-300"
+                          >
+                            {b.label}
+                          </button>
+                        ))}
+                      </div>
                     )}
                   </div>
                 </div>

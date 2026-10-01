@@ -121,10 +121,67 @@ async function systemPrompt() {
   return brief ? `${RULES}\n\n${brief}` : RULES;
 }
 
+/**
+ * ИИ-продажник (Products for AI Tinker / ИИ-продажник) — если он подключён.
+ *
+ * Тогда разговор ведёт он, а не этот файл: он берёт согласие на обработку
+ * персональных данных ДО того, как переписка уйдёт в модель, квалифицирует
+ * лида, подбирает продукты из каталога и передаёт владельцу. Живёт на сервере
+ * в Казахстане рядом с базой лидов (закон о ПД, ст. 12 п. 2); отсюда к нему —
+ * сервер-сервер с общим ключом, браузер ключа не видит.
+ *
+ *   SALES_AGENT_URL — например https://agent.tinker.kz/chat
+ *   SALES_AGENT_KEY — тот же, что SALES_HTTP_KEY у продажника
+ *
+ * Продажник не ответил — модель напрямую НЕ зовём: она получила бы переписку
+ * без согласия. Виджет в этом случае отвечает по встроенной базе знаний.
+ */
+async function askAgent(body) {
+  const url = process.env.SALES_AGENT_URL;
+  const key = process.env.SALES_AGENT_KEY;
+  if (!url || !key) return null;
+
+  const session = typeof body.session === 'string' ? body.session : '';
+  const text = typeof body.text === 'string' ? body.text.trim().slice(0, 2000) : '';
+  if (!/^[A-Za-z0-9_-]{8,64}$/.test(session) || !text) return { error: 400 };
+
+  const raw = body.source && typeof body.source === 'object' ? body.source : {};
+  const source = Object.fromEntries(Object.entries(raw)
+    .filter(([, v]) => typeof v === 'string' && v)
+    .slice(0, 8)
+    .map(([k, v]) => [String(k).slice(0, 32), v.slice(0, 200)]));
+
+  try {
+    const result = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Sales-Key': key },
+      body: JSON.stringify({ session, text, source }),
+      signal: AbortSignal.timeout(60000),
+    });
+    if (!result.ok) return { error: result.status === 429 ? 429 : 502 };
+    const data = await result.json();
+    const replies = Array.isArray(data.replies) ? data.replies : [];
+    return {
+      reply: replies.map(r => r.text).filter(Boolean).join('\n\n'),
+      buttons: replies.flatMap(r => (Array.isArray(r.buttons) ? r.buttons : [])),
+    };
+  } catch (error) {
+    console.error('Sales agent failed:', error?.name || error);
+    return { error: 502 };
+  }
+}
+
 export default async function handler(request, response) {
   if (request.method !== 'POST') {
     response.setHeader('Allow', 'POST');
     return response.status(405).json({ error: 'Method not allowed' });
+  }
+
+  const agentBody = typeof request.body === 'string' ? safeParse(request.body) : request.body || {};
+  const agent = await askAgent(agentBody);
+  if (agent) {
+    if (agent.error) return response.status(agent.error).json({ error: 'Agent unavailable', agent: true });
+    return response.status(200).json({ reply: agent.reply, buttons: agent.buttons, agent: true });
   }
 
   const apiKey = process.env.ANTHROPIC_API_KEY;
