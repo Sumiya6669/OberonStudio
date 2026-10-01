@@ -148,7 +148,7 @@ async function askAgent(body) {
   const raw = body.source && typeof body.source === 'object' ? body.source : {};
   const source = Object.fromEntries(Object.entries(raw)
     .filter(([, v]) => typeof v === 'string' && v)
-    .slice(0, 8)
+    .slice(0, 10)
     .map(([k, v]) => [String(k).slice(0, 32), v.slice(0, 200)]));
 
   try {
