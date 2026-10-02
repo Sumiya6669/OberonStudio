@@ -22,8 +22,9 @@
  * работу в панели — консультант знает о ней со следующего запроса.
  */
 
-// Модель — актуальная, как во всех продуктах Tinker; поменять без выкладки кода — CONSULTANT_MODEL в Vercel.
-const MODEL = process.env.CONSULTANT_MODEL || 'claude-opus-5';
+// Модель — самая дешёвая из актуальных: Haiku 4.5, около $0,005 за ответ (правила и каталог ~4 тыс. токенов на
+// входе, ответ до 400). Поменять без выкладки кода — CONSULTANT_MODEL в Vercel.
+const MODEL = process.env.CONSULTANT_MODEL || 'claude-haiku-4-5';
 
 /**
  * Цена ответа в $ — та же таблица, что в Products for AI Tinker (tinker1c.usage), сверена 01.10.2026:
