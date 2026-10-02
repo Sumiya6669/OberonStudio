@@ -30,6 +30,15 @@
  *   SUPABASE_ANON_KEY  — публичный ключ. Ключ service_role здесь НЕ НУЖЕН:
  *                        запись идёт через функцию public.submit_lead
  *                        с ограниченными правами.
+ *   VITE_YM_ID         — номер счётчика Яндекс Метрики (тот же, что у сайта)
+ *   YM_MS_TOKEN        — секретный токен Measurement Protocol (Метрика →
+ *                        Настройки → Measurement Protocol). Без него цель
+ *                        «лид» отправляет браузер.
+ *
+ * Цель «лид» в Метрику уходит с сервера: браузер может закрыться сразу после
+ * отправки формы, а блокировщики режут счётчик. Уходит только ClientID
+ * посетителя (если он согласился на счётчик), страница и название цели —
+ * ни имени, ни телефона, ни текста заявки.
  */
 
 const FIELD_LABELS = {
@@ -51,6 +60,30 @@ function escapeHtml(value) {
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;');
+}
+
+/**
+ * Цель «лид» в Яндекс Метрику через Measurement Protocol. true — Метрика
+ * приняла. Ошибка здесь заявку не роняет: она уже в базе.
+ */
+async function sendMetrikaGoal(clientIdValue, page) {
+  const counter = process.env.VITE_YM_ID;
+  const token = process.env.YM_MS_TOKEN;
+  if (!counter || !token || !/^\d{6,30}$/.test(clientIdValue || '')) return false;
+  const site = process.env.VITE_SITE_URL || 'https://' + (process.env.VERCEL_PROJECT_PRODUCTION_URL || '');
+  const params = new URLSearchParams({
+    tid: counter, cid: clientIdValue, t: 'event', ea: 'lead', ms: token,
+    et: String(Math.floor(Date.now() / 1000)),
+    dl: new URL(page || '/', site).toString(),
+  });
+  try {
+    const result = await fetch(`https://mc.yandex.ru/collect/?${params}`, { signal: AbortSignal.timeout(3000) });
+    if (!result.ok) console.error('Метрика не приняла цель:', result.status, (await result.text()).slice(0, 200));
+    return result.ok;
+  } catch (error) {
+    console.error('Метрика недоступна:', error?.name || error);
+    return false;
+  }
 }
 
 function safeParse(value) {
@@ -156,9 +189,10 @@ export default async function handler(request, response) {
 
   // Заявка в базе — дальше дело Вестника. Здесь больше ничего не отправляем.
   if (stored) {
+    const metrika = await sendMetrikaGoal(String(body.ym_client_id || ''), cleaned.page) ? 'sent' : 'browser';
     return response.status(200).json({
       ok: true, ticketId, delivered: true,
-      ref: receipt?.ref ?? null, reactBy: receipt?.react_by ?? null,
+      ref: receipt?.ref ?? null, reactBy: receipt?.react_by ?? null, metrika,
     });
   }
 

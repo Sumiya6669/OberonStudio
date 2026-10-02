@@ -7,10 +7,14 @@
  * которого обещан ответ. Оба приходят из базы, а не придумываются здесь.
  */
 import { readCampaign } from '@/lib/analytics/campaign';
+import { clientId, reachGoal } from '@/lib/analytics/metrika';
 
 export async function submitLead(values) {
   // Метки снимались при заходе на сайт, а не сейчас: см. campaign.js.
   const campaign = readCampaign();
+  // ClientID Метрики — только если посетитель согласился на счётчик; по нему
+  // сервер засчитывает цель «лид». Контакты в Метрику не уходят никогда.
+  const ymClientId = await clientId();
 
   const response = await fetch('/api/lead', {
     method: 'POST',
@@ -29,6 +33,7 @@ export async function submitLead(values) {
       landing: campaign.landing || '',
       referrer: campaign.referrer || '',
       utm: campaign.utm || {},
+      ym_client_id: ymClientId,
     }),
   });
 
@@ -43,5 +48,9 @@ export async function submitLead(values) {
     throw new Error(reason);
   }
 
-  return response.json().catch(() => ({ ok: true }));
+  const receipt = await response.json().catch(() => ({ ok: true }));
+  // Сервер не отправил цель сам (нет токена Measurement Protocol или ClientID) —
+  // отправляет браузер. Без согласия на счётчик reachGoal ничего не делает.
+  if (receipt?.metrika !== 'sent') reachGoal('lead');
+  return receipt;
 }

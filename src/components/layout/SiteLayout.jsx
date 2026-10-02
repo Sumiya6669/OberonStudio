@@ -7,6 +7,7 @@ import Consultant from '../chat/Consultant';
 import CursorGlow from '../core/CursorGlow';
 import RouteSeo from '@/lib/seo/RouteSeo';
 import PageTransition from './PageTransition';
+import CookieConsent from './CookieConsent';
 
 /**
  * Раскладка публичного сайта.
@@ -51,6 +52,7 @@ export default function SiteLayout() {
       </div>
 
       <Consultant />
+      <CookieConsent />
     </div>
   );
 }
