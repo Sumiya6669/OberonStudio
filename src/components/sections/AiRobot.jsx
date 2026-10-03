@@ -1,9 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { LocaleLink as Link } from '@/components/nav/LocaleLink';
-import TinkerMark3D from '@/components/core/TinkerMark3D';
+import { InteractiveRobotSpline } from '@/components/ui/interactive-3d-robot';
 import { useLang } from '@/lib/i18n/LangContext';
 import { CONTACT_PATH } from '@/lib/routes';
+
+const ROBOT_SCENE_URL = 'https://prod.spline.design/PyzDhpQ9E5f1E3MT/scene.splinecode';
 
 export default function AiRobot() {
   const { t } = useLang();
@@ -43,11 +45,17 @@ export default function AiRobot() {
     >
       {/* 3D-сцена */}
       <div className="absolute inset-0 lg:left-[38%]">
-        {/* Свечение-подложка: видно, пока грузится three, и остаётся, если WebGL нет */}
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-          <div className="w-[520px] h-[520px] max-w-full rounded-full bg-primary/10 blur-3xl" />
-        </div>
-        {visible && <TinkerMark3D className="relative w-full h-full" />}
+        {visible && (
+          <InteractiveRobotSpline
+            scene={ROBOT_SCENE_URL}
+            className="w-full h-full"
+            fallback={
+              <div className="w-full h-full flex items-center justify-center">
+                <div className="w-40 h-40 rounded-full bg-primary/10 blur-3xl" />
+              </div>
+            }
+          />
+        )}
       </div>
 
       {/* Затемнение, чтобы текст читался поверх сцены */}
