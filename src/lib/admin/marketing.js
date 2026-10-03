@@ -128,7 +128,7 @@ export function summarizeLeads(rows) {
   const site = list.filter((r) => r.channel === 'site');
   const withUtm = list.filter((r) => UTM_FIELDS.some((k) => tagOf(r, k)));
   const withRef = list.filter((r) => hostOf(r.referrer));
-  const withForm = list.filter((r) => formOf(r.body));
+  const withForm = list.filter((r) => r.form || formOf(r.body));
 
   const utm = {};
   for (const key of UTM_FIELDS) utm[key] = countBy(list, (r) => tagOf(r, key) || NO_TAG);
@@ -141,7 +141,7 @@ export function summarizeLeads(rows) {
     withForm: withForm.length,
     byChannel: countBy(list, (r) => CHANNELS[r.channel] || r.channel || '—'),
     byForm: countBy(list, (r) => {
-      const code = formOf(r.body);
+      const code = r.form || formOf(r.body);   // колонка form — с миграции 055, раньше — из строки согласия
       return code ? FORMS[code] || code : NO_FORM;
     }),
     byLanding: countBy(list, (r) => (r.landing_page || '').trim() || NO_PAGE),

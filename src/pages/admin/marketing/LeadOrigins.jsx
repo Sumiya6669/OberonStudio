@@ -181,10 +181,9 @@ export default function LeadOrigins() {
                     с ними ещё не было. Соберите их на вкладке «Ссылки с метками».
                   </p>
                 )}
-                <Notice title="fbclid и yclid пока не сохраняются в базе">
-                  Сайт снимает их при входе, но /api/lead и функция public.submit_lead пропускают только
-                  utm_source, utm_medium, utm_campaign, utm_content и utm_term. Поэтому клики из рекламы
-                  Meta и Яндекса здесь не видны и вернуть площадке «лид стал клиентом» не с чем.
+                <Notice title="fbclid и yclid — с миграции 055">
+                  После миграции 055 метки клика Meta и Яндекса сохраняются в crm.ticket.utm рядом с utm_*;
+                  у заявок до неё их нет.
                 </Notice>
                 <div className="grid gap-4 xl:grid-cols-2">
                   <ShareTable title="utm_source" nameTitle="Источник" rows={s.utm.utm_source} />
@@ -202,18 +201,14 @@ export default function LeadOrigins() {
               <li>
                 <span className="font-medium">fbclid и yclid.</span>{' '}
                 <span className="text-muted-foreground">
-                  Новой миграцией пересоздать public.submit_lead так, чтобы фильтр ключей метки
-                  пропускал fbclid и yclid (лягут в crm.ticket.utm рядом с utm_*), и добавить эти
-                  два ключа в UTM_KEYS в api/lead.js — иначе сервер отрежет их раньше базы.
+                  Закрывает миграция 055 (submit_lead пропускает их в crm.ticket.utm) вместе с api/lead.js.
                 </span>
               </li>
               <li>
                 <span className="font-medium">Форма заявки.</span>{' '}
                 <span className="text-muted-foreground">
-                  Миграцией добавить колонку crm.ticket.form (text) и запись payload-&gt;&gt;'source' в неё
-                  в public.submit_lead; в api/lead.js передавать source в payload. Тогда форма будет
-                  считаться и у длинных заявок, где строка согласия обрезается, и не будет зависеть от
-                  текста согласия.
+                  С миграции 055 — колонка crm.ticket.form; у заявок до неё форма берётся из строки согласия
+                  в тексте (с 04.10.2026).
                 </span>
               </li>
               <li>

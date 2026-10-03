@@ -626,7 +626,7 @@ export const MARKETING_LEADS_LIMIT = 5000;
  */
 export const fetchLeadOrigins = async ({ from, to }) =>
   unwrap(await crmDb.from('ticket')
-    .select('id, created_at, channel, landing_page, referrer, utm, body')
+    .select('*')   // колонка form появляется с миграции 055 — '*' работает и до неё, и после
     .gte('created_at', from.toISOString())
     .lt('created_at', to.toISOString())
     .order('created_at', { ascending: false })

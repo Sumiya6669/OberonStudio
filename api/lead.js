@@ -130,6 +130,10 @@ async function saveToDatabase(body) {
         landing: body.landing || body.page,
         referrer: body.referrer,
         utm: body.utm,
+        // Форма и согласие — колонками заявки (миграция 055); до неё база эти поля просто не берёт.
+        source: body.source,
+        consent: body.consent === true,
+        consent_version: body.consent_version,
         channel: 'site',
         received_at: new Date().toISOString(),
       },
@@ -175,7 +179,8 @@ export default async function handler(request, response) {
   // Метки кампании приходят объектом, поэтому через строковую чистку не идут.
   // Берём только известные ключи и только строки: складывать в базу
   // произвольный объект из браузера — значит однажды получить туда мусор.
-  const UTM_KEYS = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term'];
+  // fbclid и yclid — метки клика Meta и Яндекса: по ним конверсия возвращается в кабинет без контактов клиента.
+  const UTM_KEYS = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term', 'fbclid', 'yclid'];
   cleaned.utm = Object.fromEntries(
     UTM_KEYS
       .map(key => [key, String(body?.utm?.[key] ?? '').trim().slice(0, 200)])
@@ -187,6 +192,8 @@ export default async function handler(request, response) {
   // заявки: так она попадает и в базу, и в аварийное сообщение в Telegram.
   // Только дата, без времени: база ловит повтор по началу текста, секунды сделали бы каждую копию «новой».
   const consentVersion = String(body.consent_version || '').trim().slice(0, 40) || 'не указана';
+  cleaned.consent = true;
+  cleaned.consent_version = consentVersion;
   const consentLine = `Согласие на обработку ПД: да · версия ${consentVersion}`
     + ` · форма ${cleaned.source || 'website'} · ${new Date().toISOString().slice(0, 10)}`;
   cleaned.message = [cleaned.message, consentLine].filter(Boolean).join('\n\n');
