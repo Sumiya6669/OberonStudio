@@ -22,7 +22,6 @@ import {
 } from './jsonld';
 import { SITE_NAME } from './pages';
 import { useTestimonials } from '@/lib/site/SiteContentContext';
-import { buildFallbackTestimonials } from '@/lib/content/portfolio';
 import { splitLocale } from '@/lib/i18n/locales';
 
 export default function RouteSeo() {
@@ -149,7 +148,8 @@ export default function RouteSeo() {
       if (block) blocks.push(block);
     }
     if (pathname === '/reviews') {
-      const list = reviewsDb || buildFallbackTestimonials(t, lang);
+      // Только отзывы из базы (прошли модерацию). Выдуманные в разметку не идут никогда.
+      const list = reviewsDb || [];
       const block = reviewsLd(list);
       if (block) blocks.push(block);
     }

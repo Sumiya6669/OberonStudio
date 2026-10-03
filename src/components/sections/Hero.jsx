@@ -119,11 +119,13 @@ export default function Hero() {
   const y = useTransform(scrollYProgress, [0, 1], [0, 120]);
   const opacity = useTransform(scrollYProgress, [0, 0.6], [1, 0]);
 
+  // Только то, что проверяется по каталогу на этом же сайте (src/lib/content/site.js).
+  // «120+ проектов», «24/7» и подобное убраны: доказать их нечем.
   const statsData = [
-    { n: 120, suf: '+', static: null },
-    { n: 8, suf: '+', static: null },
-    { n: 5, suf: '+', static: null },
-    { n: null, suf: '', static: '24/7' },
+    { n: 24, suf: '', static: null },
+    { n: 12, suf: '', static: null },
+    { n: 4, suf: '', static: null },
+    { n: 2, suf: '', static: null },
   ];
   const heroTitle = null;
   const heroSubtitle = h.sub;

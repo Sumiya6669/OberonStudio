@@ -8,9 +8,7 @@ const COMPARE_FEATURES = [
   'Единая архитектура',
   'WhatsApp интеграция',
   'AI функции',
-  'Поддержка 24/7',
   'Обновления включены',
-  'Гарантия результата',
 ];
 
 const COLUMNS = [
@@ -18,21 +16,21 @@ const COLUMNS = [
     label: 'Tinker',
     sub: 'Готовое решение',
     highlight: true,
-    values: [true, true, true, true, true, true, true, true],
+    values: [true, true, true, true, true, true],
     color: '#7C5CFF',
   },
   {
     label: 'Заказная разработка',
     sub: 'Custom разработчик',
     highlight: false,
-    values: [false, false, false, '?', '?', false, false, false],
+    values: [false, false, false, '?', '?', false],
     color: null,
   },
   {
     label: 'Коробочное ПО',
-    sub: 'amoCRM / Bitrix24',
+    sub: 'Готовая CRM из коробки',
     highlight: false,
-    values: [true, true, false, '?', false, false, false, false],
+    values: [true, true, false, '?', false, false],
     color: null,
   },
 ];
@@ -57,7 +55,7 @@ export default function ProductCompare({ onClose }) {
         <div className="flex items-center justify-between px-6 py-5 border-b border-line">
           <div>
             <h3 className="font-bold text-white">Сравнение подходов</h3>
-            <p className="text-xs text-white/30 mt-0.5">Почему Tinker — лучший выбор</p>
+            <p className="text-xs text-white/30 mt-0.5">Чем отличаются подходы</p>
           </div>
           <button onClick={onClose} className="text-white/25 hover:text-white/70 transition-colors text-xl">✕</button>
         </div>

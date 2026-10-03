@@ -1,7 +1,6 @@
-import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Reveal from '../core/Reveal';
 import { useLang } from '@/lib/i18n/LangContext';
-import { buildFallbackTestimonials } from '@/lib/content/portfolio';
 import { useTestimonials } from '@/lib/site/SiteContentContext';
 
 function ReviewCard({ item }) {
@@ -27,7 +26,7 @@ function ReviewCard({ item }) {
 }
 
 export default function Reviews() {
-  const { t, lang } = useLang();
+  const { t } = useLang();
   const rt = t.reviews;
   const [isPaused, setIsPaused] = useState(false);
   const trackRef = useRef(null);
@@ -35,8 +34,9 @@ export default function Reviews() {
   const rafRef = useRef(null);
   const SPEED = 0.5;
   const fromDb = useTestimonials();
-  const fallbackReviews = useMemo(() => buildFallbackTestimonials(t, lang), [t, lang]);
-  const reviews = fromDb ?? fallbackReviews;
+  // Только опубликованные из базы — то, что прошло модерацию в панели. Запасного списка
+  // нет: пустой блок честнее, чем отзывы людей, которых не было.
+  const reviews = fromDb ?? [];
 
   const animate = useCallback(() => {
     if (!trackRef.current || isPaused) {

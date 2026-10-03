@@ -1,7 +1,7 @@
 /**
  * Fallback-контент для портфолио и отзывов.
  *
- * Тексты проектов и отзывов берутся из i18n (`t.works.projects`, `t.reviews.items`),
+ * Тексты проектов берутся из i18n (`t.works.projects`); отзывы — только из базы (cms.item, коллекция review),
  * а здесь лежат метаданные, одинаковые для всех языков (отрасль, стек) и
  * локализованные подписи (результат, роль автора отзыва).
  *
@@ -214,29 +214,6 @@ export const PROJECT_META = [
   },
 ];
 
-export const TESTIMONIAL_META = [
-  { rating: 5, role: { ru: 'Коммерческий директор', kz: 'Коммерциялық директор', en: 'Commercial Director' }, company: { ru: 'Оптовая торговля · Алматы', kz: 'Көтерме сауда · Алматы', en: 'Wholesale · Almaty' } },
-  { rating: 5, role: { ru: 'Управляющий', kz: 'Басқарушы', en: 'General Manager' }, company: { ru: 'Ресторан · Алматы', kz: 'Мейрамхана · Алматы', en: 'Restaurant · Almaty' } },
-  { rating: 5, role: { ru: 'CTO', kz: 'CTO', en: 'CTO' }, company: { ru: 'IT-стартап · Астана', kz: 'IT-стартап · Астана', en: 'IT startup · Astana' } },
-  { rating: 5, role: { ru: 'Владелец', kz: 'Иесі', en: 'Owner' }, company: { ru: 'Гостиница · Шымкент', kz: 'Қонақ үй · Шымкент', en: 'Hotel · Shymkent' } },
-  { rating: 5, role: { ru: 'Финансовый директор', kz: 'Қаржы директоры', en: 'CFO' }, company: { ru: 'Розничная сеть · Алматы', kz: 'Бөлшек сауда желісі · Алматы', en: 'Retail chain · Almaty' } },
-  { rating: 5, role: { ru: 'Администратор', kz: 'Әкімші', en: 'Administrator' }, company: { ru: 'Косметология · Астана', kz: 'Косметология · Астана', en: 'Beauty clinic · Astana' } },
-  { rating: 5, role: { ru: 'Руководитель отдела продаж', kz: 'Сату бөлімінің жетекшісі', en: 'Head of Sales' }, company: { ru: 'Интернет-магазин · Караганда', kz: 'Интернет-дүкен · Қарағанды', en: 'Online store · Karaganda' } },
-  { rating: 5, role: { ru: 'Операционный директор', kz: 'Операциялық директор', en: 'COO' }, company: { ru: 'Логистика · Алматы', kz: 'Логистика · Алматы', en: 'Logistics · Almaty' } },
-  { rating: 5, role: { ru: 'Владелец', kz: 'Иесі', en: 'Owner' }, company: { ru: 'Фитнес-клуб · Астана', kz: 'Фитнес-клуб · Астана', en: 'Fitness club · Astana' } },
-  { rating: 5, role: { ru: 'Директор', kz: 'Директор', en: 'Director' }, company: { ru: 'B2B-дистрибуция · Алматы', kz: 'B2B-дистрибуция · Алматы', en: 'B2B distribution · Almaty' } },
-  { rating: 5, role: { ru: 'Руководитель', kz: 'Жетекші', en: 'Head of Operations' }, company: { ru: 'Учебный центр · Астана', kz: 'Оқу орталығы · Астана', en: 'Training centre · Astana' } },
-  { rating: 5, role: { ru: 'Главный бухгалтер', kz: 'Бас бухгалтер', en: 'Chief Accountant' }, company: { ru: 'Производство · Караганда', kz: 'Өндіріс · Қарағанды', en: 'Manufacturing · Karaganda' } },
-  { rating: 5, role: { ru: 'Собственник', kz: 'Меншік иесі', en: 'Founder' }, company: { ru: 'Оптовые продажи · Тараз', kz: 'Көтерме сату · Тараз', en: 'Wholesale · Taraz' } },
-  { rating: 5, role: { ru: 'Главный врач', kz: 'Бас дәрігер', en: 'Chief Physician' }, company: { ru: 'Медцентр · Алматы', kz: 'Медорталық · Алматы', en: 'Medical centre · Almaty' } },
-  { rating: 5, role: { ru: 'Категорийный менеджер', kz: 'Санат менеджері', en: 'Category Manager' }, company: { ru: 'Розница · Астана', kz: 'Бөлшек сауда · Астана', en: 'Retail · Astana' } },
-  { rating: 5, role: { ru: 'Руководитель направления', kz: 'Бағыт жетекшісі', en: 'Business Unit Lead' }, company: { ru: 'Финансовые услуги · Алматы', kz: 'Қаржы қызметтері · Алматы', en: 'Financial services · Almaty' } },
-  { rating: 5, role: { ru: 'Маркетолог', kz: 'Маркетолог', en: 'Marketing Lead' }, company: { ru: 'Digital-агентство · Алматы', kz: 'Digital-агенттік · Алматы', en: 'Digital agency · Almaty' } },
-  { rating: 5, role: { ru: 'Начальник склада', kz: 'Қойма бастығы', en: 'Warehouse Manager' }, company: { ru: 'Дистрибуция · Шымкент', kz: 'Дистрибуция · Шымкент', en: 'Distribution · Shymkent' } },
-  { rating: 5, role: { ru: 'Директор', kz: 'Директор', en: 'Director' }, company: { ru: 'Туристическая компания · Алматы', kz: 'Туристік компания · Алматы', en: 'Travel company · Almaty' } },
-  { rating: 5, role: { ru: 'Сооснователь', kz: 'Тең құрылтайшы', en: 'Co-founder' }, company: { ru: 'SaaS-стартап · Астана', kz: 'SaaS-стартап · Астана', en: 'SaaS startup · Astana' } },
-];
-
 /** Проекты для секции «Работы» — тексты из i18n, метаданные отсюда. Без стоимости. */
 export function buildFallbackProjects(t, lang) {
   const items = t?.works?.projects || [];
@@ -251,22 +228,6 @@ export function buildFallbackProjects(t, lang) {
       technologies: meta.tech || [],
       result: meta.result?.[lang] || meta.result?.ru || '',
       client_name: null,
-      image_url: null,
-    };
-  });
-}
-
-/** Отзывы — тексты из i18n, подписи отсюда. */
-export function buildFallbackTestimonials(t, lang) {
-  const items = t?.reviews?.items || [];
-  return items.map((review, index) => {
-    const meta = TESTIMONIAL_META[index] || {};
-    return {
-      id: `fallback-review-${index}`,
-      text: review.text,
-      name: meta.role?.[lang] || meta.role?.ru || '',
-      company: meta.company?.[lang] || meta.company?.ru || '',
-      rating: meta.rating || 5,
       image_url: null,
     };
   });
