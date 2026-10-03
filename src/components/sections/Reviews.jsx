@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Reveal from '../core/Reveal';
 import { useLang } from '@/lib/i18n/LangContext';
 import { useTestimonials } from '@/lib/site/SiteContentContext';
+import ReviewForm from './ReviewForm';
 
 function ReviewCard({ item }) {
   return (
@@ -26,7 +27,9 @@ function ReviewCard({ item }) {
 }
 
 export default function Reviews() {
-  const { t } = useLang();
+  const { t, lang } = useLang();
+  const [writing, setWriting] = useState(false);
+  const writeLabel = { ru: 'Написать отзыв', kz: 'Пікір жазу', en: 'Write a review' }[lang] || 'Написать отзыв';
   const rt = t.reviews;
   const [isPaused, setIsPaused] = useState(false);
   const trackRef = useRef(null);
@@ -69,16 +72,24 @@ export default function Reviews() {
                 <p className="text-xs tracking-[0.3em] text-white/20 uppercase mb-4">{rt.label}</p>
                 <h2 className="text-[clamp(2rem,5vw,4rem)] font-black tracking-[-0.03em] text-white">{rt.title}</h2>
               </div>
-              <div className="flex items-center gap-2">
-                <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                <span className="text-xs text-white/30">{rt.countLabel(reviews.length)}</span>
+              <div className="flex items-center gap-4">
+                {reviews.length > 0 && (
+                  <div className="flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                    <span className="text-xs text-white/30">{rt.countLabel(reviews.length)}</span>
+                  </div>
+                )}
+                <button type="button" onClick={() => setWriting(true)}
+                  className="text-xs font-semibold px-4 py-2 rounded-full border border-primary/40 text-white/80 hover:bg-primary/15 transition-colors">
+                  {writeLabel}
+                </button>
               </div>
             </div>
           </Reveal>
         </div>
 
         {reviews.length === 0 ? (
-          <div className="max-w-7xl mx-auto px-5 text-sm text-white/20">{rt.emptyText}</div>
+          <div className="max-w-7xl mx-auto px-5 text-sm text-white/35">{rt.emptyText}</div>
         ) : (
           <div
             className="overflow-hidden relative"
@@ -101,6 +112,7 @@ export default function Reviews() {
           </div>
         )}
       </div>
+      {writing && <ReviewForm lang={lang} onClose={() => setWriting(false)} />}
     </section>
   );
 }

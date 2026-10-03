@@ -603,3 +603,13 @@ export const fetchDeals = async () =>
 
 export const updateDeal = async (id, patch) =>
   unwrap(await crmDb.from('deal').update(patch).eq('id', id).select().single());
+
+// ── Отзывы с сайта (миграция 052): карантин и решение о публикации ─────────
+export const fetchReviewInbox = async (status = 'pending') =>
+  unwrap(await cmsDb.from('review_inbox')
+    .select('id, product_code, author_name, author_role, company, city, rating, body, contact, page, status, decided_at, decision_note, item_id, created_at')
+    .eq('status', status).order('created_at', { ascending: false }).limit(200));
+
+/** verdict: 'approved' | 'rejected' | 'spam'. Одобрение создаёт обычную запись cms.item (коллекция review). */
+export const decideReview = async (id, verdict, note = null) =>
+  unwrap(await supabase.rpc('review_decide', { p_id: id, p_verdict: verdict, p_note: note }));

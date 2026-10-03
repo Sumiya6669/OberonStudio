@@ -46,6 +46,7 @@ import MoneyRate from './pages/admin/MoneyRate';
 import MoneyClose from './pages/admin/MoneyClose';
 import MoneyTax from './pages/admin/MoneyTax';
 import Funnel from './pages/admin/Funnel';
+import SiteReviews from './pages/admin/SiteReviews';
 import AiLive from './pages/admin/AiLive';
 import AiSpend from './pages/admin/AiSpend';
 import AiRights from './pages/admin/AiRights';
@@ -145,6 +146,7 @@ const AppRoutes = () => (
       <Route path="site" element={<SitePages />} />
       <Route path="site/content" element={<SiteContent />} />
       <Route path="site/settings" element={<SiteSettings />} />
+      <Route path="site/reviews" element={<SiteReviews />} />
 
       {/* Прежний адрес очереди: ссылки из переписки и закладки должны работать.
           Сломанная закладка выглядит как сломанная панель. */}

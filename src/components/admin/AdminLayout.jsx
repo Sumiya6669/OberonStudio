@@ -13,7 +13,7 @@ import {
   Bot, Building2, Clock, Database, ExternalLink, FileText, Globe, Inbox,
   LayoutDashboard, ListTodo, LogOut, Receipt, Settings, ShieldCheck, Users,
   Wallet, Activity, Coins, BookOpen, PieChart, HeartPulse, Boxes, Compass,
-  Repeat, Gauge, CalendarCheck, Landmark, Filter,
+  Repeat, Gauge, CalendarCheck, Landmark, Filter, MessageSquare,
 } from 'lucide-react';
 import { useAuth } from '@/lib/auth/AuthContext';
 import { cx } from './ui';
@@ -68,6 +68,7 @@ export const NAV_GROUPS = [
       { to: '/admin/site', end: true, label: 'Сайт: страницы', icon: Globe },
       { to: '/admin/site/content', label: 'Сайт: справочники', icon: Boxes },
       { to: '/admin/site/settings', label: 'Сайт: настройки', icon: Settings },
+      { to: '/admin/site/reviews', label: 'Сайт: отзывы', icon: MessageSquare },
     ],
   },
 ];
