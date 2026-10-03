@@ -8,9 +8,11 @@ import React, { useEffect, useRef } from 'react';
  * которые моргают, антенна-огонёк, светящиеся кольца на «ушах» и груди, руки парят
  * отдельно и иногда машут. Платформы нет — под роботом только мягкое свечение.
  *
- * На нажатие робот отвечает эмоцией: смущается (румянец, отводит взгляд, мнёт руки),
- * удивляется (подпрыгивает, глаза круглые), радуется (кружится, машет обеими руками);
- * если тыкать часто — у него кружится голова (глаза «> <»).
+ * Нажатия — по месту: голова — его гладят (жмурится, ластится, сердечки); бока — щекотно
+ * (хохочет «>▽<», дёргается); рука — машет ею в ответ; середина — по очереди смущается
+ * (румянец, отводит взгляд, мнёт руки), удивляется (прыжок), радуется (кружится); если
+ * тыкать в середину часто — кружится голова («> <»). Долго нет курсора — засыпает
+ * (глаза-чёрточки, клюёт носом, «z» над головой); движение мыши его будит.
  *
  * three грузится внутри эффекта (отдельный чанк, на сборке страниц не нужен);
  * сцена спит, когда её не видно, и при «уменьшить движение» стоит на месте.
@@ -139,7 +141,11 @@ export default function TinkerRobot3D({ className = '', label = '' }) {
         return g;
       };
       const chevL = chevron(1); const chevR = chevron(-1);
-      head.add(eyeL, eyeR, arcL, arcR, chevL, chevR, blushL, blushR);
+      // Сон — глаза-чёрточки; рот: «D» для смеха и улыбки, «o» для удивления
+      const sleepL = new THREE.Mesh(strokeGeo, glow); const sleepR = new THREE.Mesh(strokeGeo, glow);
+      const smile = new THREE.Mesh(new THREE.CircleGeometry(0.12, 24, Math.PI, Math.PI), glow);
+      const mouthO = new THREE.Mesh(new THREE.TorusGeometry(0.04, 0.014, 8, 24), glow);
+      head.add(eyeL, eyeR, arcL, arcR, chevL, chevR, sleepL, sleepR, smile, mouthO, blushL, blushR);
 
       const ear = (side) => {
         const g = new THREE.Group();
@@ -218,42 +224,105 @@ export default function TinkerRobot3D({ className = '', label = '' }) {
       renderer.domElement.addEventListener('pointerdown', onDown);
       window.addEventListener('pointerup', onUp);
 
-      // Нажатие (не перетаскивание) по самому роботу — эмоция
-      const ray = new THREE.Raycaster(); const ndc = new THREE.Vector2();
-      const hits = (e) => {
+      // Части тела — по ним выбираем реакцию на нажатие
+      head.traverse((o) => { o.userData.zone = 'head'; });
+      neck.userData.zone = 'head';
+      bodyMesh.userData.zone = 'body';
+      chest.traverse((o) => { o.userData.zone = 'chest'; });
+      armL.traverse((o) => { o.userData.zone = 'arm'; o.userData.side = -1; });
+      armR.traverse((o) => { o.userData.zone = 'arm'; o.userData.side = 1; });
+
+      // Сердечки и «z» — спрайты из маленького пула
+      const paint = (draw) => {
+        const c = document.createElement('canvas'); c.width = c.height = 64; draw(c.getContext('2d'));
+        const tex = new THREE.CanvasTexture(c); tex.colorSpace = THREE.SRGBColorSpace; return tex;
+      };
+      const heartTex = paint((g) => {
+        g.fillStyle = '#ff5fae'; g.shadowColor = '#ff2d95'; g.shadowBlur = 8;
+        g.beginPath(); g.moveTo(32, 54);
+        g.bezierCurveTo(6, 36, 8, 12, 24, 12); g.bezierCurveTo(30, 12, 32, 18, 32, 20);
+        g.bezierCurveTo(32, 18, 34, 12, 40, 12); g.bezierCurveTo(56, 12, 58, 36, 32, 54); g.fill();
+      });
+      const zzzTex = paint((g) => {
+        g.fillStyle = '#d6c9ff'; g.shadowColor = '#7c5cff'; g.shadowBlur = 8;
+        g.font = 'bold 46px system-ui, sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('z', 32, 32);
+      });
+      const motes = [];
+      for (let i = 0; i < 12; i += 1) {
+        const m = new THREE.Sprite(new THREE.SpriteMaterial({ map: heartTex, transparent: true, depthWrite: false, opacity: 0, toneMapped: false }));
+        m.visible = false; scene.add(m); motes.push(m);
+      }
+      const origin = new THREE.Vector3();
+      const spawn = (kind, t) => {
+        const m = motes.find((x) => !x.visible) || motes[0];
+        head.getWorldPosition(origin);
+        const heart = kind === 'heart';
+        m.material.map = heart ? heartTex : zzzTex; m.material.needsUpdate = true;
+        m.userData = { born: t, life: heart ? 1.6 : 2.6, kind, sway: Math.random() * 6,
+          x: origin.x + (heart ? (Math.random() - 0.5) * 1.3 : 0.8), y: origin.y + (heart ? 0.95 : 0.55), z: origin.z + 0.4 };
+        m.visible = true;
+      };
+      const queue = [];
+
+      // Нажатие (не перетаскивание) — реакция по месту
+      const ray = new THREE.Raycaster(); const ndc = new THREE.Vector2(); const local = new THREE.Vector3();
+      const touch = (e) => {
         const r = renderer.domElement.getBoundingClientRect();
         ndc.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
         ray.setFromCamera(ndc, camera);
-        return ray.intersectObject(robot, true).length > 0;
+        const hit = ray.intersectObject(robot, true)[0];
+        if (!hit) return null;
+        const zone = hit.object.userData.zone || 'chest';
+        if (zone === 'body') {
+          // Бока — ближе к краю корпуса, середина — у оси
+          local.copy(hit.point); bodyMesh.worldToLocal(local);
+          return Math.abs(local.x) > 0.36 ? { zone: 'side', side: Math.sign(local.x) } : { zone: 'chest', side: 0 };
+        }
+        return { zone, side: hit.object.userData.side || 0 };
       };
-      const DUR = { shy: 2.8, surprised: 1.6, happy: 1.9, dizzy: 2.6 };
+      const DUR = { shy: 2.8, surprised: 1.6, happy: 1.9, dizzy: 2.6, pat: 2.6, tickle: 2.2, hi: 1.8 };
       const ORDER = ['shy', 'surprised', 'happy'];
-      const emo = { kind: '', at: -10, dir: 1 };
-      let turnIdx = 0; let taps = []; let press = null;
-      const feel = (kind) => {
-        emo.kind = kind; emo.at = clock.getElapsedTime(); emo.dir = mouse.x >= 0 ? -1 : 1;
+      const emo = { kind: '', at: -10, dir: 1, side: 0 };
+      let turnIdx = 0; let taps = []; let press = null; let sleep = 0; let lastZ = 0;
+      const feel = (kind, side = 0) => {
+        const now = clock.getElapsedTime();
+        // Повторное поглаживание или щекотка продлевают реакцию, а не начинают её заново
+        if (emo.kind === kind && (kind === 'pat' || kind === 'tickle')) emo.at = now - DUR[kind] * 0.15;
+        else { emo.kind = kind; emo.at = now; }
+        emo.side = side;
+        emo.dir = side ? -side : (mouse.x >= 0 ? -1 : 1);
+        if (kind === 'pat') for (let i = 0; i < 3; i += 1) queue.push({ kind: 'heart', at: now + i * 0.28 });
         if (!raf) raf = requestAnimationFrame(frame);
       };
       const onPress = (e) => { press = { x: e.clientX, y: e.clientY, at: performance.now() }; };
       const onRelease = (e) => {
         const p = press; press = null;
-        if (!p || Math.hypot(e.clientX - p.x, e.clientY - p.y) > 6 || performance.now() - p.at > 450 || !hits(e)) return;
+        if (!p || Math.hypot(e.clientX - p.x, e.clientY - p.y) > 6 || performance.now() - p.at > 450) return;
+        const hit = touch(e);
+        if (!hit) return;
         const now = clock.getElapsedTime();
+        mouse.at = now;
+        if (sleep > 0.5) { feel('surprised'); return; }           // разбудили
+        if (hit.zone === 'head') { feel('pat'); return; }
+        if (hit.zone === 'side') { feel('tickle', hit.side); return; }
+        if (hit.zone === 'arm') { feel('hi', hit.side); return; }
         taps = taps.filter((x) => now - x < 1.6).concat(now);
         if (taps.length >= 4) { taps = []; feel('dizzy'); return; }
         feel(ORDER[turnIdx % ORDER.length]); turnIdx += 1;
       };
-      const onHover = (e) => { if (!spin.drag) renderer.domElement.style.cursor = hits(e) ? 'pointer' : 'grab'; };
+      const onHover = (e) => { if (!spin.drag) renderer.domElement.style.cursor = touch(e) ? 'pointer' : 'grab'; };
+      const onWake = () => { if (sleep > 0.6 && emo.kind !== 'surprised') feel('surprised'); };
       renderer.domElement.addEventListener('pointerdown', onPress);
       renderer.domElement.addEventListener('pointerup', onRelease);
       renderer.domElement.addEventListener('pointermove', onHover, { passive: true });
+      window.addEventListener('pointermove', onWake, { passive: true });
 
       let visible = true; let raf = 0;
       const io = new IntersectionObserver(([entry]) => { visible = entry.isIntersecting; if (visible && !raf) raf = requestAnimationFrame(frame); });
       io.observe(el);
 
       let nextBlink = 2; let nextWave = 6;
-      let yaw = 0; let eyeX = 0; let eyeY = -0.04;
+      let yaw = 0; let roll = 0; let eyeX = 0; let eyeY = -0.04;
       const violet = new THREE.Color(0xb3a1ff); const pink = new THREE.Color(0xff8cc6);
       const ease = (a, b, k) => a + (b - a) * k;
 
@@ -263,36 +332,41 @@ export default function TinkerRobot3D({ className = '', label = '' }) {
         const t = clock.getElapsedTime();
         const live = reduce ? 0 : 1;
 
-        // Курсор давно не двигался — робот сам оглядывается
-        const idle = t - mouse.at > 4;
-        const lookX = idle ? Math.sin(t * 0.45) * 0.5 * live : mouse.x;
-        const lookY = idle ? Math.sin(t * 0.3 + 1) * 0.2 * live : mouse.y;
-
         // Эмоция: вес плавно нарастает и спадает
         const ep = emo.kind ? (t - emo.at) / DUR[emo.kind] : 1;
         if (ep >= 1) emo.kind = '';
         const env = emo.kind ? (ep < 0.12 ? ep / 0.12 : ep > 0.75 ? (1 - ep) / 0.25 : 1) : 0;
         const w = env * env * (3 - 2 * env);
-        const shy = emo.kind === 'shy' ? w : 0;
-        const wow = emo.kind === 'surprised' ? w : 0;
-        const joy = emo.kind === 'happy' ? w : 0;
-        const dizzy = emo.kind === 'dizzy' ? w : 0;
+        const is = (k) => (emo.kind === k ? w : 0);
+        const shy = is('shy'); const wow = is('surprised'); const joy = is('happy'); const dizzy = is('dizzy');
+        const pat = is('pat'); const tickle = is('tickle'); const hi = is('hi');
         const calm = 1 - w;
 
+        // Курсор давно не двигался — сначала оглядывается, через 20 с засыпает
+        const still = t - mouse.at;
+        sleep = ease(sleep, still > 20 && !emo.kind ? 1 : 0, 0.02);
+        const nap = sleep * calm; const awake = 1 - sleep;
+        const idle = still > 4;
+        const lookX = (idle ? Math.sin(t * 0.45) * 0.5 * live : mouse.x) * awake;
+        const lookY = (idle ? Math.sin(t * 0.3 + 1) * 0.2 * live : mouse.y) * awake;
+
         if (!spin.drag) { spin.v *= 0.92; spin.y = spin.y * 0.97 + spin.v; }
-        yaw = ease(yaw, spin.y + lookX * 0.22 * calm + emo.dir * 0.2 * shy, 0.08);
+        yaw = ease(yaw, spin.y + lookX * 0.22 * calm + emo.dir * (0.2 * shy + 0.25 * tickle), 0.08);
         const twirl = emo.kind === 'happy' && live ? Math.PI * (1 - Math.cos(Math.min(1, Math.max(0, (ep - 0.05) / 0.65)) * Math.PI)) : 0;
         robot.rotation.y = yaw + twirl;
+        robot.rotation.z = Math.sin(t * 26) * 0.06 * tickle * live;
         const hop = emo.kind === 'surprised' && ep < 0.4 ? Math.sin((ep / 0.4) * Math.PI) * 0.45 : 0;
-        robot.position.y = (Math.sin(t * 1.1) * 0.1 + hop) * live;
+        robot.position.y = (Math.sin(t * (1.1 - 0.5 * sleep)) * 0.1 * (1 - 0.6 * sleep) + hop
+          + Math.abs(Math.sin(t * 13)) * 0.1 * tickle) * live - 0.08 * nap;
         const squash = 1 - shy * 0.03 + hop * 0.06 * live;
         robot.scale.set(1 + (1 - squash) * 0.5, squash, 1 + (1 - squash) * 0.5);
 
-        head.rotation.y = ease(head.rotation.y, lookX * 0.55 * calm + emo.dir * 0.3 * shy, 0.1);
-        head.rotation.x = ease(head.rotation.x, lookY * 0.32 * calm + 0.3 * shy - 0.12 * wow
-          + Math.cos(t * 7) * 0.14 * dizzy * live, 0.1);
-        head.rotation.z = ease(head.rotation.z, -lookX * 0.06 * calm - emo.dir * 0.15 * shy
-          + Math.sin(t * 7) * 0.25 * dizzy * live, 0.1);
+        head.rotation.y = ease(head.rotation.y, lookX * 0.55 * calm + emo.dir * (0.3 * shy + 0.25 * tickle), 0.1);
+        head.rotation.x = ease(head.rotation.x, lookY * 0.32 * calm + 0.3 * shy - 0.12 * wow + 0.1 * pat - 0.1 * tickle
+          + Math.cos(t * 7) * 0.14 * dizzy * live + nap * (0.3 + Math.sin(t * 1.2) * 0.05 * live), 0.1);
+        roll = ease(roll, -lookX * 0.06 * calm - emo.dir * 0.15 * shy + Math.sin(t * 7) * 0.25 * dizzy * live
+          + Math.sin(t * 2.6) * 0.22 * pat * live + 0.15 * nap, 0.1);
+        head.rotation.z = roll + Math.sin(t * 24) * 0.06 * tickle * live;
         eyeX = ease(eyeX, lookX * 0.06 * calm + emo.dir * 0.07 * shy, 0.15);
         eyeY = ease(eyeY, -0.04 - lookY * 0.04 * calm - 0.06 * shy + 0.02 * wow, 0.15);
 
@@ -301,12 +375,13 @@ export default function TinkerRobot3D({ className = '', label = '' }) {
         if (live && t > nextBlink) {
           const p = (t - nextBlink) / 0.16;
           if (p >= 1) nextBlink = t + 2.5 + Math.random() * 3.5;
-          else if (!emo.kind) lid = 1 - Math.sin(p * Math.PI) * 0.9;
+          else if (!emo.kind && sleep < 0.1) lid = 1 - Math.sin(p * Math.PI) * 0.9;
         }
-        // Глаза: обычные капсулы; смущение — прищур; удивление — крупные;
-        // радость и смущение — дужки «^ ^»; головокружение — «> <»
-        const arc = joy + shy;
-        const open = Math.max(0.001, (1 - arc - dizzy) * lid);
+        // Глаза: обычные капсулы; удивление — крупные; радость, смущение, поглаживание,
+        // привет — дужки «^ ^»; щекотка и головокружение — «> <»; сон — чёрточки
+        const arc = joy + shy + pat + hi;
+        const chev = dizzy + tickle;
+        const open = Math.max(0.001, (1 - arc - chev) * lid * (1 - nap));
         const gap = 0.29 + 0.03 * wow;
         for (const [eye, side] of [[eyeL, -1], [eyeR, 1]]) {
           onFace(eye, eyeX + side * gap, eyeY, 0.012);
@@ -318,41 +393,74 @@ export default function TinkerRobot3D({ className = '', label = '' }) {
         }
         for (const [eye, side] of [[chevL, -1], [chevR, 1]]) {
           onFace(eye, eyeX + side * 0.29, eyeY, 0.012);
-          const k = Math.max(0.001, dizzy) * 1.3;
+          const k = Math.max(0.001, chev) * 1.3;
           eye.scale.set(k * eye.userData.mirror, k, k * 0.3);
         }
+        for (const [eye, side] of [[sleepL, -1], [sleepR, 1]]) {
+          onFace(eye, eyeX + side * 0.29, eyeY - 0.05, 0.012, Math.PI / 2);
+          eye.scale.set(Math.max(0.001, nap), Math.max(0.001, nap) * 1.2, 0.3);
+        }
+        const laugh = tickle * (0.7 + 0.3 * Math.abs(Math.sin(t * 16)));
+        const grin = Math.max(0.001, laugh + joy * 0.8 + hi * 0.6 + pat * 0.4);
+        onFace(smile, eyeX, eyeY - 0.2, 0.012);
+        smile.scale.set(grin, grin * (0.6 + 0.6 * tickle), 1);
+        onFace(mouthO, eyeX, eyeY - 0.21, 0.012);
+        mouthO.scale.setScalar(Math.max(0.001, wow));
         onFace(blushL, eyeX - 0.47, eyeY - 0.17, 0.006); blushL.scale.set(1.35, 0.6, 1);
         onFace(blushR, eyeX + 0.47, eyeY - 0.17, 0.006); blushR.scale.set(1.35, 0.6, 1);
-        blushMat.opacity = 0.8 * shy;
-        glow.color.copy(violet).lerp(pink, shy * 0.75);
+        blushMat.opacity = 0.8 * shy + 0.55 * pat + 0.45 * tickle;
+        glow.color.copy(violet).lerp(pink, shy * 0.75 + pat * 0.5);
 
         // Руки: покачиваются, правая иногда машет; в эмоциях — свои позы
         let wave = 0;
-        if (live && !emo.kind && t > nextWave) {
+        if (live && !emo.kind && sleep < 0.1 && t > nextWave) {
           const p = (t - nextWave) / 2.2;
           if (p >= 1) nextWave = t + 8 + Math.random() * 6;
           else wave = Math.sin(p * Math.PI);
         }
+        const sway = live * awake;
         const fidget = Math.sin(t * 9) * 0.1 * live;
         const flap = Math.sin(t * 13) * 0.3 * live;
         const droop = Math.sin(t * 3) * 0.3 * live;
-        armL.rotation.z = calm * (-0.2 - Math.sin(t * 1.3) * 0.05 * live)
-          + shy * (0.55 + fidget) - wow * 1.3 + joy * (-2.5 + flap) - dizzy * (0.5 + droop);
-        armL.rotation.x = calm * Math.sin(t * 1.1) * 0.08 * live - shy * 1.1;
-        armR.rotation.z = calm * (0.2 + Math.sin(t * 1.3 + 1) * 0.05 * live + wave * (2.3 + Math.sin(t * 11) * 0.25))
-          + shy * (-0.55 - fidget) + wow * 1.3 + joy * (2.5 - flap) + dizzy * (0.5 - droop);
-        armR.rotation.x = calm * Math.sin(t * 1.1 + 1) * 0.08 * live - shy * 1.1;
+        const jig = Math.sin(t * 22) * 0.15 * live;
+        const hello = Math.sin(t * 12) * 0.35 * live;
+        const purr = Math.sin(t * 3) * 0.1 * live;
+        armL.rotation.z = calm * (-0.2 - Math.sin(t * 1.3) * 0.05 * sway + 0.1 * sleep)
+          + shy * (0.55 + fidget) - wow * 1.3 + joy * (-2.5 + flap) - dizzy * (0.5 + droop)
+          + tickle * (0.05 + jig) + pat * (-0.45 + purr) + hi * (emo.side < 0 ? -2.4 + hello : -0.2);
+        armL.rotation.x = calm * Math.sin(t * 1.1) * 0.08 * sway - shy * 1.1 - tickle * 0.5;
+        armR.rotation.z = calm * (0.2 + Math.sin(t * 1.3 + 1) * 0.05 * sway - 0.1 * sleep + wave * (2.3 + Math.sin(t * 11) * 0.25))
+          + shy * (-0.55 - fidget) + wow * 1.3 + joy * (2.5 - flap) + dizzy * (0.5 - droop)
+          - tickle * (0.05 + jig) + pat * (0.45 - purr) + hi * (emo.side > 0 ? 2.4 - hello : 0.2);
+        armR.rotation.x = calm * Math.sin(t * 1.1 + 1) * 0.08 * sway - shy * 1.1 - tickle * 0.5;
 
-        antenna.rotation.z = -0.22 + (Math.sin(t * 25) * 0.3 * (1 - ep) * wow + Math.sin(t * 7) * 0.35 * dizzy) * live;
+        antenna.rotation.z = -0.22 - 0.5 * nap + (Math.sin(t * 25) * 0.3 * (1 - ep) * wow + Math.sin(t * 7) * 0.35 * dizzy
+          + Math.sin(t * 4) * 0.25 * pat + Math.sin(t * 30) * 0.2 * tickle) * live;
 
         const pulse = (Math.sin(t * 2.2) + 1) / 2;
-        bulb.scale.setScalar(1 + pulse * 0.25 * live + wow * 0.5);
+        bulb.scale.setScalar((1 + pulse * 0.25 * live + wow * 0.5) * (1 - 0.4 * sleep));
         chestDot.scale.setScalar(0.8 + pulse * 0.4 * live);
-        rim.intensity = 40 + pulse * 10 * live;
+        rim.intensity = (40 + pulse * 10 * live) * (1 - 0.35 * sleep);
         halo.scale.set(2.2 - robot.position.y * 1.2, 0.5, 1);
 
+        // Сердечки и «z»
+        while (queue.length && queue[0].at <= t) spawn(queue.shift().kind, t);
+        if (sleep > 0.8 && t - lastZ > 1.5) { lastZ = t; spawn('z', t); }
+        let floating = false;
+        for (const m of motes) {
+          if (!m.visible) continue;
+          const d = m.userData; const a = (t - d.born) / d.life;
+          if (a >= 1 || a < 0) { m.visible = false; continue; }
+          floating = true;
+          const heart = d.kind === 'heart';
+          m.position.set(d.x + Math.sin(a * 5 + d.sway) * (heart ? 0.12 : 0.2) + (heart ? 0 : a * 0.5), d.y + a * (heart ? 1.1 : 0.9), d.z);
+          const k = (heart ? 0.42 : 0.55) * (0.6 + a * 0.6);
+          m.scale.set(k, k, 1);
+          m.material.opacity = Math.min(1, a * 6) * (1 - a);
+        }
+
         renderer.render(scene, camera);
-        if (!reduce || spin.drag || Math.abs(spin.v) > 0.0005 || emo.kind) raf = requestAnimationFrame(frame);
+        if (!reduce || spin.drag || Math.abs(spin.v) > 0.0005 || emo.kind || floating || queue.length) raf = requestAnimationFrame(frame);
       }
       raf = requestAnimationFrame(frame);
 
@@ -362,8 +470,10 @@ export default function TinkerRobot3D({ className = '', label = '' }) {
         renderer.domElement.removeEventListener('pointerdown', onPress);
         renderer.domElement.removeEventListener('pointerup', onRelease);
         renderer.domElement.removeEventListener('pointermove', onHover);
+        window.removeEventListener('pointermove', onWake);
         scene.traverse((o) => { if (o.geometry) o.geometry.dispose(); });
-        [shell, visor, joint, glow, glowSoft, blushMat, haloMat, backMat, blobTex].forEach((m) => m.dispose());
+        motes.forEach((m) => m.material.dispose());
+        [shell, visor, joint, glow, glowSoft, blushMat, haloMat, backMat, blobTex, heartTex, zzzTex].forEach((m) => m.dispose());
         envTex.dispose(); pmrem.dispose(); renderer.dispose();
         renderer.domElement.remove();
       };
