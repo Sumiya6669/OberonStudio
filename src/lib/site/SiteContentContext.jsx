@@ -136,7 +136,9 @@ export function useTestimonials() {
     text: it.text?.text || '',
     name: it.text?.role || it.props?.author || '',
     company: it.text?.company || '',
-    rating: it.props?.rating || 5,
+    // Оценки нет — значит её не ставили; подставлять «5» значило бы приписать её автору.
+    rating: Number(it.props?.rating) || null,
+    product: it.props?.product || '',
     image_url: null,
   })), [items]);
 }

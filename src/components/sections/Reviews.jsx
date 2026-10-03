@@ -3,14 +3,23 @@ import Reveal from '../core/Reveal';
 import { useLang } from '@/lib/i18n/LangContext';
 import { useTestimonials } from '@/lib/site/SiteContentContext';
 import ReviewForm from './ReviewForm';
+import { PRODUCTS } from '@/lib/content/site';
 
 function ReviewCard({ item }) {
+  const product = item.product ? PRODUCTS.find((p) => p.id === item.product)?.name || '' : '';
   return (
     <div className="glass rounded-2xl p-6 border border-line hover:border-white/10 transition-colors duration-300 flex flex-col min-w-[280px] max-w-[340px] flex-shrink-0">
-      <div className="flex items-center gap-2 mb-4">
-        <span className="text-[9px] px-2 py-0.5 rounded-full bg-white/[0.05] border border-white/[0.08] text-white/25">
-          {item.rating || 5}/5
-        </span>
+      <div className="flex flex-wrap items-center gap-2 mb-4">
+        {item.rating && (
+          <span className="text-[9px] px-2 py-0.5 rounded-full bg-white/[0.05] border border-white/[0.08] text-white/25">
+            {item.rating}/5
+          </span>
+        )}
+        {product && (
+          <span className="text-[9px] px-2 py-0.5 rounded-full bg-primary/10 border border-primary/20 text-white/45">
+            {product}
+          </span>
+        )}
       </div>
       <p className="text-sm text-white/55 leading-relaxed flex-1 mb-5">"{item.text}"</p>
       <div className="flex items-center gap-3">
