@@ -21,6 +21,7 @@ import OfferPage from './pages/OfferPage';
 import CasesPage from './pages/CasesPage';
 import CasePage from './pages/CasePage';
 import AnswerPage from './pages/AnswerPage';
+import PrivacyPage from './pages/PrivacyPage';
 
 // Админка: своя раскладка, свой вход. Данные защищает RLS в базе,
 // страж маршрута — только удобство.
@@ -73,6 +74,8 @@ export const SITE_PAGES = [
   { path: '/reviews', element: <ReviewsPage /> },
   { path: '/faq', element: <FaqPage /> },
   { path: '/contact', element: <ContactPage /> },
+  // Политика ПД: текст один, на русском; на /kz и /en — строка о языке документа.
+  { path: '/privacy', element: <PrivacyPage /> },
 ];
 
 /** Один и тот же набор страниц под каждой языковой приставкой. */

@@ -36,6 +36,48 @@ export function saveConsent(value) {
   if (value === 'yes') loadMetrika();
 }
 
+/**
+ * Стирает выбор посетителя («Настройки cookie» в подвале). Возвращает прежний
+ * выбор: если счётчик уже работал, а теперь выбрано «Только необходимые»,
+ * его надо остановить — см. forgetMetrika.
+ */
+export function resetConsent() {
+  const previous = readConsent();
+  try {
+    localStorage.removeItem(KEY);
+  } catch {
+    // приватный режим — стирать нечего
+  }
+  return previous;
+}
+
+/**
+ * Отзыв согласия на аналитику. Загруженный скрипт Метрики выгрузить нельзя,
+ * поэтому стираются её cookie и записи, а страница перезагружается — уже без
+ * счётчика. Метрика ставит cookie и на сам домен, и на домен уровнем выше,
+ * поэтому стираем во всех вариантах.
+ */
+export function forgetMetrika() {
+  if (typeof document === 'undefined') return;
+  const host = window.location.hostname;
+  const parts = host.split('.');
+  const domains = ['', host, `.${host}`];
+  if (parts.length > 2) domains.push(`.${parts.slice(-2).join('.')}`);
+  for (const pair of document.cookie.split(';')) {
+    const name = pair.split('=')[0].trim();
+    if (!name.startsWith('_ym')) continue;
+    for (const domain of domains) {
+      document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/${domain ? `; domain=${domain}` : ''}`;
+    }
+  }
+  try {
+    Object.keys(localStorage).filter((key) => key.startsWith('_ym')).forEach((key) => localStorage.removeItem(key));
+  } catch {
+    // нет доступа к хранилищу — cookie уже стёрты
+  }
+  window.location.reload();
+}
+
 let loaded = false;
 
 /** Подключает счётчик. Вызывать только после согласия. */

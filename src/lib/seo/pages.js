@@ -31,7 +31,7 @@ export const OG_IMAGE_SIZE = { width: 1200, height: 630 };
 /** Страницы, которые попадают в карту сайта и получают свои мета-теги. */
 export const SEO_ROUTES = [
   '/', '/services', '/projects', '/products',
-  '/process', '/stack', '/reviews', '/faq', '/contact',
+  '/process', '/stack', '/reviews', '/faq', '/contact', '/privacy',
 ];
 
 /**
@@ -64,6 +64,11 @@ const FALLBACK_DESC = {
     ru: 'Связаться: Telegram, WhatsApp, почта. Ответ в течение часа.',
     kz: 'Байланысу: Telegram, WhatsApp, пошта. Бір сағат ішінде жауап.',
     en: 'Get in touch: Telegram, WhatsApp, email. Reply within an hour.',
+  },
+  '/privacy': {
+    ru: 'Какие персональные данные собирает Tinker, зачем, где хранит и кому передаёт; текст согласия, cookie и ваши права.',
+    kz: 'Tinker қандай дербес деректерді жинайды, не үшін, қайда сақтайды және кімге береді; келісім мәтіні, cookie және құқықтарыңыз. Құжат орыс тілінде.',
+    en: 'What personal data Tinker collects, why, where it is stored and who receives it; consent terms, cookies and your rights. The document is in Russian.',
   },
 };
 
@@ -103,6 +108,11 @@ const TITLE_OVERRIDE = {
     ru: 'Контакты и связь',
     kz: 'Байланыс',
     en: 'Contacts',
+  },
+  '/privacy': {
+    ru: 'Политика обработки персональных данных',
+    kz: 'Дербес деректерді өңдеу саясаты',
+    en: 'Personal data policy',
   },
 };
 

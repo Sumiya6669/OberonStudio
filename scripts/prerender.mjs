@@ -36,7 +36,7 @@ const SITE_URL = (process.env.VITE_SITE_URL || 'https://oberon-studio.vercel.app
 
 const ROUTES = [
   '/', '/services', '/projects', '/products',
-  '/process', '/stack', '/reviews', '/faq', '/contact',
+  '/process', '/stack', '/reviews', '/faq', '/contact', '/privacy',
 ];
 
 /**
@@ -178,7 +178,9 @@ function buildSitemap(routes, content, ruOnly = []) {
 
   // Главная важнее внутренних, контакты — реже остальных. Числа тут не
   // магические: это подсказка обходчику, а не обещание.
-  const weight = (route) => (route === '/' ? '1.0' : route === '/contact' ? '0.6' : '0.8');
+  const weight = (route) => (
+    route === '/' ? '1.0' : route === '/contact' ? '0.6' : route === '/privacy' ? '0.3' : '0.8'
+  );
 
   // Каждый языковой адрес — отдельная запись, и в каждой перечислены все
   // три версии. Так поисковик понимает, что это одна страница на трёх
@@ -292,6 +294,7 @@ function buildLlmsTxt(content) {
 - [Отзывы](${SITE_URL}/reviews): отзывы клиентов
 - [Вопросы](${SITE_URL}/faq): частые вопросы и ответы
 - [Контакты](${SITE_URL}/contact): связаться
+- [Политика обработки персональных данных](${SITE_URL}/privacy): какие данные собираются, где хранятся, права
 
 ${offers.length ? `## Что можно заказать\n\n${offers}\n` : ''}
 ${answers.length ? `## Разборы частых проблем 1С\n\n${answers}\n` : ''}

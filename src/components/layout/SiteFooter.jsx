@@ -2,6 +2,7 @@ import React from 'react';
 import Mark from '@/components/brand/Mark';
 import { LocaleLink as Link } from '@/components/nav/LocaleLink';
 import Reveal from '../core/Reveal';
+import { openCookieSettings } from './CookieConsent';
 import { useLang } from '@/lib/i18n/LangContext';
 import { SITE_ROUTES } from '@/lib/routes';
 import { SITE_SETTINGS } from '@/lib/content/site';
@@ -63,7 +64,24 @@ export default function SiteFooter() {
           </div>
 
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 border-t border-line">
-            <p className="text-xs text-white/15">{rights}</p>
+            <div className="flex flex-wrap items-center justify-center sm:justify-start gap-x-4 gap-y-2">
+              <p className="text-xs text-white/15">{rights}</p>
+              {/* Политика и смена выбора по cookie — обязаны быть доступны с
+                  любой страницы (Политика, п. 9.3). */}
+              <Link
+                to="/privacy"
+                className="text-xs text-white/25 hover:text-white/60 transition-colors duration-300"
+              >
+                {ft.privacy}
+              </Link>
+              <button
+                type="button"
+                onClick={openCookieSettings}
+                className="text-xs text-white/25 hover:text-white/60 transition-colors duration-300"
+              >
+                {ft.cookieSettings}
+              </button>
+            </div>
             <div className="flex items-center gap-4">
               <a
                 href={SETTINGS.telegram_url}
