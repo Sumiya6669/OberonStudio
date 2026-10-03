@@ -93,16 +93,6 @@ export const PROJECT_META = [
     },
   },
   {
-    slug: 'marketplace-ai',
-    industry: 'Marketplace',
-    tech: ['Next.js', 'OpenAI', 'Elasticsearch', 'PostgreSQL'],
-    result: {
-      ru: 'Умный поиск и авто-модерация контента без ручной проверки',
-      kz: 'Ақылды іздеу мен контентті авто-модерация',
-      en: 'Smart search and automated content moderation',
-    },
-  },
-  {
     slug: 'telegram-ai-operator',
     industry: 'AI Agent',
     tech: ['Telegram Bot API', 'OpenAI', 'LangChain', 'CRM API'],
@@ -120,26 +110,6 @@ export const PROJECT_META = [
       ru: 'Прайсы, наличие и оформление заявок — без менеджера',
       kz: 'Прайс, қолжетімділік және өтінім — менеджерсіз',
       en: 'Price lists, stock and order intake without a manager',
-    },
-  },
-  {
-    slug: 'b2b-wholesale-crm',
-    industry: 'CRM',
-    tech: ['React', 'Node.js', 'PostgreSQL', '1C'],
-    result: {
-      ru: 'Воронка, KPI менеджеров и счета связаны с 1C',
-      kz: 'Воронка, менеджер KPI және шот 1C-пен байланысты',
-      en: 'Pipeline, manager KPIs and invoices wired into 1C',
-    },
-  },
-  {
-    slug: 'kaspi-halyk-payments',
-    industry: 'Fintech',
-    tech: ['Kaspi QR', 'Halyk API', 'Python', '1C'],
-    result: {
-      ru: 'Авто-чеки и сверка кассы вместо ручной отчётности',
-      kz: 'Авто-чек және касса салыстыруы қолмен есеп берудің орнына',
-      en: 'Automatic receipts and till reconciliation instead of manual reports',
     },
   },
   {
@@ -180,16 +150,6 @@ export const PROJECT_META = [
       ru: 'Первая линия поддержки закрывается агентом без оператора',
       kz: 'Бірінші желі қолдауын агент операторсыз жабады',
       en: 'First-line support handled by the agent, not a person',
-    },
-  },
-  {
-    slug: 'medical-booking',
-    industry: 'Medical',
-    tech: ['React', 'Node.js', 'WhatsApp API', 'PostgreSQL'],
-    result: {
-      ru: 'Запись, напоминания и история приёмов в одном контуре',
-      kz: 'Жазылу, еске салу және қабылдау тарихы бір жүйеде',
-      en: 'Appointments, reminders and visit history in one place',
     },
   },
   {
