@@ -150,7 +150,7 @@ const en = {
     label: 'Testimonials',
     emptyText: 'No reviews yet: the products are just reaching their first clients. Only real, verified reviews will appear here.',
     title: 'Client Feedback',
-    countLabel: (n) => `${n} reviews · diverse industries`,
+    countLabel: (n) => `${n} ${n === 1 ? 'review' : 'reviews'}`,
     pauseHint: 'Hover over a card to pause scrolling',
     items: [],
   },

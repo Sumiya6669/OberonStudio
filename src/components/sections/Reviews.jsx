@@ -49,6 +49,8 @@ export default function Reviews() {
   // Только опубликованные из базы — то, что прошло модерацию в панели. Запасного списка
   // нет: пустой блок честнее, чем отзывы людей, которых не было.
   const reviews = fromDb ?? [];
+  // Бегущая лента — только когда отзывов хватает, чтобы заполнить ширину.
+  const marquee = reviews.length >= 4;
 
   const animate = useCallback(() => {
     if (!trackRef.current || isPaused) {
@@ -63,10 +65,10 @@ export default function Reviews() {
   }, [isPaused]);
 
   useEffect(() => {
-    if (reviews.length === 0) return undefined;
+    if (!marquee) return undefined;
     rafRef.current = requestAnimationFrame(animate);
     return () => cancelAnimationFrame(rafRef.current);
-  }, [animate, reviews.length]);
+  }, [animate, marquee]);
 
   const doubled = [...reviews, ...reviews];
 
@@ -99,6 +101,12 @@ export default function Reviews() {
 
         {reviews.length === 0 ? (
           <div className="max-w-7xl mx-auto px-5 text-sm text-white/35">{rt.emptyText}</div>
+        ) : !marquee ? (
+          // Пока отзывов мало, лента не нужна: она показывает список дважды подряд,
+          // и один отзыв выглядел бы как два.
+          <div className="max-w-7xl mx-auto px-5 flex flex-wrap gap-4 py-2">
+            {reviews.map((item) => <ReviewCard key={item.id} item={item} />)}
+          </div>
         ) : (
           <div
             className="overflow-hidden relative"
@@ -115,7 +123,7 @@ export default function Reviews() {
           </div>
         )}
 
-        {reviews.length > 0 && (
+        {marquee && (
           <div className="max-w-7xl mx-auto px-5 mt-6">
             <p className="text-[10px] text-white/15 text-center">{rt.pauseHint}</p>
           </div>
