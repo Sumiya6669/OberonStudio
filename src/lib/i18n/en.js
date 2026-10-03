@@ -194,7 +194,7 @@ const en = {
     aiSub: 'We build tools people use every day: agents answering customers, a CRM moving deals forward, integrations keeping data in sync. The scene on the right is live — go ahead and grab it.',
     aiCta: 'Discuss your task',
     aiCtaSecondary: 'Ready solutions',
-    aiHint: 'Drag the scene to rotate it',
+    aiHint: 'Drag to spin the robot — or give it a tap',
   },
   // Consultant
   consultant: {
