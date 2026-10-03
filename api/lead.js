@@ -185,9 +185,10 @@ export default async function handler(request, response) {
   // Отметка о согласии — доказательство по ст. 25 Закона о ПД. Колонок под
   // неё в базе нет, поэтому она уходит служебной строкой в конце текста
   // заявки: так она попадает и в базу, и в аварийное сообщение в Telegram.
+  // Только дата, без времени: база ловит повтор по началу текста, секунды сделали бы каждую копию «новой».
   const consentVersion = String(body.consent_version || '').trim().slice(0, 40) || 'не указана';
   const consentLine = `Согласие на обработку ПД: да · версия ${consentVersion}`
-    + ` · форма ${cleaned.source || 'website'} · ${new Date().toISOString()}`;
+    + ` · форма ${cleaned.source || 'website'} · ${new Date().toISOString().slice(0, 10)}`;
   cleaned.message = [cleaned.message, consentLine].filter(Boolean).join('\n\n');
 
   let receipt = null;
