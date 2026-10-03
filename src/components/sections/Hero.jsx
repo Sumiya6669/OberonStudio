@@ -6,6 +6,7 @@ import Counter from '../core/Counter';
 import { LocaleLink as Link } from '@/components/nav/LocaleLink';
 import { useLang } from '@/lib/i18n/LangContext';
 import { CONTACT_PATH, PROJECTS_PATH } from '@/lib/routes';
+import HeroShowcase from './HeroShowcase';
 
 function RotatingWord({ words }) {
   const [idx, setIdx] = useState(0);
@@ -36,78 +37,6 @@ function RotatingWord({ words }) {
     <span className="text-gradient-violet" style={style}>
       {words[idx]}
     </span>
-  );
-}
-
-function DashboardMockup() {
-  return (
-    <div className="relative w-full max-w-lg mx-auto">
-      <div className="absolute -inset-8 rounded-3xl bg-primary/5 blur-3xl" />
-      <div className="relative glass rounded-2xl overflow-hidden border border-white/10">
-        <div className="flex items-center gap-2 px-4 py-3 border-b border-white/5 bg-white/[0.02]">
-          <div className="flex gap-1.5">
-            <div className="w-2.5 h-2.5 rounded-full bg-white/10" />
-            <div className="w-2.5 h-2.5 rounded-full bg-white/10" />
-            <div className="w-2.5 h-2.5 rounded-full bg-white/10" />
-          </div>
-          <div className="flex-1 mx-3 h-5 rounded-md bg-white/[0.04] flex items-center px-2">
-            <span className="text-[9px] text-white/20">tinker.kz/admin</span>
-          </div>
-          <div className="w-6 h-5 rounded bg-white/[0.04]" />
-        </div>
-        <div className="p-4 space-y-3">
-          <div className="grid grid-cols-3 gap-2">
-            {[
-              { label: 'AI запросов', val: '12.4K' },
-              { label: 'Автоматизаций', val: '347' },
-              { label: 'Экономия', val: '68%' },
-            ].map((s, i) => (
-              <div key={i} className="rounded-xl bg-white/[0.03] border border-white/5 p-3">
-                <p className="text-[9px] text-white/30 mb-1">{s.label}</p>
-                <p className="text-sm font-bold text-white">{s.val}</p>
-                <span className="text-[8px] text-emerald-400">↑ 12%</span>
-              </div>
-            ))}
-          </div>
-          <div className="rounded-xl bg-white/[0.03] border border-white/5 p-3">
-            <div className="flex items-center justify-between mb-3">
-              <p className="text-[9px] text-white/40">Активность AI агентов</p>
-              <div className="flex gap-1">
-                {['1д', '7д', '30д'].map((t, i) => (
-                  <span key={t} className={`text-[8px] px-2 py-0.5 rounded-md ${i === 1 ? 'bg-primary/30 text-primary' : 'text-white/20'}`}>{t}</span>
-                ))}
-              </div>
-            </div>
-            <div className="flex items-end gap-1 h-14">
-              {[30, 55, 42, 70, 58, 85, 72, 90, 65, 88, 75, 95].map((h, i) => (
-                <motion.div
-                  key={i}
-                  initial={{ scaleY: 0 }}
-                  animate={{ scaleY: 1 }}
-                  transition={{ delay: 1.2 + i * 0.05, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-                  className="flex-1 rounded-sm origin-bottom"
-                  style={{ height: `${h}%`, background: i === 11 ? 'hsl(252 100% 68%)' : `hsl(252 100% 68% / ${0.15 + (i / 11) * 0.25})` }}
-                />
-              ))}
-            </div>
-          </div>
-          <div className="rounded-xl bg-white/[0.03] border border-white/5 p-3 space-y-2">
-            <p className="text-[9px] text-white/30 mb-2">Активные процессы</p>
-            {[
-              { name: 'AI → CRM sync', status: 'running', color: 'bg-emerald-400' },
-              { name: 'Telegram bot handler', status: 'active', color: 'bg-primary' },
-              { name: '1C data pipeline', status: 'syncing', color: 'bg-amber-400' },
-            ].map((p, i) => (
-              <div key={i} className="flex items-center gap-2">
-                <div className={`w-1.5 h-1.5 rounded-full ${p.color} animate-pulse`} />
-                <span className="text-[9px] text-white/50 flex-1">{p.name}</span>
-                <span className="text-[8px] text-white/20">{p.status}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    </div>
   );
 }
 
@@ -235,7 +164,7 @@ export default function Hero() {
               transition={{ delay: 0.8, duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
               className="hidden lg:block"
             >
-              <DashboardMockup />
+              <HeroShowcase />
             </motion.div>
           </div>
         </div>
