@@ -151,6 +151,13 @@ export default async function handler(request, response) {
 
   const body = typeof request.body === 'string' ? safeParse(request.body) : request.body || {};
 
+  // Без явного согласия на обработку ПД заявку не принимаем (Закон РК
+  // «О персональных данных», ст. 7–8). Проверка здесь, а не только галочкой
+  // в форме: форму можно обойти прямым запросом.
+  if (body.consent !== true) {
+    return response.status(400).json({ error: 'Нужно согласие на обработку персональных данных.' });
+  }
+
   const name = String(body.name || '').trim();
   const phone = String(body.phone || '').trim();
   const email = String(body.email || '').trim();
@@ -174,6 +181,14 @@ export default async function handler(request, response) {
       .map(key => [key, String(body?.utm?.[key] ?? '').trim().slice(0, 200)])
       .filter(([, value]) => value !== ''),
   );
+
+  // Отметка о согласии — доказательство по ст. 25 Закона о ПД. Колонок под
+  // неё в базе нет, поэтому она уходит служебной строкой в конце текста
+  // заявки: так она попадает и в базу, и в аварийное сообщение в Telegram.
+  const consentVersion = String(body.consent_version || '').trim().slice(0, 40) || 'не указана';
+  const consentLine = `Согласие на обработку ПД: да · версия ${consentVersion}`
+    + ` · форма ${cleaned.source || 'website'} · ${new Date().toISOString()}`;
+  cleaned.message = [cleaned.message, consentLine].filter(Boolean).join('\n\n');
 
   let receipt = null;
   let ticketId = null;

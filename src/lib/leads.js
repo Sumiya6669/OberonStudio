@@ -9,6 +9,13 @@
 import { readCampaign } from '@/lib/analytics/campaign';
 import { clientId, reachGoal } from '@/lib/analytics/metrika';
 
+/**
+ * Версия текста согласия на обработку ПД (страница /privacy#consent).
+ * Меняется при каждой правке текста: сервер пишет её в заявку, и по ней
+ * видно, с каким именно текстом человек согласился.
+ */
+export const CONSENT_VERSION = '2026-10-04';
+
 export async function submitLead(values) {
   // Метки снимались при заходе на сайт, а не сейчас: см. campaign.js.
   const campaign = readCampaign();
@@ -34,6 +41,10 @@ export async function submitLead(values) {
       referrer: campaign.referrer || '',
       utm: campaign.utm || {},
       ym_client_id: ymClientId,
+      // Согласие ставит сама форма (галочка или кнопка в чате) — здесь его
+      // не додумываем: без явного true сервер заявку не примет.
+      consent: values.consent === true,
+      consent_version: CONSENT_VERSION,
     }),
   });
 

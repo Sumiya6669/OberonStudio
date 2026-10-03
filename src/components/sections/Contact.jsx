@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { CheckCircle2, Loader2, Mail, MessageCircle, Phone } from 'lucide-react';
 import Reveal from '../core/Reveal';
+import ConsentCheckbox from '../core/ConsentCheckbox';
 import { useLang } from '@/lib/i18n/LangContext';
 import { submitLead } from '@/lib/leads';
 import { SITE_SETTINGS } from '@/lib/content/site';
@@ -13,6 +14,9 @@ export default function Contact() {
   const ct = t.contact;
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [form, setForm] = useState({ name: '', phone: '', email: '', company: '', message: '' });
+  // Согласие на обработку ПД — отдельно от полей: оно не уходит текстом,
+  // а ставит consent: true, и после отправки сбрасывается.
+  const [consent, setConsent] = useState(false);
   const [saving, setSaving] = useState(false);
   const [sent, setSent] = useState(false);
   // Расписка из базы: номер обращения и время, до которого обещан ответ.
@@ -48,13 +52,18 @@ export default function Contact() {
 
   const submit = async (event) => {
     event.preventDefault();
+    if (!consent) {
+      setError(t.consent.required);
+      return;
+    }
     setSaving(true);
     setError('');
     try {
-      const receipt = await submitLead({ ...form, source: 'contact_form' });
+      const receipt = await submitLead({ ...form, source: 'contact_form', consent: true });
       setReceipt(receipt || null);
       setSent(true);
       setForm({ name: '', phone: '', email: '', company: '', message: '' });
+      setConsent(false);
     } catch (err) {
       setError(err.message || 'Не удалось отправить заявку.');
     } finally {
@@ -225,9 +234,11 @@ export default function Contact() {
                     />
                   </label>
 
+                  <ConsentCheckbox checked={consent} onChange={setConsent} />
+
                   {error && <p className="text-sm text-red-300">{error}</p>}
 
-                  <button type="submit" disabled={saving} className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl bg-primary text-white text-sm font-bold hover:bg-primary/80 transition-colors disabled:opacity-50">
+                  <button type="submit" disabled={saving || !consent} className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl bg-primary text-white text-sm font-bold hover:bg-primary/80 transition-colors disabled:opacity-50">
                     {saving && <Loader2 className="w-4 h-4 animate-spin" />}
                     {saving ? 'Отправляем...' : ct.cta}
                   </button>

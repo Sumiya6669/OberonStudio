@@ -184,6 +184,24 @@ const en = {
   footer: {
     subtitle: 'AI Automation Engineer · Kazakhstan',
     rights: '© {year} · All rights reserved',
+    privacy: 'Privacy policy',
+    cookieSettings: 'Cookie settings',
+  },
+
+  // Consent to personal data processing: checkbox line in forms and chat prompt.
+  consent: {
+    text: 'I agree that Albert Gaan (Tinker studio) processes my personal data to answer my request, including transfer to services outside Kazakhstan.',
+    link: 'Consent terms',
+    required: 'Please tick the consent to personal data processing.',
+    chatAsk: 'To pass your contact to the team, we need your consent to personal data processing: Albert Gaan (Tinker studio) will receive your name, contact and message to answer you. Data may be transferred to services outside Kazakhstan. Term — 12 months from your last request.',
+    chatYes: 'I agree',
+    chatNo: 'Do not send',
+    chatDeclined: 'OK, your contact is not passed anywhere. You can write to us directly in Telegram — the button below the chat window.',
+  },
+
+  // /privacy page
+  privacy: {
+    notice: 'This document is published in Russian.',
   },
 
   // Home

@@ -1,15 +1,24 @@
 import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { motion } from 'framer-motion';
 import { submitLead } from '@/lib/leads';
+import { useLang } from '@/lib/i18n/LangContext';
+import ConsentCheckbox from '@/components/core/ConsentCheckbox';
 
 export default function DemoModal({ product, onClose }) {
+  const { t } = useLang();
   const [form, setForm] = useState({ name: '', phone: '', company: '' });
+  const [consent, setConsent] = useState(false);
   const [sent, setSent] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!consent) {
+      setError(t.consent.required);
+      return;
+    }
     setSaving(true);
     setError('');
     try {
@@ -18,6 +27,7 @@ export default function DemoModal({ product, onClose }) {
         service: product?.name || 'Tinker demo',
         source: 'demo_modal',
         message: `Запрос демо: ${product?.name || 'Tinker Products'}`,
+        consent: true,
       });
       setSent(true);
     } catch (err) {
@@ -27,7 +37,10 @@ export default function DemoModal({ product, onClose }) {
     }
   };
 
-  return (
+  // Портал в body: страница обёрнута в анимированный переход (transform), и без
+  // портала position: fixed привязался бы к обёртке, а не к экрану.
+  if (typeof document === 'undefined') return null;
+  return createPortal(
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
@@ -70,9 +83,10 @@ export default function DemoModal({ product, onClose }) {
                   />
                 </div>
               ))}
+              <ConsentCheckbox checked={consent} onChange={setConsent} />
               <button type="submit"
-                disabled={saving}
-                className="w-full py-3.5 rounded-xl bg-primary text-white text-sm font-bold hover:bg-primary/80 transition-colors mt-2">
+                disabled={saving || !consent}
+                className="w-full py-3.5 rounded-xl bg-primary text-white text-sm font-bold hover:bg-primary/80 transition-colors mt-2 disabled:opacity-50">
                 {saving ? 'Отправляем...' : 'Отправить запрос на демо'}
               </button>
               {error && <p className="text-xs text-red-300 text-center">{error}</p>}
@@ -92,6 +106,7 @@ export default function DemoModal({ product, onClose }) {
           </div>
         )}
       </motion.div>
-    </motion.div>
+    </motion.div>,
+    document.body,
   );
 }

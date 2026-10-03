@@ -16,6 +16,13 @@ import {
 /** После стольких реплик клиента предлагаем передать задачу команде. */
 const LEAD_AFTER = 3;
 
+/**
+ * Кнопки вопроса о согласии на обработку ПД. Это кнопки самого виджета, а не
+ * продажника: id с подчёркиваниями, чтобы не совпасть с его кнопками.
+ */
+const CONSENT_YES = '__consent_yes';
+const CONSENT_NO = '__consent_no';
+
 /** Пауза перед ответом — мгновенный отклик выглядит роботизированно. */
 function thinkingDelay(text) {
   return Math.min(1600, 500 + text.length * 6);
@@ -55,6 +62,7 @@ export default function Consultant() {
   const SETTINGS = useSettings(SITE_SETTINGS);
   const { t, lang } = useLang();
   const ct = t.consultant;
+  const cs = t.consent;
 
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState([]);
@@ -65,6 +73,10 @@ export default function Consultant() {
   // Разговор ведёт ИИ-продажник: согласие, карточку и контакт собирает он, а
   // не виджет. Узнаём это по первому ответу /api/chat.
   const [agentMode, setAgentMode] = useState(false);
+  // Контакт, оставленный в чате, до согласия на обработку ПД никуда не
+  // уходит: лежит здесь, пока человек не нажмёт «Согласен(на)».
+  const [pendingContact, setPendingContact] = useState(null);
+  const [chatConsent, setChatConsent] = useState(false);
   const scrollRef = useRef(null);
   const inputRef = useRef(null);
 
@@ -87,6 +99,7 @@ export default function Consultant() {
     setMessages([{ role: 'assistant', content: ct.greeting }]);
     setLeadAsked(false);
     setLeadSent(false);
+    setPendingContact(null);
   }, [lang, ct.greeting]);
 
   useEffect(() => {
@@ -138,6 +151,8 @@ export default function Consultant() {
         phone: contactText.slice(0, 200),
         message: transcript,
         source: 'ai_consultant',
+        // Сюда попадаем только после кнопки «Согласен(на)» — см. respond.
+        consent: true,
       });
       return true;
     } catch {
@@ -152,9 +167,44 @@ export default function Consultant() {
     setMessages(history);
     setTyping(true);
 
-    // Клиент оставил телефон, ник или почту — передаём заявку команде.
+    // Ответ на вопрос о согласии. Отправляется тот контакт, что человек
+    // оставил до вопроса, и та переписка, что была на тот момент.
+    if (pendingContact && (text === CONSENT_YES || text === CONSENT_NO)) {
+      const pending = pendingContact;
+      setPendingContact(null);
+      if (text === CONSENT_NO) {
+        setTyping(false);
+        setMessages(prev => [...prev, { role: 'assistant', content: cs.chatDeclined }]);
+        return;
+      }
+      setChatConsent(true);
+      const ok = await sendLead(pending.text, pending.history);
+      const reply = ok ? (LEAD_DONE[lang] || LEAD_DONE.ru) : (LEAD_FAILED[lang] || LEAD_FAILED.ru);
+      setLeadSent(ok);
+      setTyping(false);
+      setMessages(prev => [...prev, { role: 'assistant', content: reply }]);
+      return;
+    }
+    // Человек не ответил на вопрос, а написал дальше — вопрос снят.
+    if (pendingContact) setPendingContact(null);
+
+    // Клиент оставил телефон, ник или почту — передаём заявку команде, но
+    // только с согласия на обработку ПД (ст. 7–8 Закона РК о ПД).
     // С продажником этого не делаем: контакт он берёт сам и только после согласия.
     if (!agentMode && !leadSent && containsContact(text)) {
+      if (!chatConsent) {
+        setPendingContact({ text, history });
+        setTyping(false);
+        setMessages(prev => [...prev, {
+          role: 'assistant',
+          content: cs.chatAsk,
+          link: '/privacy#consent',
+          linkText: cs.link,
+          linkNewTab: true,
+          buttons: [{ id: CONSENT_YES, label: cs.chatYes }, { id: CONSENT_NO, label: cs.chatNo }],
+        }]);
+        return;
+      }
       const ok = await sendLead(text, history);
       const reply = ok ? (LEAD_DONE[lang] || LEAD_DONE.ru) : (LEAD_FAILED[lang] || LEAD_FAILED.ru);
       setLeadSent(ok);
@@ -189,7 +239,8 @@ export default function Consultant() {
       ...(shouldAskLead ? [{ role: 'assistant', content: LEAD_PROMPT[lang] || LEAD_PROMPT.ru }] : []),
     ]);
     if (shouldAskLead) setLeadAsked(true);
-  }, [messages, lang, leadAsked, leadSent, agentMode, askModel, sendLead, published]);
+  }, [messages, lang, leadAsked, leadSent, agentMode, askModel, sendLead, published,
+      pendingContact, chatConsent, cs]);
 
   const send = (value) => {
     const text = (value ?? input).trim();
@@ -252,10 +303,14 @@ export default function Consultant() {
                     {m.link && (
                       <Link
                         to={m.link}
-                        onClick={() => setOpen(false)}
+                        // Условия согласия — в новой вкладке: разговор и
+                        // ждущий согласия контакт остаются на месте.
+                        {...(m.linkNewTab
+                          ? { target: '_blank', rel: 'noopener noreferrer' }
+                          : { onClick: () => setOpen(false) })}
                         className="mt-2.5 flex items-center gap-1 text-[11px] font-semibold text-primary hover:text-white transition-colors"
                       >
-                        {linkLabel} <ArrowUpRight className="w-3 h-3" />
+                        {m.linkText || linkLabel} <ArrowUpRight className="w-3 h-3" />
                       </Link>
                     )}
                     {m.buttons?.length > 0 && (
