@@ -613,3 +613,34 @@ export const fetchReviewInbox = async (status = 'pending') =>
 /** verdict: 'approved' | 'rejected' | 'spam'. Одобрение создаёт обычную запись cms.item (коллекция review). */
 export const decideReview = async (id, verdict, note = null) =>
   unwrap(await supabase.rpc('review_decide', { p_id: id, p_verdict: verdict, p_note: note }));
+
+// ── Маркетинг: откуда заявки (миграции 018/027) и темы Контентщика (047) ──
+
+export const MARKETING_LEADS_LIMIT = 5000;
+
+/**
+ * Заявки за период со всеми полями источника, что есть в crm.ticket.
+ * body нужен только ради названия формы: отдельной колонки под него нет,
+ * оно есть лишь в служебной строке согласия, которую дописывает api/lead.js.
+ * from — включительно, to — нет.
+ */
+export const fetchLeadOrigins = async ({ from, to }) =>
+  unwrap(await crmDb.from('ticket')
+    .select('id, created_at, channel, landing_page, referrer, utm, body')
+    .gte('created_at', from.toISOString())
+    .lt('created_at', to.toISOString())
+    .order('created_at', { ascending: false })
+    .limit(MARKETING_LEADS_LIMIT));
+
+/** Очередь тем и посты по ним — только чтение: решение по посту принимают кнопкой в Telegram. */
+export const fetchContentTopics = async () => {
+  const [topics, posts] = await Promise.all([
+    cmsDb.from('post_topic')
+      .select('id, slug, title, angle, source_url, position, is_active, used_at, created_at')
+      .order('position').order('id'),
+    cmsDb.from('post')
+      .select('id, topic_id, status, headline, created_at, published_at')
+      .order('created_at', { ascending: false }).limit(500),
+  ]);
+  return { topics: unwrap(topics), posts: unwrap(posts) };
+};

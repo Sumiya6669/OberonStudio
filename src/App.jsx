@@ -48,6 +48,7 @@ import MoneyClose from './pages/admin/MoneyClose';
 import MoneyTax from './pages/admin/MoneyTax';
 import Funnel from './pages/admin/Funnel';
 import SiteReviews from './pages/admin/SiteReviews';
+import Marketing from './pages/admin/Marketing';
 import AiLive from './pages/admin/AiLive';
 import AiSpend from './pages/admin/AiSpend';
 import AiRights from './pages/admin/AiRights';
@@ -124,6 +125,7 @@ const AppRoutes = () => (
       <Route path="time" element={<TimeSheet />} />
       <Route path="sources" element={<Sources />} />
       <Route path="subscriptions" element={<CrmSubscriptions />} />
+      <Route path="marketing" element={<Marketing />} />
 
       {/* Бух учет */}
       <Route path="money" element={<MoneyOverview />} />
