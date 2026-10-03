@@ -1,11 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { LocaleLink as Link } from '@/components/nav/LocaleLink';
-import { InteractiveRobotSpline } from '@/components/ui/interactive-3d-robot';
+import TinkerRobot3D from '@/components/core/TinkerRobot3D';
 import { useLang } from '@/lib/i18n/LangContext';
 import { CONTACT_PATH } from '@/lib/routes';
-
-const ROBOT_SCENE_URL = 'https://prod.spline.design/PyzDhpQ9E5f1E3MT/scene.splinecode';
 
 export default function AiRobot() {
   const { t } = useLang();
@@ -13,8 +11,8 @@ export default function AiRobot() {
   const sectionRef = useRef(null);
   const [visible, setVisible] = useState(false);
 
-  // Сцена весит несколько мегабайт, поэтому грузим её только когда
-  // пользователь до неё домотал — главная открывается быстро.
+  // three.js грузится отдельным чанком только когда пользователь до сцены
+  // домотал — главная открывается быстро.
   useEffect(() => {
     const node = sectionRef.current;
     if (!node) return undefined;
@@ -45,17 +43,11 @@ export default function AiRobot() {
     >
       {/* 3D-сцена */}
       <div className="absolute inset-0 lg:left-[38%]">
-        {visible && (
-          <InteractiveRobotSpline
-            scene={ROBOT_SCENE_URL}
-            className="w-full h-full"
-            fallback={
-              <div className="w-full h-full flex items-center justify-center">
-                <div className="w-40 h-40 rounded-full bg-primary/10 blur-3xl" />
-              </div>
-            }
-          />
-        )}
+        {/* Свечение остаётся, даже если WebGL недоступен */}
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+          <div className="w-72 h-72 rounded-full bg-primary/10 blur-3xl" />
+        </div>
+        {visible && <TinkerRobot3D className="relative w-full h-full" label={at.aiHint} />}
       </div>
 
       {/* Затемнение, чтобы текст читался поверх сцены */}
