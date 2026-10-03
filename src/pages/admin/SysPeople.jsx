@@ -23,6 +23,7 @@ import {
   Badge, Button, ErrorNote, Field, Modal, Panel, Spinner, Stat, Table,
   dateTime, inputClass, num,
 } from '@/components/admin/ui';
+import Select from '@/components/core/Select';
 
 export default function SysPeople() {
   const { person } = useAuth();
@@ -186,12 +187,12 @@ export default function SysPeople() {
                      onChange={(e) => setInvite({ ...invite, email: e.target.value })} />
             </Field>
             <Field label="Роль при первом входе">
-              <select className={inputClass} value={invite.role_code}
+              <Select className={inputClass} value={invite.role_code}
                       onChange={(e) => setInvite({ ...invite, role_code: e.target.value })}>
                 {(roles.data || []).map((r) => (
                   <option key={r.code} value={r.code}>{r.title} ({r.code})</option>
                 ))}
-              </select>
+              </Select>
             </Field>
             <Field label="Примечание">
               <input className={inputClass} value={invite.note}

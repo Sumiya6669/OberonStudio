@@ -10,6 +10,7 @@ import { fetchCompanies, saveCompany } from '@/lib/supabase/queries';
 import {
   Badge, Button, Empty, ErrorNote, Field, Panel, Spinner, inputClass, money,
 } from '@/components/admin/ui';
+import Select from '@/components/core/Select';
 
 const EMPTY = {
   title: '', bin: '', domains: '', phones: '', hourly_rate: '', status: 'lead',
@@ -82,10 +83,10 @@ export default function Companies() {
             <Field label="БИН / ИИН"><input className={inputClass} value={form.bin}
               onChange={(e) => setForm({ ...form, bin: e.target.value })} /></Field>
             <Field label="Статус">
-              <select className={inputClass} value={form.status}
+              <Select className={inputClass} value={form.status}
                       onChange={(e) => setForm({ ...form, status: e.target.value })}>
                 {STATUSES.map(([v, l]) => <option key={v} value={v}>{l}</option>)}
-              </select>
+              </Select>
             </Field>
             <Field label="Домены почты" hint="через запятую: alfa.kz, alfa-group.kz">
               <input className={inputClass} value={form.domains}

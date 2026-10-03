@@ -24,6 +24,7 @@ import {
   Badge, Button, ErrorNote, Field, Modal, Panel, Spinner, Stat, Table,
   ago, cx, dateOnly, hours, inputClass, money,
 } from '@/components/admin/ui';
+import Select from '@/components/core/Select';
 
 const today = () => new Date().toISOString().slice(0, 10);
 
@@ -245,16 +246,16 @@ export default function CrmSubscriptions() {
             }));
           }}>
             <Field label="Клиент">
-              <select className={inputClass} required value={sell.company}
+              <Select className={inputClass} required value={sell.company}
                       onChange={(e) => setSell({ ...sell, company: e.target.value })}>
                 <option value="">— выберите —</option>
                 {(companies.data || []).map((c) => (
                   <option key={c.id} value={c.id}>{c.title}</option>
                 ))}
-              </select>
+              </Select>
             </Field>
             <Field label="Тариф" hint="условия скопируются в абонемент и дальше от прайса не зависят">
-              <select className={inputClass} required value={sell.plan}
+              <Select className={inputClass} required value={sell.plan}
                       onChange={(e) => {
                         const p = (plans.data || []).find((x) => x.code === e.target.value);
                         setSell({
@@ -266,7 +267,7 @@ export default function CrmSubscriptions() {
                 <option value="">— выберите —</option>
                 {(plans.data || []).filter((p) => p.code !== 'default' && p.is_active)
                   .map((p) => <option key={p.code} value={p.code}>{p.title}</option>)}
-              </select>
+              </Select>
             </Field>
             <div className="grid grid-cols-2 gap-3">
               <Field label="Цена в месяц, ₸">
@@ -351,11 +352,11 @@ export default function CrmSubscriptions() {
             </div>
             <Field label="Как идёт время"
                    hint="«час» в пятницу в 23:50 означает разное — клиент должен знать, что ему продали">
-              <select className={inputClass} value={plan.clock}
+              <Select className={inputClass} value={plan.clock}
                       onChange={(e) => setPlan({ ...plan, clock: e.target.value })}>
                 <option value="calendar">круглосуточно</option>
                 <option value="business">только в рабочее время</option>
-              </select>
+              </Select>
             </Field>
             <Field label="Примечание">
               <textarea className={inputClass} rows={2} value={plan.note || ''}

@@ -19,6 +19,7 @@ import {
   Bar, Button, Empty, ErrorNote, Field, Modal, Panel, Spinner, Stat, Table,
   dateOnly, inputClass, num, usd,
 } from '@/components/admin/ui';
+import Select from '@/components/core/Select';
 
 export default function AiSpend() {
   const { person } = useAuth();
@@ -190,11 +191,11 @@ export default function AiSpend() {
           <form onSubmit={submit} className="space-y-4">
             <ErrorNote error={error} />
             <Field label="Период">
-              <select className={inputClass} value={form.period}
+              <Select className={inputClass} value={form.period}
                       onChange={(e) => setForm({ ...form, period: e.target.value })}>
                 <option value="month">месяц</option>
                 <option value="day">сутки</option>
-              </select>
+              </Select>
             </Field>
             <Field label="Предел, единиц"
                    hint="Ноль означает полный запрет обращений, а не отсутствие ограничения.">

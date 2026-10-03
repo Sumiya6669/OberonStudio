@@ -23,6 +23,7 @@ import {
   Badge, Button, Empty, ErrorNote, Field, Modal, Panel, Spinner, Stat, Table, Tabs,
   dateOnly, inputClass, money, num,
 } from '@/components/admin/ui';
+import Select from '@/components/core/Select';
 
 const today = () => new Date().toISOString().slice(0, 10);
 
@@ -200,10 +201,10 @@ export default function MoneyTax() {
               <span className="text-xs text-muted-foreground">{r.purpose}</span>
             ) },
             { key: 'kind', title: 'Что это', render: (r) => (
-              <select className={inputClass} value={r.kind} disabled={busy}
+              <Select className={inputClass} value={r.kind} disabled={busy}
                       onChange={(e) => run(() => setBankLine(r.id, e.target.value))}>
                 {Object.entries(BANK_KIND).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
-              </select>
+              </Select>
             ) },
             { key: 'confirm', title: '', render: (r) => (
               <Button variant="ghost" disabled={busy || r.kind === 'unknown'}
@@ -281,9 +282,9 @@ function ActForm({ row, busy, error, onClose, onSave }) {
         <ErrorNote error={error} />
         <div className="grid grid-cols-2 gap-3">
           <Field label="Покупатель — это" hint="От этого зависит, нужен ли ЭСФ">
-            <select className={inputClass} value={f.kind} onChange={(e) => setF({ ...f, kind: e.target.value })}>
+            <Select className={inputClass} value={f.kind} onChange={(e) => setF({ ...f, kind: e.target.value })}>
               {Object.entries(BUYER_KIND).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
-            </select>
+            </Select>
           </Field>
           <Field label="Подписан покупателем" hint="Дата дохода и начало 15 дней на ЭСФ">
             <input className={inputClass} type="date" min={row.issued_on} value={f.signed_on}
@@ -293,9 +294,9 @@ function ActForm({ row, busy, error, onClose, onSave }) {
         {f.kind === 'fl' && (
           <div className="grid grid-cols-2 gap-3">
             <Field label="Как платил">
-              <select className={inputClass} value={f.pay_method} onChange={(e) => setF({ ...f, pay_method: e.target.value })}>
+              <Select className={inputClass} value={f.pay_method} onChange={(e) => setF({ ...f, pay_method: e.target.value })}>
                 {Object.entries(PAY_METHOD).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
-              </select>
+              </Select>
             </Field>
             <label className="flex items-center gap-2 pt-6 text-sm">
               <input type="checkbox" checked={f.kkm_receipt} onChange={(e) => setF({ ...f, kkm_receipt: e.target.checked })} />

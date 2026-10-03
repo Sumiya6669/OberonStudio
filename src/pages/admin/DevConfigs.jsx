@@ -17,6 +17,7 @@ import {
 import {
   Badge, Button, Empty, ErrorNote, Field, Panel, Spinner, dateTime, inputClass,
 } from '@/components/admin/ui';
+import Select from '@/components/core/Select';
 
 const EMPTY = { title: '', company_id: '', src_path: '', db_path: '', source_kind: 'xml', note: '' };
 
@@ -88,11 +89,11 @@ export default function DevConfigs() {
         <Panel title={form.id ? 'Правка' : 'Новая конфигурация'}>
           <form onSubmit={submit} className="grid gap-3 sm:grid-cols-2">
             <Field label="Клиент">
-              <select required className={inputClass} value={form.company_id}
+              <Select required className={inputClass} value={form.company_id}
                       onChange={(e) => setForm({ ...form, company_id: e.target.value })}>
                 <option value="">— выберите —</option>
                 {(companies.data || []).map((c) => <option key={c.id} value={c.id}>{c.title}</option>)}
-              </select>
+              </Select>
             </Field>
             <Field label="Название" hint="как отличаете её от других баз клиента">
               <input required className={inputClass} value={form.title}
@@ -104,11 +105,11 @@ export default function DevConfigs() {
               <input required className={inputClass} value={form.db_path}
                      onChange={(e) => setForm({ ...form, db_path: e.target.value })} /></Field>
             <Field label="Источник">
-              <select className={inputClass} value={form.source_kind}
+              <Select className={inputClass} value={form.source_kind}
                       onChange={(e) => setForm({ ...form, source_kind: e.target.value })}>
                 <option value="xml">выгрузка в XML</option>
                 <option value="cf_unpack">распаковка CF</option>
-              </select>
+              </Select>
             </Field>
             <Field label="Заметка"><input className={inputClass} value={form.note}
               onChange={(e) => setForm({ ...form, note: e.target.value })} /></Field>

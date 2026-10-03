@@ -18,6 +18,7 @@ import {
 } from '@/components/admin/ui';
 import SiteFreshness from '@/components/admin/SiteFreshness';
 import { ItemFields, LOCALES } from '@/components/admin/fields';
+import Select from '@/components/core/Select';
 
 const BLOCK_TYPES = [
   ['hero', 'Заглавный блок'], ['text', 'Текст'], ['features', 'Список преимуществ'],
@@ -286,12 +287,12 @@ function BlocksModal({ page, onClose, tenantId, onSaved }) {
         {edit && (
           <form onSubmit={submit} className="space-y-4 rounded-xl border border-line p-4">
             <Field label="Тип блока">
-              <select className={inputClass} value={edit.type}
+              <Select className={inputClass} value={edit.type}
                       onChange={(e) => setEdit({ ...edit, type: e.target.value })}>
                 {BLOCK_TYPES.map(([code, label]) => (
                   <option key={code} value={code}>{label}</option>
                 ))}
-              </select>
+              </Select>
             </Field>
 
             {edit.type.endsWith('s') && ['services', 'works', 'reviews', 'stack', 'products'].includes(edit.type) && (

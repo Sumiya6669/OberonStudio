@@ -15,6 +15,7 @@ import {
 import { Button, ErrorNote, Field, Modal, Panel, Spinner, Stat, StatusBadge,
   Table, Tabs, Toolbar, dateOnly, docStatusLabel, inputClass, money, num,
 } from '@/components/admin/ui';
+import Select from '@/components/core/Select';
 
 const FILTERS = [
   { value: 'live', label: 'Действующие', statuses: ['draft', 'issued', 'partly_paid', 'overdue'] },
@@ -164,7 +165,7 @@ export default function MoneyDocs() {
           <form onSubmit={submit} className="space-y-4">
             <ErrorNote error={error} />
             <Field label="Клиент">
-              <select className={inputClass} required value={form.company_id}
+              <Select className={inputClass} required value={form.company_id}
                       onChange={(e) => setForm({ ...form, company_id: e.target.value })}>
                 <option value="">— выберите —</option>
                 {(companies.data || []).map((c) => {
@@ -175,7 +176,7 @@ export default function MoneyDocs() {
                     </option>
                   );
                 })}
-              </select>
+              </Select>
             </Field>
 
             {picked && (

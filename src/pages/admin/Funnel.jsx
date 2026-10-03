@@ -15,6 +15,7 @@ import { PRODUCTS } from '@/lib/content/site';
 import {
   Badge, Button, ErrorNote, Field, Modal, Spinner, Stat, ago, inputClass, money,
 } from '@/components/admin/ui';
+import Select from '@/components/core/Select';
 
 const STAGES = [
   ['new', 'Новые'], ['qualified', 'Квалифицированы'], ['demo', 'Демо'], ['proposal', 'КП'],
@@ -144,16 +145,16 @@ function DealCard({ deal, busy, error, onClose, onSave }) {
         </p>
         <div className="grid grid-cols-2 gap-3">
           <Field label="Этап">
-            <select className={inputClass} value={stage} onChange={(e) => setStage(e.target.value)}
+            <Select className={inputClass} value={stage} onChange={(e) => setStage(e.target.value)}
                     disabled={deal.opted_out}>
               {STAGES.map(([code, title]) => <option key={code} value={code}>{title}</option>)}
-            </select>
+            </Select>
           </Field>
           {stage === 'lost' && (
             <Field label="Причина">
-              <select className={inputClass} value={lost} onChange={(e) => setLost(e.target.value)}>
+              <Select className={inputClass} value={lost} onChange={(e) => setLost(e.target.value)}>
                 {Object.entries(LOST).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
-              </select>
+              </Select>
             </Field>
           )}
           <Field label="Следующий шаг"><input className={inputClass} value={next.step}

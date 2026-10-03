@@ -13,6 +13,7 @@
  */
 import React from 'react';
 import { Field, Tabs, cx, inputClass } from './ui';
+import Select from '@/components/core/Select';
 
 export const LOCALES = [
   { value: 'ru', label: 'Русский' },
@@ -168,12 +169,12 @@ export function ItemFields({ collection, value, onChange }) {
 
       <div className="grid grid-cols-2 gap-3 border-t border-line pt-4">
         <Field label="Состояние">
-          <select className={inputClass} value={value.status}
+          <Select className={inputClass} value={value.status}
                   onChange={(e) => onChange({ ...value, status: e.target.value })}>
             <option value="draft">черновик</option>
             <option value="published">опубликовано</option>
             <option value="hidden">скрыто</option>
-          </select>
+          </Select>
         </Field>
         <Field label="Порядок" hint="Меньше — выше в списке на сайте.">
           <input className={inputClass} type="number" value={value.sort ?? 0}

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 import { PRODUCTS } from '@/lib/content/site';
+import Select from '@/components/core/Select';
 
 /**
  * Форма отзыва. Отзыв уходит в карантин (/api/review → cms.review_inbox) и
@@ -105,14 +106,14 @@ export default function ReviewForm({ lang = 'ru', onClose }) {
               <input className={input} placeholder={t.role} value={form.role} onChange={set('role')} maxLength={120} />
               <input className={input} placeholder={t.company} value={form.company} onChange={set('company')} maxLength={160} />
               <input className={input} placeholder={t.city} value={form.city} onChange={set('city')} maxLength={80} />
-              <select className={input} value={form.rating} onChange={set('rating')} aria-label={t.rating}>
+              <Select className={input} value={form.rating} onChange={set('rating')} aria-label={t.rating}>
                 {[5, 4, 3, 2, 1].map((n) => <option key={n} value={n}>{`${t.rating}: ${'★'.repeat(n)}`}</option>)}
-              </select>
+              </Select>
             </div>
-            <select className={input} value={form.product} onChange={set('product')} aria-label={t.product}>
+            <Select className={input} value={form.product} onChange={set('product')} aria-label={t.product}>
               <option value="">{`${t.product}: ${t.studio}`}</option>
               {PRODUCTS.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
-            </select>
+            </Select>
             <textarea className={input} rows={5} placeholder={t.body} value={form.body} onChange={set('body')}
               required minLength={40} maxLength={2000} />
             <input className={input} placeholder={t.contact} value={form.contact} onChange={set('contact')} required maxLength={200} />

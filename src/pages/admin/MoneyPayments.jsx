@@ -15,6 +15,7 @@ import {
   Badge, Button, ErrorNote, Field, Modal, Panel, Spinner, Stat, Table,
   dateOnly, inputClass, money,
 } from '@/components/admin/ui';
+import Select from '@/components/core/Select';
 
 const today = () => new Date().toISOString().slice(0, 10);
 
@@ -100,7 +101,7 @@ export default function MoneyPayments() {
           <form onSubmit={submit} className="space-y-4">
             <ErrorNote error={error} />
             <Field label="Счёт" hint="Оплата без счёта возможна — тогда укажите клиента вручную.">
-              <select className={inputClass} value={form.doc_id}
+              <Select className={inputClass} value={form.doc_id}
                       onChange={(e) => {
                         const d = (docs.data || []).find((x) => String(x.id) === e.target.value);
                         setForm({ ...form, doc_id: e.target.value,
@@ -112,18 +113,18 @@ export default function MoneyPayments() {
                     {d.number} · {d.company_title} · остаток {money(d.rest)}
                   </option>
                 ))}
-              </select>
+              </Select>
             </Field>
 
             {!form.doc_id && (
               <Field label="Клиент">
-                <select className={inputClass} required value={form.company_id}
+                <Select className={inputClass} required value={form.company_id}
                         onChange={(e) => setForm({ ...form, company_id: e.target.value })}>
                   <option value="">— выберите —</option>
                   {(companies.data || []).map((c) => (
                     <option key={c.id} value={c.id}>{c.title}</option>
                   ))}
-                </select>
+                </Select>
               </Field>
             )}
 

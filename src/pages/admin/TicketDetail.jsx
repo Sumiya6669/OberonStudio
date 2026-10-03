@@ -15,6 +15,7 @@ import {
 import {
   Badge, Button, Empty, ErrorNote, Field, Panel, Spinner, dateTime, hours, inputClass, money,
 } from '@/components/admin/ui';
+import Select from '@/components/core/Select';
 
 const STATUSES = ['new', 'triaged', 'estimated', 'approved', 'in_work', 'done', 'cancelled'];
 const KINDS = ['bug', 'feature', 'consult', 'update', 'integration', 'other'];
@@ -85,21 +86,21 @@ export default function TicketDetail() {
 
             <div className="mt-4 grid gap-3 sm:grid-cols-2">
               <Field label="Статус">
-                <select className={inputClass} value={t.status}
+                <Select className={inputClass} value={t.status}
                         onChange={(e) => run(async () => {
                           await updateTicket(id, { status: e.target.value }); ticket.reload();
                         })}>
                   {STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
-                </select>
+                </Select>
               </Field>
               <Field label="Тип">
-                <select className={inputClass} value={t.kind || ''}
+                <Select className={inputClass} value={t.kind || ''}
                         onChange={(e) => run(async () => {
                           await updateTicket(id, { kind: e.target.value || null }); ticket.reload();
                         })}>
                   <option value="">не задан</option>
                   {KINDS.map((k) => <option key={k} value={k}>{k}</option>)}
-                </select>
+                </Select>
               </Field>
             </div>
           </Panel>

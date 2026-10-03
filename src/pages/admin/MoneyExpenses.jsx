@@ -19,6 +19,7 @@ import {
   Badge, Button, ErrorNote, Field, Modal, Panel, Spinner, Stat, StatusBadge,
   Table, Tabs, dateOnly, entryStatusLabel, inputClass, money,
 } from '@/components/admin/ui';
+import Select from '@/components/core/Select';
 
 const KINDS = [
   ['expense', 'Расход'],
@@ -144,10 +145,10 @@ export default function MoneyExpenses() {
             <ErrorNote error={error} />
             <div className="grid grid-cols-2 gap-3">
               <Field label="Вид">
-                <select className={inputClass} value={form.kind}
+                <Select className={inputClass} value={form.kind}
                         onChange={(e) => setForm({ ...form, kind: e.target.value })}>
                   {KINDS.map(([code, label]) => <option key={code} value={code}>{label}</option>)}
-                </select>
+                </Select>
               </Field>
               <Field label="Дата">
                 <input className={inputClass} type="date" required value={form.entry_date}
@@ -163,20 +164,20 @@ export default function MoneyExpenses() {
 
             <div className="grid grid-cols-2 gap-3">
               <Field label="Статья расхода">
-                <select className={inputClass} required value={form.expense_code}
+                <Select className={inputClass} required value={form.expense_code}
                         onChange={(e) => setForm({ ...form, expense_code: e.target.value })}>
                   {expenseAccounts.map((a) => (
                     <option key={a.code} value={a.code}>{a.code} · {a.title}</option>
                   ))}
-                </select>
+                </Select>
               </Field>
               <Field label="Откуда платим">
-                <select className={inputClass} required value={form.paid_from}
+                <Select className={inputClass} required value={form.paid_from}
                         onChange={(e) => setForm({ ...form, paid_from: e.target.value })}>
                   {payAccounts.map((a) => (
                     <option key={a.code} value={a.code}>{a.code} · {a.title}</option>
                   ))}
-                </select>
+                </Select>
               </Field>
             </div>
 
@@ -188,13 +189,13 @@ export default function MoneyExpenses() {
 
             <Field label="Отнести на клиента"
                    hint="Не обязательно. Подписки и аренда общие, и делить их по клиентам честно не получится.">
-              <select className={inputClass} value={form.company_id}
+              <Select className={inputClass} value={form.company_id}
                       onChange={(e) => setForm({ ...form, company_id: e.target.value })}>
                 <option value="">— общий расход —</option>
                 {(companies.data || []).map((c) => (
                   <option key={c.id} value={c.id}>{c.title}</option>
                 ))}
-              </select>
+              </Select>
             </Field>
 
             <div className="flex gap-2">
