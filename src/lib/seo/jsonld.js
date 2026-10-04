@@ -273,9 +273,30 @@ export function answerLd(answer) {
     : answer.lead;
 
   const d = dates(answer);
+  const url = answer.slug ? `${SITE_URL}/1c/${answer.slug}` : undefined;
+
+  // Контентная аналитика Метрики читает материал с этой же разметки: ей
+  // нужны идентификатор, заголовок и текст — весь, как на странице, по его
+  // длине она считает дочитывания. Поэтому в text страницы идут все блоки
+  // разбора, а не только короткий ответ.
+  const body = [
+    answer.lead,
+    ...(answer.symptoms || []),
+    ...(answer.causes || []),
+    ...steps,
+    answer.callUs,
+  ].filter(Boolean).join('\n\n');
+
   return clean({
     '@context': 'https://schema.org',
     '@type': 'QAPage',
+    '@id': url,
+    url,
+    headline: answer.title || answer.question,
+    text: body,
+    inLanguage: 'ru',
+    about: answer.topic ? { '@type': 'Thing', name: answer.topic } : undefined,
+    author: { '@type': 'Organization', name: SITE_NAME, url: `${SITE_URL}/` },
     ...d,
     mainEntity: clean({
       '@type': 'Question',
