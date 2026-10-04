@@ -14,7 +14,7 @@ import { Check, Copy, Trash2 } from 'lucide-react';
 import Select from '@/components/core/Select';
 import { SITE_URL } from '@/lib/seo/pages';
 import {
-  HISTORY_LIMIT, LANGS, LINK_PAGES, LINK_PRESETS, UTM_HINTS,
+  HISTORY_LIMIT, LANGS, LINK_PAGES, LINK_PRESETS, READY_LINK_GROUPS, UTM_HINTS,
   buildCampaignUrl, cleanPath, cleanTag, loadLinkHistory, pushLinkHistory, saveLinkHistory,
 } from '@/lib/admin/marketing';
 import { Button, Empty, Field, Panel, ago, cx, inputClass } from '@/components/admin/ui';
@@ -60,6 +60,56 @@ function Chip({ active, onClick, children }) {
           : 'border-line text-muted-foreground hover:border-violet/40 hover:text-foreground')}>
       {children}
     </button>
+  );
+}
+
+/** Готовые ссылки: профили и посты по контент-плану — только скопировать. */
+function ReadyLinks() {
+  const [copied, setCopied] = React.useState(null);
+  const [manual, setManual] = React.useState(false);
+
+  const copy = async (url, event) => {
+    const input = event.currentTarget.closest('li')?.querySelector('input');
+    const result = await copyText(url, input);
+    setCopied(result === 'ok' ? url : null);
+    setManual(result !== 'ok');
+  };
+
+  return (
+    <Panel title="Готовые ссылки">
+      <p className="-mt-1 mb-3 text-xs text-muted-foreground">
+        Уже собраны под наши места размещения и посты октября. Нажмите «скопировать» и вставьте туда,
+        где написано. Нужна другая — соберите ниже.
+        {manual && <span className="ml-1 text-amber-400">Ссылка выделена — нажмите Ctrl+C.</span>}
+      </p>
+      <div className="grid gap-5 lg:grid-cols-3">
+        {READY_LINK_GROUPS.map((group) => (
+          <div key={group.title}>
+            <p className="text-xs font-medium text-foreground">{group.title}</p>
+            <p className="mb-2 text-[11px] text-muted-foreground">{group.hint}</p>
+            <ul className="space-y-2">
+              {group.links.map((link) => {
+                const url = buildCampaignUrl({ base: SITE_URL, lang: 'ru', path: link.path, tags: link.tags });
+                return (
+                  <li key={url} className="rounded-lg border border-line/70 bg-background/40 p-2.5">
+                    <p className="text-xs text-foreground">{link.label}</p>
+                    <p className="text-[11px] text-muted-foreground">{link.where}</p>
+                    <div className="mt-1.5 flex items-center gap-1.5">
+                      <input readOnly value={url} onFocus={(e) => e.target.select()} aria-label="Ссылка"
+                             className="min-w-0 flex-1 rounded-md border border-line bg-background px-2 py-1 font-mono text-[11px] text-muted-foreground outline-none focus:border-violet/60" />
+                      <button type="button" onClick={(e) => copy(url, e)} title="Скопировать" aria-label="Скопировать"
+                              className="rounded-md p-1.5 text-muted-foreground hover:bg-white/5 hover:text-foreground">
+                        {copied === url ? <Check className="h-3.5 w-3.5 text-emerald-400" /> : <Copy className="h-3.5 w-3.5" />}
+                      </button>
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        ))}
+      </div>
+    </Panel>
   );
 }
 
@@ -127,6 +177,8 @@ export default function LinkBuilder() {
   };
 
   return (
+    <div className="space-y-4">
+    <ReadyLinks />
     <div className="grid gap-4 xl:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
       <div className="space-y-4">
         <Panel title="Куда ставите ссылку">
@@ -257,6 +309,7 @@ export default function LinkBuilder() {
           </ul>
         )}
       </Panel>
+    </div>
     </div>
   );
 }

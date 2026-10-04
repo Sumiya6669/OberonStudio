@@ -189,6 +189,9 @@ export const LANGS = [
  */
 export const LINK_PRESETS = [
   { code: 'tg_channel', label: 'Telegram-канал', utm_source: 'telegram', utm_medium: 'channel' },
+  { code: 'ig_bio', label: 'Instagram — профиль', utm_source: 'instagram', utm_medium: 'bio' },
+  { code: 'ig_story', label: 'Instagram — сторис', utm_source: 'instagram', utm_medium: 'story' },
+  { code: 'wa_profile', label: 'WhatsApp — профиль', utm_source: 'whatsapp', utm_medium: 'profile' },
   { code: 'buh_chat', label: 'Чат бухгалтеров', utm_source: 'buh_chat', utm_medium: 'chat' },
   { code: '2gis', label: '2ГИС', utm_source: '2gis', utm_medium: 'listing' },
   { code: 'partner', label: 'Партнёр-бухфирма', utm_source: 'partner', utm_medium: 'referral' },
@@ -198,11 +201,75 @@ export const LINK_PRESETS = [
 
 /** Подсказки к полям: нажатие подставляет значение. */
 export const UTM_HINTS = {
-  utm_source: ['telegram', 'whatsapp', 'instagram', '2gis', 'partner', 'newsletter', 'personal'],
-  utm_medium: ['channel', 'chat', 'listing', 'referral', 'email', 'dm', 'post'],
-  utm_campaign: ['esf_snt', 'kaspi', 'ip_tax', 'products_1c'],
-  utm_content: ['post', 'pinned', 'bio', 'button', 'story', 'signature'],
+  utm_source: ['telegram', 'instagram', 'whatsapp', '2gis', 'partner', 'email', 'newsletter', 'personal'],
+  utm_medium: ['channel', 'bio', 'story', 'profile', 'chat', 'listing', 'referral', 'signature', 'dm'],
+  utm_campaign: ['profile', 'catalog', 'esf', 'akty_sverki', 'antikameralka', 'bank_robot', 'eaes_import',
+    'vs_snt', 'kadry', 'kaspi_margin', 'rest_invoice', 'wa_seller', 'partners'],
+  utm_content: ['bio', 'pinned', 'button', 'signature', 'post_0510', 'story_0510'],
 };
+
+/**
+ * Готовые ссылки: то, что ставится один раз (профили, закреп, 2ГИС, подпись),
+ * и ссылки под посты октября из «Контент-плана Q4 2026» (Products/Документы).
+ * Кампания — код продукта латиницей, вариант — тип и дата публикации
+ * (post_ДДММ, story_ДДММ): так в «Откуда заявки» видно, какой пост привёл
+ * заявку. В Instagram ссылка в тексте поста не кликается, поэтому для постов
+ * там — ссылка для стикера в сторис, а в профиле — общая.
+ */
+const PROFILE_LINKS = [
+  { label: 'Instagram — ссылка в профиле', where: 'Instagram → Редактировать профиль → Ссылки', path: '/',
+    tags: { utm_source: 'instagram', utm_medium: 'bio', utm_campaign: 'profile', utm_content: 'bio' } },
+  { label: 'Telegram-канал — описание канала', where: 't.me/tinkerkz → Изменить → Описание', path: '/',
+    tags: { utm_source: 'telegram', utm_medium: 'channel', utm_campaign: 'profile', utm_content: 'bio' } },
+  { label: 'Telegram-канал — закреплённый пост с каталогом', where: 'Первый пост канала, закрепить', path: '/products',
+    tags: { utm_source: 'telegram', utm_medium: 'channel', utm_campaign: 'catalog', utm_content: 'pinned' } },
+  { label: 'WhatsApp Business — профиль', where: 'WhatsApp Business → Профиль компании → Сайт', path: '/',
+    tags: { utm_source: 'whatsapp', utm_medium: 'profile', utm_campaign: 'profile', utm_content: 'bio' } },
+  { label: '2ГИС — кнопка «Сайт» в карточке', where: 'Кабинет 2ГИС → Карточка → Сайт', path: '/',
+    tags: { utm_source: '2gis', utm_medium: 'listing', utm_campaign: 'profile', utm_content: 'button' } },
+  { label: 'Подпись в письмах', where: 'Почта → Настройки → Подпись', path: '/products',
+    tags: { utm_source: 'email', utm_medium: 'signature', utm_campaign: 'catalog', utm_content: 'signature' } },
+  { label: 'Партнёрам-бухфирмам — каталог', where: 'В переписке с бухфирмой, в презентации для партнёров', path: '/products',
+    tags: { utm_source: 'partner', utm_medium: 'referral', utm_campaign: 'partners', utm_content: 'catalog' } },
+  { label: 'Разборы 1С — в чаты бухгалтеров', where: 'Ответ на вопрос в чате, со ссылкой на разборы', path: '/1c',
+    tags: { utm_source: 'buh_chat', utm_medium: 'chat', utm_campaign: 'answers_1c', utm_content: 'reply' } },
+];
+
+// Посты октября: дата (ДДММ), тема, код продукта, страница.
+const OCTOBER_POSTS = [
+  ['0510', 'Акты сверки после квартала', 'akty_sverki', '/products'],
+  ['0710', 'Антикамералка до 300.00', 'antikameralka', '/products'],
+  ['0910', 'ЕСУТД: штраф за невнесённый договор', 'kadry', '/products'],
+  ['1210', 'Робот разноски банка', 'bank_robot', '/products'],
+  ['1410', 'Импорт из ЕАЭС: 328.00 до 20 октября', 'eaes_import', '/products'],
+  ['1610', 'Как ставится расширение Tinker', 'esf', '/products'],
+  ['1910', 'Kaspi: прибыль по товару', 'kaspi_margin', '/products'],
+  ['2110', 'Отклонённая СНТ — 3 рабочих дня', 'vs_snt', '/products'],
+  ['2310', 'Кадры для клиентов бухфирмы', 'kadry', '/products'],
+  ['2710', 'Накладные в iiko и StoreHouse по фото', 'rest_invoice', '/products'],
+  ['2810', '«Деньги под риском» по ЭСФ', 'esf', '/products'],
+  ['3010', 'WhatsApp-продавец', 'wa_seller', '/products'],
+];
+
+export const READY_LINK_GROUPS = [
+  { title: 'Профили и постоянные места', hint: 'Ставятся один раз.', links: PROFILE_LINKS },
+  {
+    title: 'Посты Telegram-канала · октябрь',
+    hint: 'Ссылка в конце поста. Дата — по контент-плану.',
+    links: OCTOBER_POSTS.map(([day, title, campaign, path]) => ({
+      label: `${day.slice(0, 2)}.${day.slice(2)} · ${title}`, where: 'Telegram-канал, в тексте поста', path,
+      tags: { utm_source: 'telegram', utm_medium: 'channel', utm_campaign: campaign, utm_content: `post_${day}` },
+    })),
+  },
+  {
+    title: 'Сторис Instagram · октябрь',
+    hint: 'Стикер «Ссылка» в сторис к тому же посту: в тексте поста Instagram ссылки не кликаются.',
+    links: OCTOBER_POSTS.map(([day, title, campaign, path]) => ({
+      label: `${day.slice(0, 2)}.${day.slice(2)} · ${title}`, where: 'Instagram, сторис со стикером «Ссылка»', path,
+      tags: { utm_source: 'instagram', utm_medium: 'story', utm_campaign: campaign, utm_content: `story_${day}` },
+    })),
+  },
+];
 
 /** Чистка значения метки: без пробелов по краям, пробелы внутри → «_», нижний регистр. */
 export const cleanTag = (value) =>

@@ -137,6 +137,20 @@ export const enqueueJob = async ({ tenantId, jobType, agentKind, payload = {}, p
     payload, priority, dedupe_key: dedupeKey, requested_by: 'admin',
   }).select().single());
 
+/**
+ * Живые задания агента разработки — те же статусы, что держит индекс
+ * job_dedupe_idx. По ним экран конфигураций показывает «уже в очереди»,
+ * а не даёт нажать кнопку, которую база всё равно отвергнет.
+ */
+export const LIVE_JOB_STATUSES = ['queued', 'leased', 'blocked', 'awaiting', 'failed'];
+
+export const fetchLiveDevJobs = async () =>
+  unwrap(await coreDb.from('job')
+    .select('id, job_type, status, dedupe_key, attempts, error_text, created_at')
+    .like('job_type', 'dev.%')
+    .in('status', LIVE_JOB_STATUSES)
+    .order('created_at', { ascending: false }));
+
 export const fetchJobTypes = async () =>
   unwrap(await coreDb.from('job_type').select('*').eq('is_active', true).order('code'));
 

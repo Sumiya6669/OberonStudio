@@ -12,7 +12,7 @@ import { Database, RefreshCw, FileSearch } from 'lucide-react';
 import { useAsync } from '@/lib/admin/useAsync';
 import { useAuth } from '@/lib/auth/AuthContext';
 import {
-  fetchConfigs, fetchCompanies, saveConfigSnapshot, fetchReports, enqueueJob,
+  fetchConfigs, fetchCompanies, saveConfigSnapshot, fetchReports, enqueueJob, fetchLiveDevJobs,
 } from '@/lib/supabase/queries';
 import {
   Badge, Button, Empty, ErrorNote, Field, Panel, Spinner, dateTime, inputClass,
@@ -21,10 +21,37 @@ import Select from '@/components/core/Select';
 
 const EMPTY = { title: '', company_id: '', src_path: '', db_path: '', source_kind: 'xml', note: '' };
 
+// Задания dev_1c исполняет раннер на ПК (runner\run-runner.bat), а не облако:
+// пока он не запущен, задание честно лежит в очереди. Показываем это словами,
+// иначе второе нажатие упирается в job_dedupe_idx и человек видит текст ошибки базы.
+const JOB_STATUS = {
+  queued: 'в очереди', leased: 'выполняется', blocked: 'ждёт', awaiting: 'ждёт подтверждения', failed: 'ошибка, будет повтор',
+};
+
+const dayMonth = (iso) => new Date(iso).toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit' });
+
+function liveJob(jobs, type, snapshotId) {
+  return (jobs || []).find((j) => j.dedupe_key === `${type}:${snapshotId}`) || null;
+}
+
+function JobLine({ job, label }) {
+  if (!job) return null;
+  return (
+    <p className="text-[11px] text-amber-300/80">
+      {label}: {JOB_STATUS[job.status] || job.status} с {dayMonth(job.created_at)}
+      {job.status === 'queued' && ' — выполнится, когда запустите раннер на ПК (runner\\run-runner.bat)'}
+      {job.status === 'failed' && job.error_text && ` — ${job.error_text.slice(0, 160)}`}
+    </p>
+  );
+}
+
+const isDuplicate = (err) => /job_dedupe_idx|duplicate key/i.test(String(err?.message || err));
+
 export default function DevConfigs() {
   const { person } = useAuth();
   const list = useAsync(fetchConfigs);
   const companies = useAsync(fetchCompanies);
+  const jobs = useAsync(fetchLiveDevJobs);
   const [form, setForm] = useState(null);
   const [openReports, setOpenReports] = useState(null);
   const [error, setError] = useState(null);
@@ -32,7 +59,16 @@ export default function DevConfigs() {
 
   const run = async (fn) => {
     setError(null); setBusy(true);
-    try { await fn(); } catch (err) { setError(err); } finally { setBusy(false); }
+    try {
+      await fn();
+    } catch (err) {
+      setError(isDuplicate(err)
+        ? new Error('Такое задание уже стоит в очереди — второе не нужно. Оно выполнится, когда запустите раннер на ПК.')
+        : err);
+    } finally {
+      setBusy(false);
+      jobs.reload();
+    }
   };
 
   const submit = (event) => {
@@ -154,11 +190,19 @@ export default function DevConfigs() {
 
               <p className="mt-3 break-all text-[11px] text-muted-foreground">{c.src_path}</p>
 
+              <div className="mt-2 space-y-1">
+                <JobLine job={liveJob(jobs.data, 'dev.index', c.id)} label="Индексация" />
+                <JobLine job={liveJob(jobs.data, 'dev.audit', c.id)} label="Аудит" />
+              </div>
+
               <div className="mt-3 flex flex-wrap gap-2">
-                <Button variant="ghost" disabled={busy} onClick={() => reindex(c)}>
+                <Button variant="ghost" disabled={busy || Boolean(liveJob(jobs.data, 'dev.index', c.id))}
+                        onClick={() => reindex(c)}>
                   <RefreshCw className="h-3.5 w-3.5" /> Переиндексировать
                 </Button>
-                <Button variant="ghost" disabled={busy || !c.indexed_at} onClick={() => audit(c)}>
+                <Button variant="ghost"
+                        disabled={busy || !c.indexed_at || Boolean(liveJob(jobs.data, 'dev.audit', c.id))}
+                        onClick={() => audit(c)}>
                   <FileSearch className="h-3.5 w-3.5" /> Аудит доработок
                 </Button>
                 <Button variant="ghost"
