@@ -182,6 +182,7 @@ const en = {
     rights: '© {year} · All rights reserved',
     privacy: 'Privacy policy',
     cookieSettings: 'Cookie settings',
+    channel: 'Telegram channel',
   },
 
   // Consent to personal data processing: checkbox line in forms and chat prompt.

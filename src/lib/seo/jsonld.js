@@ -55,6 +55,7 @@ export function organizationLd(settings = {}) {
   // сайт с реальной точкой на карте.
   const sameAs = [
     settings.telegram_url, settings.whatsapp_url,
+    settings.telegram_channel_url, settings.instagram_url,
     settings.maps_2gis_url, settings.maps_google_url,
   ].filter(Boolean);
 

@@ -82,7 +82,7 @@ export default function SiteFooter() {
                 {ft.cookieSettings}
               </button>
             </div>
-            <div className="flex items-center gap-4">
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
               <a
                 href={SETTINGS.telegram_url}
                 target="_blank"
@@ -99,6 +99,26 @@ export default function SiteFooter() {
               >
                 {SETTINGS.whatsapp}
               </a>
+              {SETTINGS.telegram_channel_url && (
+                <a
+                  href={SETTINGS.telegram_channel_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs text-white/20 hover:text-white/50 transition-colors duration-300"
+                >
+                  {ft.channel || 'Telegram-канал'}
+                </a>
+              )}
+              {SETTINGS.instagram_url && (
+                <a
+                  href={SETTINGS.instagram_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs text-white/20 hover:text-white/50 transition-colors duration-300"
+                >
+                  Instagram
+                </a>
+              )}
             </div>
           </div>
         </Reveal>

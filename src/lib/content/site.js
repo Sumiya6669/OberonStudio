@@ -20,6 +20,11 @@ export const SITE_SETTINGS = {
   telegram_url: 'https://t.me/DeveloperAI0',
   whatsapp: '+7 776 550 96 86',
   whatsapp_url: 'https://wa.me/77765509686',
+  // Соцсети студии: канал и Instagram — для подвала и sameAs; связь — по личному Telegram выше.
+  telegram_channel: '@tinkerkz',
+  telegram_channel_url: 'https://t.me/tinkerkz',
+  instagram: '@tinker.kz',
+  instagram_url: 'https://www.instagram.com/tinker.kz/',
 };
 
 /**
