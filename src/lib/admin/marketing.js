@@ -8,12 +8,9 @@
  *   crm.ticket.landing_page — страница ВХОДА на сайт (не та, где отправили форму);
  *   crm.ticket.referrer     — откуда пришёл посетитель, если браузер сообщил;
  *   crm.ticket.utm          — utm_source, utm_medium, utm_campaign, utm_content, utm_term.
- * Чего в базе нет:
- *   fbclid и yclid — браузер их снимает (campaign.js), но /api/lead и
- *     submit_lead пропускают только utm_*-ключи;
- *   форма (contact_form, ai_consultant, demo_modal) — отдельной колонки нет,
- *     название формы есть только в служебной строке согласия в тексте заявки
- *     (с 04.10.2026, api/lead.js). Отсюда его и читаем.
+ *   crm.ticket.utm.fbclid / yclid — метки клика Meta и Яндекса (с миграции 055);
+ *   crm.ticket.form         — форма: contact_form / ai_consultant / demo_modal (с 055);
+ *     у заявок до 055 форма берётся из служебной строки согласия в тексте (с 04.10.2026).
  */
 import { SEO_ROUTES } from '@/lib/seo/pages';
 import { localePath } from '@/lib/i18n/locales';
@@ -129,6 +126,7 @@ export function summarizeLeads(rows) {
   const withUtm = list.filter((r) => UTM_FIELDS.some((k) => tagOf(r, k)));
   const withRef = list.filter((r) => hostOf(r.referrer));
   const withForm = list.filter((r) => r.form || formOf(r.body));
+  const withClick = list.filter((r) => tagOf(r, 'fbclid') || tagOf(r, 'yclid'));
 
   const utm = {};
   for (const key of UTM_FIELDS) utm[key] = countBy(list, (r) => tagOf(r, key) || NO_TAG);
@@ -139,6 +137,9 @@ export function summarizeLeads(rows) {
     withUtm: withUtm.length,
     withRef: withRef.length,
     withForm: withForm.length,
+    fromMeta: list.filter((r) => tagOf(r, 'fbclid')).length,
+    fromYandex: list.filter((r) => tagOf(r, 'yclid')).length,
+    withClick: withClick.length,
     byChannel: countBy(list, (r) => CHANNELS[r.channel] || r.channel || '—'),
     byForm: countBy(list, (r) => {
       const code = r.form || formOf(r.body);   // колонка form — с миграции 055, раньше — из строки согласия

@@ -2,12 +2,8 @@
  * Маркетинг → Откуда заявки.
  *
  * Счёт заявок за период по всему, что о источнике действительно лежит в
- * crm.ticket: канал, страница входа, домен перехода, метки UTM. Форма
- * (контакты / чат / демо) отдельной колонки не имеет — её название читается
- * из служебной строки согласия в тексте заявки, которая есть с 04.10.2026.
- *
- * Чего в базе нет, экран не изображает: про fbclid/yclid и форму стоит
- * плашка и перечень, чем это закрыть.
+ * crm.ticket: канал, форма, страница входа, домен перехода, метки UTM и
+ * метки клика рекламы (fbclid/yclid, с миграции 055).
  *
  * Деньги и конверсию по источникам считает экран «Источники заявок» —
  * здесь только поток заявок, зато за любой период, а не помесячно.
@@ -166,7 +162,7 @@ export default function LeadOrigins() {
                 <ShareTable title="По каналу" nameTitle="Канал" rows={s.byChannel}
                   hint="Сайт, Telegram-бот, почта, телефон или заведена вручную." />
                 <ShareTable title="По форме" nameTitle="Форма" rows={s.byForm}
-                  hint="Отдельной колонки нет: название берётся из строки согласия в тексте заявки (с 04.10.2026). У заявок из бота, почты и старых заявок формы нет." />
+                  hint="Форма, через которую отправили заявку. У заявок из бота и почты формы нет." />
                 <ShareTable title="По странице входа" nameTitle="Страница" rows={s.byLanding}
                   hint="Первая страница визита, а не та, где отправили форму: важно, что привело." />
                 <ShareTable title="По домену перехода" nameTitle="Домен" rows={s.byReferrer}
@@ -181,10 +177,10 @@ export default function LeadOrigins() {
                     с ними ещё не было. Соберите их на вкладке «Ссылки с метками».
                   </p>
                 )}
-                <Notice title="fbclid и yclid — с миграции 055">
-                  После миграции 055 метки клика Meta и Яндекса сохраняются в crm.ticket.utm рядом с utm_*;
-                  у заявок до неё их нет.
-                </Notice>
+                <p className="text-xs text-muted-foreground">
+                  Клики из рекламы за период: Meta (fbclid) — {s.fromMeta}, Яндекс (yclid) — {s.fromYandex}.
+                  Метка клика ставится сама, когда человек приходит из рекламного кабинета.
+                </p>
                 <div className="grid gap-4 xl:grid-cols-2">
                   <ShareTable title="utm_source" nameTitle="Источник" rows={s.utm.utm_source} />
                   <ShareTable title="utm_medium" nameTitle="Тип канала" rows={s.utm.utm_medium} />
@@ -196,26 +192,13 @@ export default function LeadOrigins() {
             </>
           )}
 
-          <Panel title="Что не сохраняется в базе и чем это закрыть">
+          <Panel title="Что не сохраняется в базе">
             <ul className="space-y-3 text-sm">
-              <li>
-                <span className="font-medium">fbclid и yclid.</span>{' '}
-                <span className="text-muted-foreground">
-                  Закрывает миграция 055 (submit_lead пропускает их в crm.ticket.utm) вместе с api/lead.js.
-                </span>
-              </li>
-              <li>
-                <span className="font-medium">Форма заявки.</span>{' '}
-                <span className="text-muted-foreground">
-                  С миграции 055 — колонка crm.ticket.form; у заявок до неё форма берётся из строки согласия
-                  в тексте (с 04.10.2026).
-                </span>
-              </li>
               <li>
                 <span className="font-medium">Страница, где отправили форму.</span>{' '}
                 <span className="text-muted-foreground">
-                  Сейчас пишется только текстом в первое сообщение заявки («Страница: …»). Если нужна в
-                  отчёте — та же миграция может добавить колонку crm.ticket.form_page.
+                  Пишется только текстом в первое сообщение заявки («Страница: …»). Если понадобится в
+                  отчёте — добавим колонку crm.ticket.form_page.
                 </span>
               </li>
             </ul>
