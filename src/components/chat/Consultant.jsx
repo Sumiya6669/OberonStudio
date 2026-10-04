@@ -372,7 +372,7 @@ export default function Consultant() {
                   onChange={e => setInput(e.target.value)}
                   onKeyDown={e => e.key === 'Enter' && !e.shiftKey && send()}
                   placeholder={ct.placeholder}
-                  className="flex-1 bg-transparent text-xs text-white/70 placeholder-white/20 outline-none"
+                  className="flex-1 bg-transparent text-xs text-white/70 placeholder-white/20 outline-none ym-disable-keys"
                 />
                 <button
                   onClick={() => send()}

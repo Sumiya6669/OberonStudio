@@ -51,7 +51,7 @@ const TEXT = {
   },
 };
 
-const input = 'w-full rounded-lg border border-white/[0.08] bg-white/[0.03] px-3 py-2 text-sm text-white placeholder-white/25 focus:border-primary/50 focus:outline-none';
+const input = 'w-full rounded-lg border border-white/[0.08] bg-white/[0.03] px-3 py-2 text-sm text-white placeholder-white/25 focus:border-primary/50 focus:outline-none ym-disable-keys';
 
 export default function ReviewForm({ lang = 'ru', onClose }) {
   const t = TEXT[lang] || TEXT.ru;

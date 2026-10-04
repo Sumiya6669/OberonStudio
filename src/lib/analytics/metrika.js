@@ -13,7 +13,9 @@
  * при каждой смене адреса (`hit`), а не самим счётчиком при загрузке.
  */
 const ID = Number(import.meta.env.VITE_YM_ID || 0);
-const KEY = 'tk_cookie_consent';
+// Версия в имени ключа: согласие на аналитику расширилось Вебвизором (05.10.2026) — прежний выбор не действует,
+// баннер спросит снова.
+const KEY = 'tk_cookie_consent_2';
 
 export const metrikaEnabled = ID > 0;
 
@@ -92,7 +94,11 @@ export function loadMetrika() {
   script.src = 'https://mc.yandex.ru/metrika/tag.js';
   document.head.appendChild(script);
   window.ym(ID, 'init', {
-    defer: true, clickmap: true, trackLinks: true, accurateTrackBounce: true, webvisor: false,
+    defer: true, clickmap: true, trackLinks: true, accurateTrackBounce: true,
+    // Вебвизор — запись действий на страницах (прокрутка, клики), чтобы видеть, где посетители теряются.
+    // Что вводят в поля, не пишется: у всех полей сайта класс ym-disable-keys, в настройках счётчика
+    // «Записывать все поля» выключено. Включается тем же согласием на аналитику.
+    webvisor: true,
   });
   hit(window.location.pathname + window.location.search, document.referrer);
 }

@@ -216,7 +216,7 @@ export default function Contact() {
                           value={form[key]}
                           onChange={e => update(key, e.target.value)}
                           required={key === 'name' || key === 'phone'}
-                          className="w-full bg-surface-2 border border-line rounded-xl px-4 py-3 text-sm text-white/70 placeholder-white/15 outline-none focus:border-primary/40 transition-colors"
+                          className="w-full bg-surface-2 border border-line rounded-xl px-4 py-3 text-sm text-white/70 placeholder-white/15 outline-none focus:border-primary/40 transition-colors ym-disable-keys"
                           placeholder={placeholder}
                         />
                       </label>
@@ -229,7 +229,7 @@ export default function Contact() {
                       value={form.message}
                       onChange={e => update('message', e.target.value)}
                       rows={5}
-                      className="w-full bg-surface-2 border border-line rounded-xl px-4 py-3 text-sm text-white/70 placeholder-white/15 outline-none focus:border-primary/40 transition-colors resize-none"
+                      className="w-full bg-surface-2 border border-line rounded-xl px-4 py-3 text-sm text-white/70 placeholder-white/15 outline-none focus:border-primary/40 transition-colors resize-none ym-disable-keys"
                       placeholder="Что хотите автоматизировать или внедрить?"
                     />
                   </label>

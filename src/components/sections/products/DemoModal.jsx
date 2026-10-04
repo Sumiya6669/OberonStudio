@@ -77,7 +77,7 @@ export default function DemoModal({ product, onClose }) {
                   <input
                     value={form[f.key]}
                     onChange={e => setForm(p => ({ ...p, [f.key]: e.target.value }))}
-                    className="w-full bg-surface-2 border border-line rounded-xl px-4 py-3 text-sm text-white/70 placeholder-white/15 outline-none focus:border-primary/40 transition-colors"
+                    className="w-full bg-surface-2 border border-line rounded-xl px-4 py-3 text-sm text-white/70 placeholder-white/15 outline-none focus:border-primary/40 transition-colors ym-disable-keys"
                     placeholder={f.placeholder}
                     required
                   />

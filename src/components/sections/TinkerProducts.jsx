@@ -139,7 +139,7 @@ export default function TinkerProducts() {
                 value={search}
                 onChange={e => setSearch(e.target.value)}
                 placeholder="Поиск продуктов..."
-                className="w-full bg-surface border border-line rounded-2xl pl-10 pr-4 py-3 text-sm text-white/70 placeholder-white/20 outline-none focus:border-primary/30 transition-colors"
+                className="w-full bg-surface border border-line rounded-2xl pl-10 pr-4 py-3 text-sm text-white/70 placeholder-white/20 outline-none focus:border-primary/30 transition-colors ym-disable-keys"
               />
             </div>
             <button
