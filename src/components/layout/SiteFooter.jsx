@@ -7,6 +7,7 @@ import { useLang } from '@/lib/i18n/LangContext';
 import { SITE_ROUTES } from '@/lib/routes';
 import { SITE_SETTINGS } from '@/lib/content/site';
 import { useSettings } from '@/lib/site/SiteContentContext';
+import { InstagramIcon, TelegramIcon, WhatsAppIcon } from '@/components/brand/SocialIcons';
 
 export default function SiteFooter() {
   // Контакты из панели поверх зашитых. Пустое поле в панели ничего не стирает.
@@ -16,7 +17,7 @@ export default function SiteFooter() {
   const rights = ft.rights.replace('{year}', new Date().getFullYear());
 
   return (
-    <footer className="relative border-t border-line py-12 px-5">
+    <footer className="relative border-t border-line pt-12 pb-28 px-5">
       <div className="max-w-7xl mx-auto">
         <Reveal>
           <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-10 mb-10">
@@ -82,43 +83,29 @@ export default function SiteFooter() {
                 {ft.cookieSettings}
               </button>
             </div>
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-              <a
-                href={SETTINGS.telegram_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-xs text-white/20 hover:text-white/50 transition-colors duration-300"
-              >
-                {SETTINGS.telegram}
-              </a>
-              <a
-                href={SETTINGS.whatsapp_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-xs text-white/20 hover:text-white/50 transition-colors duration-300"
-              >
-                {SETTINGS.whatsapp}
-              </a>
-              {SETTINGS.telegram_channel_url && (
+            {/* Соцсети — иконками. Внизу справа висят кнопки чата и мессенджеров, поэтому у подвала
+                отступ снизу (pb-28): последняя строка не уходит под них. */}
+            <div className="flex items-center gap-2.5">
+              {[
+                { href: SETTINGS.telegram_channel_url, label: `${ft.channel || 'Telegram-канал'} ${SETTINGS.telegram_channel || ''}`, Icon: TelegramIcon,
+                  tone: 'text-sky-400 border-sky-400/25 bg-sky-500/10 hover:bg-sky-500/20 hover:border-sky-400/50' },
+                { href: SETTINGS.instagram_url, label: `Instagram ${SETTINGS.instagram || ''}`, Icon: InstagramIcon,
+                  tone: 'text-pink-400 border-pink-400/25 bg-pink-500/10 hover:bg-pink-500/20 hover:border-pink-400/50' },
+                { href: SETTINGS.whatsapp_url, label: `WhatsApp ${SETTINGS.whatsapp || ''}`, Icon: WhatsAppIcon,
+                  tone: 'text-emerald-400 border-emerald-400/25 bg-emerald-500/10 hover:bg-emerald-500/20 hover:border-emerald-400/50' },
+              ].filter((s) => s.href).map(({ href, label, Icon, tone }) => (
                 <a
-                  href={SETTINGS.telegram_channel_url}
+                  key={href}
+                  href={href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-xs text-white/20 hover:text-white/50 transition-colors duration-300"
+                  aria-label={label.trim()}
+                  title={label.trim()}
+                  className={`w-10 h-10 rounded-full flex items-center justify-center border transition-colors duration-300 ${tone}`}
                 >
-                  {ft.channel || 'Telegram-канал'}
+                  <Icon className="w-[18px] h-[18px]" />
                 </a>
-              )}
-              {SETTINGS.instagram_url && (
-                <a
-                  href={SETTINGS.instagram_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-xs text-white/20 hover:text-white/50 transition-colors duration-300"
-                >
-                  Instagram
-                </a>
-              )}
+              ))}
             </div>
           </div>
         </Reveal>
