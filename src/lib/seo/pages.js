@@ -19,7 +19,7 @@
 import { HREFLANG, OG_LOCALE, localeAlternates, localePath } from '@/lib/i18n/locales';
 
 export const SITE_URL = (
-  import.meta?.env?.VITE_SITE_URL || 'https://oberon-studio.vercel.app'
+  import.meta?.env?.VITE_SITE_URL || 'https://tinker-kz.vercel.app'
 ).replace(/\/$/, '');
 
 export const SITE_NAME = 'Tinker';

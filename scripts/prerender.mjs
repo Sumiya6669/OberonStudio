@@ -31,7 +31,7 @@ const ROOT = path.resolve(__dirname, '..');
 const DIST = path.join(ROOT, 'dist');
 const SSR = path.join(ROOT, 'dist-ssr', 'entry-server.js');
 
-const SITE_URL = (process.env.VITE_SITE_URL || 'https://oberon-studio.vercel.app')
+const SITE_URL = (process.env.VITE_SITE_URL || 'https://tinker-kz.vercel.app')
   .replace(/\/$/, '');
 
 const ROUTES = [

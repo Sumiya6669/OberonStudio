@@ -11,7 +11,7 @@
  * команду сразу после сборки, иначе её не будут запускать.
  *
  *   npm run build && node scripts/check-site.mjs
- *   node scripts/check-site.mjs --url https://oberon-studio.vercel.app
+ *   node scripts/check-site.mjs --url https://tinker-kz.vercel.app
  *
  * С `--url` проверяется живой сайт: те же правила, но по сети. Полезно
  * после пересборки из панели — она собирает не из этой папки.
