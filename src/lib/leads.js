@@ -8,13 +8,18 @@
  */
 import { readCampaign } from '@/lib/analytics/campaign';
 import { clientId, reachGoal } from '@/lib/analytics/metrika';
+import { DATA_IN_RK } from '@/lib/dataResidency';
 
 /**
  * Версия текста согласия на обработку ПД (страница /privacy#consent).
  * Меняется при каждой правке текста: сервер пишет её в заявку, и по ней
  * видно, с каким именно текстом человек согласился.
+ *
+ * Две редакции зависят от переключателя DATA_IN_RK (src/lib/dataResidency.js):
+ * до переезда базы в РК — временная, после — без Supabase и зарубежного
+ * хранения. Версия поднимается сама вместе с переключателем.
  */
-export const CONSENT_VERSION = '2026-10-04';
+export const CONSENT_VERSION = DATA_IN_RK ? '2026-10-10' : '2026-10-04';
 
 export async function submitLead(values) {
   // Метки снимались при заходе на сайт, а не сейчас: см. campaign.js.

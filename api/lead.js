@@ -22,6 +22,19 @@
  * задание ставит как раз запись в базу. Это последняя линия, и она не
  * дублирует Вестника, а закрывает дыру, где заявка исчезла бы совсем.
  *
+ * Что уходит в этом случае — зависит от DATA_IN_RK (src/lib/dataResidency.js):
+ *   false — заявка целиком (имя, телефон, текст) в Telegram, как раньше;
+ *   true  — после переезда базы в РК персональные данные в Telegram не уходят:
+ *           только «заявка не записана, смотрите журнал Vercel», форма,
+ *           страница и метка для поиска. Сама заявка — одной строкой в журнале
+ *           функции (Vercel → Logs) с той же меткой. Компромисс: журнал Vercel
+ *           хранится недолго (срок зависит от тарифа), поэтому заявку надо
+ *           переписать оттуда в панель сразу по сигналу; и пока строка жива,
+ *           ПД лежат у Vercel (США) — это тот же получатель, что в Политике
+ *           («транзитом»), но уже не совсем транзит. Если не прочитать журнал
+ *           вовремя, заявка потеряется: это плата за то, что ПД не уходят
+ *           в чат за рубежом.
+ *
  * Переменные окружения (Vercel → Settings → Environment Variables):
  *   TELEGRAM_BOT_TOKEN — токен бота от @BotFather. Нужен ТОЛЬКО для случая
  *                        выше; в обычной работе не используется
@@ -40,6 +53,9 @@
  * посетителя (если он согласился на счётчик), страница и название цели —
  * ни имени, ни телефона, ни текста заявки.
  */
+
+// Относительный путь, а не «@/…»: у серверных функций нет алиаса сборки сайта.
+import { DATA_IN_RK } from '../src/lib/dataResidency.js';
 
 const FIELD_LABELS = {
   name: 'Имя',
@@ -220,6 +236,13 @@ export default async function handler(request, response) {
   }
 
   // Сюда попадаем, только если база заявку не приняла.
+  // После переезда в РК заявка сохраняется только в журнале функции, а в
+  // Telegram уходит сигнал без ПД с той же меткой, — см. шапку файла.
+  const mark = `lead-${Date.now().toString(36)}`;
+  if (DATA_IN_RK) {
+    console.error(`Заявка не записана в базу [${mark}]:`, JSON.stringify(cleaned));
+  }
+
   const token = process.env.TELEGRAM_BOT_TOKEN;
   const chatId = process.env.TELEGRAM_CHAT_ID;
 
@@ -231,10 +254,18 @@ export default async function handler(request, response) {
   }
 
   const lines = ['<b>⚠ Заявка НЕ записана в базу</b>', ''];
-  for (const [key, label] of Object.entries(FIELD_LABELS)) {
-    if (cleaned[key]) lines.push(`<b>${label}:</b> ${escapeHtml(cleaned[key])}`);
+  if (DATA_IN_RK) {
+    lines.push('Проверьте журнал Vercel (функция /api/lead): заявка там, по метке ниже.', '');
+    lines.push(`<b>Метка:</b> ${mark}`);
+    if (cleaned.source) lines.push(`<b>Форма:</b> ${escapeHtml(cleaned.source)}`);
+    if (cleaned.page) lines.push(`<b>Страница:</b> ${escapeHtml(cleaned.page)}`);
+    lines.push('', '<i>Журнал Vercel хранится недолго — перенесите заявку в панель сразу.</i>');
+  } else {
+    for (const [key, label] of Object.entries(FIELD_LABELS)) {
+      if (cleaned[key]) lines.push(`<b>${label}:</b> ${escapeHtml(cleaned[key])}`);
+    }
+    lines.push('', '<i>Это запасной канал: заявки нет ни в панели, ни у Вестника.</i>');
   }
-  lines.push('', '<i>Это запасной канал: заявки нет ни в панели, ни у Вестника.</i>');
   lines.push('', `<i>${new Date().toLocaleString('ru-RU', { timeZone: 'Asia/Almaty' })}</i>`);
 
   try {
