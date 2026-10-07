@@ -35,7 +35,7 @@ const SITE_URL = (process.env.VITE_SITE_URL || 'https://tinker-kz.vercel.app')
   .replace(/\/$/, '');
 
 const ROUTES = [
-  '/', '/services', '/projects', '/products',
+  '/', '/services', '/projects', '/products', '/proverka',
   '/process', '/stack', '/reviews', '/faq', '/contact', '/privacy',
 ];
 
@@ -289,6 +289,7 @@ function buildLlmsTxt(content) {
 - [Кейсы](${SITE_URL}/keysy): что уже делалось
 - [Проекты](${SITE_URL}/projects): реализованные работы
 - [Готовые решения](${SITE_URL}/products): CRM, агенты, онлайн-запись
+- [Бесплатная экспресс-проверка базы 1С](${SITE_URL}/proverka): обработка .epf для БухКз 3.0 и КА 2.4, только чтение — ЭСФ, дебиторка, СНТ и ВС, банк, ИИН/БИН, встречные расчёты
 - [Процесс](${SITE_URL}/process): как проходит работа
 - [Стек](${SITE_URL}/stack): технологии
 - [Отзывы](${SITE_URL}/reviews): отзывы клиентов

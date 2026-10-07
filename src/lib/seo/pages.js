@@ -30,7 +30,7 @@ export const OG_IMAGE_SIZE = { width: 1200, height: 630 };
 
 /** Страницы, которые попадают в карту сайта и получают свои мета-теги. */
 export const SEO_ROUTES = [
-  '/', '/services', '/projects', '/products',
+  '/', '/services', '/projects', '/products', '/proverka',
   '/process', '/stack', '/reviews', '/faq', '/contact', '/privacy',
 ];
 
@@ -54,6 +54,11 @@ const FALLBACK_DESC = {
     ru: 'Готовые решения: CRM с AI-воронкой, агент продаж, AI-поддержка, онлайн-запись, HoReCa.',
     kz: 'Дайын шешімдер: AI-воронкасы бар CRM, сату агенті, AI-қолдау, онлайн-жазылу, HoReCa.',
     en: 'Ready-made solutions: CRM with an AI funnel, sales agent, AI support, online booking, HoReCa.',
+  },
+  '/proverka': {
+    ru: 'Внешняя обработка .epf для Бухгалтерии для Казахстана 3.0 и КА 2.4: за пару минут находит ЭСФ без выписки, просроченную дебиторку, ошибки СНТ и ВС, неразнесённый банк, неверные ИИН/БИН и встречные долги. Только чтение.',
+    kz: 'Қазақстанға арналған Бухгалтерия 3.0 және КА 2.4 үшін .epf сыртқы өңдеуі: бірнеше минутта жазылмаған ЭШФ, мерзімі өткен дебиторлық берешек, ТІЖ мен виртуалды қойма қателері, банк түсімдері, қате ЖСН/БСН және қарсы қарыздарды табады. Тек оқу.',
+    en: 'An external .epf processor for 1C:Accounting for Kazakhstan 3.0 and Complex Automation 2.4: in a couple of minutes it finds missing e-invoices, overdue receivables, SNT and virtual-warehouse errors, unposted bank receipts, invalid IIN/BIN and mutual debts. Read-only.',
   },
   '/reviews': {
     ru: 'Отзывы клиентов о внедрении AI, CRM и автоматизации.',
@@ -103,6 +108,11 @@ const TITLE_OVERRIDE = {
     ru: 'Готовые решения: CRM, AI-агенты, онлайн-запись',
     kz: 'Дайын шешімдер: CRM, AI-агенттер, онлайн-жазылу',
     en: 'Ready-made solutions: CRM, AI agents, online booking',
+  },
+  '/proverka': {
+    ru: 'Бесплатная экспресс-проверка базы 1С',
+    kz: '1С базасын тегін жедел тексеру',
+    en: 'Free express check of your 1C database',
   },
   '/contact': {
     ru: 'Контакты и связь',

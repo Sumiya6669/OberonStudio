@@ -3,6 +3,7 @@ const ru = {
   nav: {
     home: 'Главная',
     products: 'Продукты',
+    proverka: 'Проверка 1С',
     reviews: 'Отзывы',
     faq: 'FAQ',
     services: 'Услуги',

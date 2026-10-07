@@ -2,7 +2,7 @@ import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { LocaleLink as Link } from '@/components/nav/LocaleLink';
-import { Search, BarChart2 } from 'lucide-react';
+import { Search, BarChart2, ScanSearch, ArrowRight } from 'lucide-react';
 import Reveal from '../core/Reveal';
 import TinkerCore from './products/TinkerCore';
 import ProductCard from './products/ProductCard';
@@ -125,6 +125,33 @@ export default function TinkerProducts() {
               ))}
             </div>
           </div>
+        </Reveal>
+
+        {/* Бесплатная экспресс-проверка: показывает, какие из расширений
+            ниже нужны именно этой базе, — поэтому стоит до каталога. */}
+        <Reveal>
+          <Link
+            to="/proverka"
+            className="group mb-14 flex flex-col gap-4 rounded-3xl border border-primary/25 bg-primary/[0.05] p-6 transition-all duration-300 hover:border-primary/45 hover:bg-primary/[0.08] sm:flex-row sm:items-center sm:p-7"
+          >
+            <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-primary/25 bg-primary/10 text-primary">
+              <ScanSearch className="h-5 w-5" />
+            </span>
+            <span className="min-w-0 flex-1">
+              <span className="block text-[10px] uppercase tracking-[0.25em] text-primary/60">Бесплатно · файл .epf</span>
+              <span className="mt-1 block text-lg font-black tracking-tight text-white">
+                Экспресс-проверка базы 1С
+              </span>
+              <span className="mt-1 block text-sm leading-relaxed text-white/40">
+                БухКз 3.0 и КА 2.4: за пару минут покажет ЭСФ без выписки, просроченную дебиторку,
+                ошибки СНТ, неразнесённый банк, неверные ИИН/БИН и встречные долги. Только чтение.
+              </span>
+            </span>
+            <span className="inline-flex shrink-0 items-center gap-1.5 text-sm font-semibold text-primary">
+              Проверить базу
+              <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
+            </span>
+          </Link>
         </Reveal>
 
         {/* Tinker Core platform */}

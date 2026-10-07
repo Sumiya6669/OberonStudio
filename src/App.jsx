@@ -22,6 +22,7 @@ import CasesPage from './pages/CasesPage';
 import CasePage from './pages/CasePage';
 import AnswerPage from './pages/AnswerPage';
 import PrivacyPage from './pages/PrivacyPage';
+import ProverkaPage from './pages/ProverkaPage';
 
 // Админка: своя раскладка, свой вход. Данные защищает RLS в базе,
 // страж маршрута — только удобство.
@@ -70,6 +71,8 @@ export const SITE_PAGES = [
   { path: '/services', element: <ServicesPage /> },
   { path: '/projects', element: <ProjectsPage /> },
   { path: '/products', element: <ProductsPage /> },
+  // Бесплатная экспресс-проверка базы 1С: файл .epf после заявки.
+  { path: '/proverka', element: <ProverkaPage /> },
   { path: '/process', element: <ProcessPage /> },
   { path: '/stack', element: <StackPage /> },
   { path: '/reviews', element: <ReviewsPage /> },

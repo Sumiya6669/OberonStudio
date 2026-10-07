@@ -3,6 +3,7 @@ const en = {
   nav: {
     home: 'Home',
     products: 'Products',
+    proverka: '1C check',
     reviews: 'Reviews',
     faq: 'FAQ',
     services: 'Services',

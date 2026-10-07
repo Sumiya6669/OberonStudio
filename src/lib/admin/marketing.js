@@ -9,7 +9,7 @@
  *   crm.ticket.referrer     — откуда пришёл посетитель, если браузер сообщил;
  *   crm.ticket.utm          — utm_source, utm_medium, utm_campaign, utm_content, utm_term.
  *   crm.ticket.utm.fbclid / yclid — метки клика Meta и Яндекса (с миграции 055);
- *   crm.ticket.form         — форма: contact_form / ai_consultant / demo_modal (с 055);
+ *   crm.ticket.form         — форма: contact_form / ai_consultant / demo_modal / express_check (с 055);
  *     у заявок до 055 форма берётся из служебной строки согласия в тексте (с 04.10.2026).
  */
 import { SEO_ROUTES } from '@/lib/seo/pages';
@@ -70,6 +70,7 @@ export const FORMS = {
   contact_form: 'Форма «Контакты»',
   ai_consultant: 'ИИ-консультант (чат)',
   demo_modal: 'Заявка на демо продукта',
+  express_check: 'Экспресс-проверка базы 1С (.epf)',
   website: 'Форма сайта (без названия)',
 };
 
@@ -158,6 +159,7 @@ const PAGE_LABELS = {
   '/services': 'Услуги',
   '/projects': 'Работы',
   '/products': 'Продукты',
+  '/proverka': 'Экспресс-проверка 1С',
   '/process': 'Процесс',
   '/stack': 'Стек',
   '/reviews': 'Отзывы',

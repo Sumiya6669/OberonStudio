@@ -3,6 +3,7 @@ const kz = {
   nav: {
     home: 'Басты бет',
     products: 'Өнімдер',
+    proverka: '1С тексеру',
     reviews: 'Пікірлер',
     faq: 'FAQ',
     services: 'Қызметтер',
