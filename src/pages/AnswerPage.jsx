@@ -16,6 +16,73 @@ import Breadcrumbs from '@/components/nav/Breadcrumbs';
 import { useAnswers, useContentReady } from '@/lib/site/SiteContentContext';
 import { CONTACT_PATH } from '@/lib/routes';
 import PageNotFound from '@/lib/PageNotFound';
+import { PROVERKA_PATH, answerFollowUp, productHref } from '@/lib/content/answerProducts';
+
+const Arrow = () => (
+  <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 16 16" aria-hidden="true">
+    <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5"
+          strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
+
+/**
+ * Последний блок разбора: бесплатная проверка базы и продукт, который
+ * закрывает эту беду постоянно. Что показывать — из таблицы
+ * src/lib/content/answerProducts.js, тексты разборов в базе не трогаются.
+ * Проверки нет и продукта нет — остаётся «Обсудить задачу».
+ */
+function FollowUp({ slug }) {
+  const { check, product } = answerFollowUp(slug);
+  const title = check ? 'Проверить вашу базу на эту проблему' : product ? 'Готовое решение' : 'Обсудить задачу';
+  return (
+    <div className="rounded-2xl border border-primary/20 bg-primary/[0.04] p-6 sm:p-8">
+      <p className="mb-3 text-xs uppercase tracking-[0.3em] text-primary/60">{title}</p>
+      {check && (
+        <p className="text-sm leading-relaxed text-white/55">
+          Бесплатная экспресс-проверка — внешняя обработка .epf для БухКз 3.0 и КА 2.4. Только читает базу,
+          в интернет не выходит и за пару минут показывает такие случаи с суммами и документами.
+        </p>
+      )}
+      {product && (
+        <p className={`text-sm leading-relaxed text-white/55 ${check ? 'mt-3' : ''}`}>
+          Постоянно эту задачу берёт на себя расширение 1С «{product.name}»: {product.tagline.charAt(0).toLowerCase() + product.tagline.slice(1)}.
+        </p>
+      )}
+      {!check && !product && (
+        <p className="text-sm leading-relaxed text-white/55">
+          Готового продукта под эту задачу нет — её решают разовой работой. Опишите, что происходит в вашей базе, и я скажу, что проверить и сколько это стоит.
+        </p>
+      )}
+      <div className="mt-6 flex flex-wrap gap-3">
+        {check && (
+          <Link
+            to={PROVERKA_PATH}
+            className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-bold text-white transition-colors hover:bg-primary/80">
+            Проверить базу бесплатно <Arrow />
+          </Link>
+        )}
+        {product && (
+          <Link
+            to={productHref(product)}
+            className={check
+              ? 'inline-flex items-center gap-2 rounded-xl border border-white/10 px-5 py-3 text-sm font-semibold text-white/70 transition-colors hover:border-white/20 hover:text-white'
+              : 'inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-bold text-white transition-colors hover:bg-primary/80'}>
+            {product.name} <Arrow />
+          </Link>
+        )}
+        {!check && (
+          <Link
+            to={CONTACT_PATH}
+            className={product
+              ? 'inline-flex items-center gap-2 rounded-xl border border-white/10 px-5 py-3 text-sm font-semibold text-white/70 transition-colors hover:border-white/20 hover:text-white'
+              : 'inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-bold text-white transition-colors hover:bg-primary/80'}>
+            Обсудить задачу <Arrow />
+          </Link>
+        )}
+      </div>
+    </div>
+  );
+}
 
 function List({ label, items, marker }) {
   if (!items?.length) return null;
@@ -87,6 +154,8 @@ export default function AnswerPage() {
               </div>
             </Reveal>
           )}
+
+          <Reveal><FollowUp slug={answer.slug} /></Reveal>
 
           {others.length > 0 && (
             <Reveal>
