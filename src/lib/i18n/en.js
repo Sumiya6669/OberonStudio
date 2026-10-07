@@ -4,6 +4,8 @@ const en = {
     home: 'Home',
     products: 'Products',
     proverka: '1C check',
+    calculator: 'Loss calculator',
+    security: 'Security',
     reviews: 'Reviews',
     faq: 'FAQ',
     services: 'Services',

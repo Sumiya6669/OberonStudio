@@ -4,6 +4,8 @@ const ru = {
     home: 'Главная',
     products: 'Продукты',
     proverka: 'Проверка 1С',
+    calculator: 'Калькулятор потерь',
+    security: 'Безопасность',
     reviews: 'Отзывы',
     faq: 'FAQ',
     services: 'Услуги',

@@ -5,7 +5,7 @@ import { useLocation } from 'react-router-dom';
 import { LocaleLink as Link, LocaleNavLink as NavLink } from '@/components/nav/LocaleLink';
 import {
   Home, Sparkles, FolderKanban, Package, Workflow,
-  Layers, Star, HelpCircle, Mail, Menu, X, ChevronRight, ScanSearch,
+  Layers, Star, HelpCircle, Mail, Menu, X, ChevronRight, ScanSearch, Calculator, ShieldCheck,
 } from 'lucide-react';
 import { useLang } from '@/lib/i18n/LangContext';
 import { SITE_ROUTES, CONTACT_PATH, PRODUCT_GROUPS } from '@/lib/routes';
@@ -13,7 +13,7 @@ import { PRODUCTS } from '@/lib/content/site';
 import LangSwitcher from './LangSwitcher';
 import Mark from '@/components/brand/Mark';
 
-const ICONS = { Home, Sparkles, FolderKanban, Package, Workflow, Layers, Star, HelpCircle, Mail, ScanSearch };
+const ICONS = { Home, Sparkles, FolderKanban, Package, Workflow, Layers, Star, HelpCircle, Mail, ScanSearch, Calculator, ShieldCheck };
 
 function Logo({ onClick }) {
   return (

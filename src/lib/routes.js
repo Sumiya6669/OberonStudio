@@ -9,6 +9,8 @@ export const SITE_ROUTES = [
   { path: '/projects', navKey: 'works', icon: 'FolderKanban' },
   { path: '/products', navKey: 'products', icon: 'Package' },
   { path: '/proverka', navKey: 'proverka', icon: 'ScanSearch' },
+  { path: '/kalkulyator', navKey: 'calculator', icon: 'Calculator' },
+  { path: '/bezopasnost', navKey: 'security', icon: 'ShieldCheck' },
   { path: '/process', navKey: 'process', icon: 'Workflow' },
   { path: '/stack', navKey: 'stack', icon: 'Layers' },
   { path: '/reviews', navKey: 'reviews', icon: 'Star' },

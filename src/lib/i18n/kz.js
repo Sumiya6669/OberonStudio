@@ -4,6 +4,8 @@ const kz = {
     home: 'Басты бет',
     products: 'Өнімдер',
     proverka: '1С тексеру',
+    calculator: 'Шығын калькуляторы',
+    security: 'Қауіпсіздік',
     reviews: 'Пікірлер',
     faq: 'FAQ',
     services: 'Қызметтер',
