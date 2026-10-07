@@ -2,7 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import Reveal from '../core/Reveal';
 
-const LINE1 = 'AI AUTOMATION · INTELLIGENT SYSTEMS · BUSINESS SOLUTIONS · ';
+const LINE1 = '1С:БУХГАЛТЕРИЯ · КА · ЭСФ · AI AGENTS · ';
 const LINE2 = '· 1C DEVELOPMENT · CRM · AI AGENTS · FULL STACK · ';
 
 function MarqueeLine({ text, reverse = false, duration = 32 }) {

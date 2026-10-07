@@ -5,7 +5,8 @@ import MagBtn from '../core/MagBtn';
 import Counter from '../core/Counter';
 import { LocaleLink as Link } from '@/components/nav/LocaleLink';
 import { useLang } from '@/lib/i18n/LangContext';
-import { CONTACT_PATH, PROJECTS_PATH } from '@/lib/routes';
+import { CONTACT_PATH } from '@/lib/routes';
+import { PRODUCTS_1C_PATH } from '@/lib/content/proverka';
 import HeroShowcase from './HeroShowcase';
 
 function RotatingWord({ words }) {
@@ -129,7 +130,7 @@ export default function Hero() {
                 </MagBtn>
                 <MagBtn>
                   <Link
-                    to={PROJECTS_PATH}
+                    to={PRODUCTS_1C_PATH}
                     className="inline-flex items-center gap-2.5 px-7 py-3.5 rounded-xl
                       border border-white/10 text-sm font-medium text-white/50
                       hover:text-white/80 hover:border-white/20 transition-all duration-300"

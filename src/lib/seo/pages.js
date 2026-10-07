@@ -41,9 +41,9 @@ export const SEO_ROUTES = [
  */
 const FALLBACK_DESC = {
   '/': {
-    ru: 'Разработка и сопровождение 1С, AI-агенты и автоматизация бизнес-процессов. Казахстан.',
-    kz: '1С әзірлеу және сүйемелдеу, AI-агенттер және бизнес-процестерді автоматтандыру. Қазақстан.',
-    en: '1C development and support, AI agents and business process automation. Kazakhstan.',
+    ru: 'Расширения для 1С:Бухгалтерии для Казахстана 3.0 и КА 2.4, ИИ-агенты, CRM и интеграции с Kaspi и банками. Бесплатная экспресс-проверка базы 1С.',
+    kz: 'Қазақстанға арналған 1С:Бухгалтерия 3.0 және КА 2.4 кеңейтулері, AI-агенттер, CRM, Kaspi және банктермен интеграциялар. 1С базасын тегін жедел тексеру.',
+    en: 'Extensions for 1C:Accounting for Kazakhstan 3.0 and Complex Automation 2.4, AI agents, CRM and integrations with Kaspi and banks. Free express check of your 1C database.',
   },
   '/services': {
     ru: 'Что я разрабатываю: AI-автоматизация, агенты, CRM, интеграции и работа с 1С.',
@@ -100,9 +100,9 @@ const clip = (text, limit) => {
  */
 const TITLE_OVERRIDE = {
   '/': {
-    ru: '1С, AI-агенты и автоматизация бизнеса в Казахстане',
-    kz: 'Қазақстанда 1С, AI-агенттер және бизнесті автоматтандыру',
-    en: '1C, AI agents and business automation in Kazakhstan',
+    ru: 'Автоматизация бизнеса и 1С через ИИ в Казахстане',
+    kz: 'Қазақстанда бизнес пен 1С-ті AI арқылы автоматтандыру',
+    en: 'Business and 1C automation with AI in Kazakhstan',
   },
   '/products': {
     ru: 'Готовые решения: CRM, AI-агенты, онлайн-запись',

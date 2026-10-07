@@ -19,12 +19,12 @@ const en = {
     available: 'Available for new projects',
     words: ['automate', 'accelerate', 'transform', 'optimize'],
     headline1: 'I',
-    headline2: 'businesses through',
+    headline2: 'business and 1C through',
     headline3: 'artificial',
     headline4: 'intelligence',
-    sub: 'I build AI systems, intelligent agents, CRMs and automation that work while you sleep. For businesses ready to operate at the next level.',
+    sub: 'I build AI agents, 1C extensions, CRMs and integrations with Kaspi and banks that work while you sleep.',
     ctaPrimary: 'Discuss a Project',
-    ctaSecondary: 'View Work',
+    ctaSecondary: '1C products',
     stats: [
       { label: 'products in the catalogue' },
       { label: '1C extensions' },
@@ -179,7 +179,7 @@ const en = {
 
   // Footer
   footer: {
-    subtitle: 'AI Automation Engineer · Kazakhstan',
+    subtitle: '1C + AI Engineer · Kazakhstan',
     rights: '© {year} · All rights reserved',
     privacy: 'Privacy policy',
     cookieSettings: 'Cookie settings',
