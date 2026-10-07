@@ -51,9 +51,9 @@ const FALLBACK_DESC = {
     en: 'What I build: AI automation, agents, CRM, integrations and 1C work.',
   },
   '/products': {
-    ru: 'Готовые решения: CRM с AI-воронкой, агент продаж, AI-поддержка, онлайн-запись, HoReCa.',
-    kz: 'Дайын шешімдер: AI-воронкасы бар CRM, сату агенті, AI-қолдау, онлайн-жазылу, HoReCa.',
-    en: 'Ready-made solutions: CRM with an AI funnel, sales agent, AI support, online booking, HoReCa.',
+    ru: '12 расширений 1С для БухКз и КА: ЭСФ, разноска банка, СНТ, акты сверки, дебиторка. Боты для Kaspi, WhatsApp и iiko. Цены на сайте.',
+    kz: 'БухКз және КА үшін 12 1С кеңейтімі: ЭШФ, банк, ТІЖ, салыстыру актілері, дебиторлық берешек. Kaspi, WhatsApp және iiko боттары. Бағалар сайтта.',
+    en: '12 1C extensions for Accounting KZ and Complex Automation: e-invoices, bank posting, waybills, reconciliations, receivables. Bots for Kaspi, WhatsApp and iiko. Prices on the site.',
   },
   '/proverka': {
     ru: 'Внешняя обработка .epf для Бухгалтерии для Казахстана 3.0 и КА 2.4: за пару минут находит ЭСФ без выписки, просроченную дебиторку, ошибки СНТ и ВС, неразнесённый банк, неверные ИИН/БИН и встречные долги. Только чтение.',
@@ -115,9 +115,9 @@ const TITLE_OVERRIDE = {
     en: 'Business and 1C automation with AI in Kazakhstan',
   },
   '/products': {
-    ru: 'Готовые решения: CRM, AI-агенты, онлайн-запись',
-    kz: 'Дайын шешімдер: CRM, AI-агенттер, онлайн-жазылу',
-    en: 'Ready-made solutions: CRM, AI agents, online booking',
+    ru: 'Продукты для 1С и бизнеса: расширения, боты, цены',
+    kz: '1С және бизнес өнімдері: кеңейтімдер, боттар, бағалар',
+    en: 'Products for 1C and business: extensions, bots, prices',
   },
   '/proverka': {
     ru: 'Бесплатная экспресс-проверка базы 1С',
