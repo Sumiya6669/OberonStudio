@@ -346,12 +346,28 @@ export const savePerson = async ({ id, ...values }) =>
 export const fetchRoles = async () =>
   unwrap(await coreDb.from('role').select('*').order('code'));
 
+/**
+ * Роли человека — разницей: сначала добавить недостающие, потом убрать лишние.
+ * Не «стереть всё и записать заново»: с миграции 063 менять роли может только
+ * владелец, и владелец, правящий свою карточку, после «стереть всё» перестал бы
+ * им быть и не смог бы дописать роли обратно. Последнего владельца база не
+ * даёт убрать вовсе.
+ */
 export const setPersonRoles = async (tenantId, personId, roles) => {
-  await unwrap(await coreDb.from('person_role').delete().eq('person_id', personId).select());
-  if (!roles.length) return [];
-  return unwrap(await coreDb.from('person_role')
-    .insert(roles.map((role_code) => ({ tenant_id: tenantId, person_id: personId, role_code })))
-    .select());
+  const current = (unwrap(await coreDb.from('person_role')
+    .select('role_code').eq('person_id', personId)) || []).map((r) => r.role_code);
+  const toAdd = roles.filter((code) => !current.includes(code));
+  const toRemove = current.filter((code) => !roles.includes(code));
+  if (toAdd.length) {
+    await unwrap(await coreDb.from('person_role')
+      .insert(toAdd.map((role_code) => ({ tenant_id: tenantId, person_id: personId, role_code })))
+      .select());
+  }
+  if (toRemove.length) {
+    await unwrap(await coreDb.from('person_role').delete()
+      .eq('person_id', personId).in('role_code', toRemove).select());
+  }
+  return roles.map((role_code) => ({ tenant_id: tenantId, person_id: personId, role_code }));
 };
 
 export const fetchAllowedEmails = async () =>
