@@ -8,6 +8,7 @@ import TinkerCore from './products/TinkerCore';
 import ProductCard from './products/ProductCard';
 import ProductCompare from './products/ProductCompare';
 import DemoModal from './products/DemoModal';
+import ProductMedia from './products/ProductMedia';
 import { PRODUCTS } from '@/lib/content/site';
 import { useProducts } from '@/lib/site/SiteContentContext';
 import { CONTACT_PATH } from '@/lib/routes';
@@ -77,6 +78,7 @@ export default function TinkerProducts() {
   };
   const [showCompare, setShowCompare] = useState(false);
   const [demoProduct, setDemoProduct] = useState(undefined);
+  const [mediaProduct, setMediaProduct] = useState(null);
   const fromDb = useProducts();
   const products = fromDb ?? PRODUCTS;
   const categories = useMemo(() => ['Все', ...Array.from(new Set(products.flatMap(p => p.categories)))], [products]);
@@ -223,7 +225,7 @@ export default function TinkerProducts() {
                       className="grid sm:grid-cols-2 xl:grid-cols-3 gap-5 items-stretch"
                     >
                       {gruppa.map((p, i) => (
-                        <ProductCard key={p.id} product={p} index={i} onDemo={setDemoProduct} onOrder={handleOrder} />
+                        <ProductCard key={p.id} product={p} index={i} onDemo={setDemoProduct} onOrder={handleOrder} onMedia={setMediaProduct} />
                       ))}
                     </motion.div>
                   </div>
@@ -264,6 +266,9 @@ export default function TinkerProducts() {
       {/* Modals */}
       <AnimatePresence>
         {showCompare && <ProductCompare onClose={() => setShowCompare(false)} />}
+      </AnimatePresence>
+      <AnimatePresence>
+        {mediaProduct && <ProductMedia product={mediaProduct} onClose={() => setMediaProduct(null)} />}
       </AnimatePresence>
       <AnimatePresence>
         {demoProduct !== undefined && (

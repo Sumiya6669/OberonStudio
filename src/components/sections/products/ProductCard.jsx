@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Check, ArrowRight, Zap } from 'lucide-react';
+import { Check, ArrowRight, Zap, PlayCircle } from 'lucide-react';
+import { hasProductMedia } from './ProductMedia';
 import { tenge } from '@/lib/money';
 
 /** Сумма полностью, «1 500 000 ₸», а не «1.5M ₸» (src/lib/money.js). */
@@ -20,7 +21,7 @@ function fmt(n) {
  * а выравнивает их сетка: цена и кнопки прижаты книзу через mt-auto,
  * так что в ряду они на одной линии независимо от длины описания.
  */
-export default function ProductCard({ product, index, onDemo, onOrder }) {
+export default function ProductCard({ product, index, onDemo, onOrder, onMedia }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 30 }}
@@ -83,6 +84,17 @@ export default function ProductCard({ product, index, onDemo, onOrder }) {
 
         {/* Цена и кнопки — всегда внизу карточки */}
         <div className="mt-auto">
+          {/* Экран 1С, сообщение в Telegram и ролик — только у продуктов, для которых они сняты */}
+          {onMedia && hasProductMedia(product.id) && (
+            <button
+              type="button"
+              onClick={() => onMedia(product)}
+              className="mb-3 flex w-full items-center justify-center gap-2 rounded-xl border border-primary/25 bg-primary/[0.06] py-2.5 text-[12px] font-semibold text-primary transition-all hover:border-primary/45 hover:bg-primary/[0.1] focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary"
+            >
+              <PlayCircle className="h-4 w-4" aria-hidden="true" />
+              Смотреть в работе: 1С, Telegram, видео
+            </button>
+          )}
           <div className="rounded-2xl border border-line bg-surface-2 p-4 mb-2">
             <div className="flex items-center justify-between gap-3">
               <div className="min-w-0">
