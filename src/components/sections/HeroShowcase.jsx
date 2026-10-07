@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { PRODUCTS } from '@/lib/content/site';
+import { tenge } from '@/lib/money';
 
 /**
  * Витрина справа на главной — вместо макета админки с выдуманными цифрами.
@@ -33,7 +34,7 @@ const glass = {
   background: 'linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.025))',
   border: '1px solid rgba(255,255,255,.1)', backdropFilter: 'blur(14px)', borderRadius: 16,
 };
-const money = (n) => `${Number(n).toLocaleString('ru-RU').replace(/,/g, ' ')} ₸`;
+const money = tenge;
 
 /** Петля сцены: fn(wait) крутится, пока сцена на экране; уход со сцены её обрывает. */
 function useScene(fn, reduce, final) {

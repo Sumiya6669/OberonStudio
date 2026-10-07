@@ -1,12 +1,12 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Check, ArrowRight, Zap } from 'lucide-react';
+import { tenge } from '@/lib/money';
 
+/** Сумма полностью, «1 500 000 ₸», а не «1.5M ₸» (src/lib/money.js). */
 function fmt(n) {
   if (!n) return 'по запросу';
-  return n >= 1000000
-    ? `${(n / 1000000).toFixed(n % 1000000 === 0 ? 0 : 1)}M ₸`
-    : `${(n / 1000).toFixed(0)} 000 ₸`;
+  return tenge(n);
 }
 
 /**
