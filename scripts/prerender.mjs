@@ -24,7 +24,7 @@
  */
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
@@ -329,7 +329,8 @@ async function main() {
     throw new Error('в index.html нет метки <!--seo-->: подставлять теги некуда');
   }
 
-  const { render } = await import(SSR);
+  // URL, а не путь: на Windows import('C:…') падает (ERR_UNSUPPORTED_ESM_URL_SCHEME).
+  const { render } = await import(pathToFileURL(SSR).href);
 
   // Содержимое CMS запрашивается один раз на язык, а не на страницу.
   const contentByLang = {};
