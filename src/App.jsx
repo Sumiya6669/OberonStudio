@@ -1,4 +1,5 @@
 import { Toaster } from "@/components/ui/toaster"
+import { lazy, Suspense } from 'react';
 import { BrowserRouter as Router, Navigate, Route, Routes } from 'react-router-dom';
 import { LOCALE_PREFIX } from '@/lib/i18n/locales';
 import PageNotFound from './lib/PageNotFound';
@@ -30,38 +31,42 @@ import SecurityPage from './pages/SecurityPage';
 // страж маршрута — только удобство.
 import AdminLayout from '@/components/admin/AdminLayout';
 import RequireAuth from '@/components/admin/RequireAuth';
-import AdminLogin from './pages/admin/AdminLogin';
-import Overview from './pages/admin/Overview';
-import Tickets from './pages/admin/Tickets';
-import TicketDetail from './pages/admin/TicketDetail';
-import Companies from './pages/admin/Companies';
-import DevConfigs from './pages/admin/DevConfigs';
-import TimeSheet from './pages/admin/TimeSheet';
-import Queue from './pages/admin/Queue';
-import Sources from './pages/admin/Sources';
-import CrmSubscriptions from './pages/admin/CrmSubscriptions';
-import MoneyOverview from './pages/admin/MoneyOverview';
-import MoneyDocs from './pages/admin/MoneyDocs';
-import MoneyPayments from './pages/admin/MoneyPayments';
-import MoneyExpenses from './pages/admin/MoneyExpenses';
-import MoneyEntries from './pages/admin/MoneyEntries';
-import MoneyReports from './pages/admin/MoneyReports';
-import MoneyRate from './pages/admin/MoneyRate';
-import MoneyClose from './pages/admin/MoneyClose';
-import MoneyTax from './pages/admin/MoneyTax';
-import Funnel from './pages/admin/Funnel';
-import Prospects from './pages/admin/Prospects';
-import SiteReviews from './pages/admin/SiteReviews';
-import Marketing from './pages/admin/Marketing';
-import AiLive from './pages/admin/AiLive';
-import AiSpend from './pages/admin/AiSpend';
-import AiRights from './pages/admin/AiRights';
-import SysHealth from './pages/admin/SysHealth';
-import SysPeople from './pages/admin/SysPeople';
-import SysRegistry from './pages/admin/SysRegistry';
-import SitePages from './pages/admin/SitePages';
-import SiteContent from './pages/admin/SiteContent';
-import SiteSettings from './pages/admin/SiteSettings';
+// Экраны панели грузятся отдельными кусками, только когда их открыли.
+// Раньше все 32 экрана (с графиками, PDF и прочим) ехали в одном файле с
+// публичным сайтом, и посетитель главной на телефоне качал панель, которую
+// никогда не увидит. Сайт от этого не меняется: панель заранее не собирается.
+const AdminLogin = lazy(() => import('./pages/admin/AdminLogin'));
+const Overview = lazy(() => import('./pages/admin/Overview'));
+const Tickets = lazy(() => import('./pages/admin/Tickets'));
+const TicketDetail = lazy(() => import('./pages/admin/TicketDetail'));
+const Companies = lazy(() => import('./pages/admin/Companies'));
+const DevConfigs = lazy(() => import('./pages/admin/DevConfigs'));
+const TimeSheet = lazy(() => import('./pages/admin/TimeSheet'));
+const Queue = lazy(() => import('./pages/admin/Queue'));
+const Sources = lazy(() => import('./pages/admin/Sources'));
+const CrmSubscriptions = lazy(() => import('./pages/admin/CrmSubscriptions'));
+const MoneyOverview = lazy(() => import('./pages/admin/MoneyOverview'));
+const MoneyDocs = lazy(() => import('./pages/admin/MoneyDocs'));
+const MoneyPayments = lazy(() => import('./pages/admin/MoneyPayments'));
+const MoneyExpenses = lazy(() => import('./pages/admin/MoneyExpenses'));
+const MoneyEntries = lazy(() => import('./pages/admin/MoneyEntries'));
+const MoneyReports = lazy(() => import('./pages/admin/MoneyReports'));
+const MoneyRate = lazy(() => import('./pages/admin/MoneyRate'));
+const MoneyClose = lazy(() => import('./pages/admin/MoneyClose'));
+const MoneyTax = lazy(() => import('./pages/admin/MoneyTax'));
+const Funnel = lazy(() => import('./pages/admin/Funnel'));
+const Prospects = lazy(() => import('./pages/admin/Prospects'));
+const SiteReviews = lazy(() => import('./pages/admin/SiteReviews'));
+const Marketing = lazy(() => import('./pages/admin/Marketing'));
+const AiLive = lazy(() => import('./pages/admin/AiLive'));
+const AiSpend = lazy(() => import('./pages/admin/AiSpend'));
+const AiRights = lazy(() => import('./pages/admin/AiRights'));
+const SysHealth = lazy(() => import('./pages/admin/SysHealth'));
+const SysPeople = lazy(() => import('./pages/admin/SysPeople'));
+const SysRegistry = lazy(() => import('./pages/admin/SysRegistry'));
+const SitePages = lazy(() => import('./pages/admin/SitePages'));
+const SiteContent = lazy(() => import('./pages/admin/SiteContent'));
+const SiteSettings = lazy(() => import('./pages/admin/SiteSettings'));
 
 /**
  * Страницы публичного сайта. Список отдельно от маршрутов, потому что
@@ -100,6 +105,11 @@ const localisedRoutes = () => Object.entries(LOCALE_PREFIX).flatMap(
   )),
 );
 
+/** Пока кусок экрана панели грузится — пустой фон, без мигания вёрстки. */
+const Lazy = ({ children }) => (
+  <Suspense fallback={<div className="min-h-[50vh]" />}>{children}</Suspense>
+);
+
 const AppRoutes = () => (
   <Routes>
     {/* Публичный сайт: каждый раздел — отдельная страница, на трёх языках */}
@@ -123,46 +133,46 @@ const AppRoutes = () => (
     </Route>
 
     {/* Рабочая панель */}
-    <Route path="/admin/login" element={<AdminLogin />} />
+    <Route path="/admin/login" element={<Lazy><AdminLogin /></Lazy>} />
     <Route path="/admin" element={<RequireAuth><AdminLayout /></RequireAuth>}>
-      <Route index element={<Overview />} />
+      <Route index element={<Lazy><Overview /></Lazy>} />
       {/* СРМ */}
-      <Route path="tickets" element={<Tickets />} />
-      <Route path="tickets/:id" element={<TicketDetail />} />
-      <Route path="companies" element={<Companies />} />
-      <Route path="funnel" element={<Funnel />} />
-      <Route path="prospects" element={<Prospects />} />
-      <Route path="configs" element={<DevConfigs />} />
-      <Route path="time" element={<TimeSheet />} />
-      <Route path="sources" element={<Sources />} />
-      <Route path="subscriptions" element={<CrmSubscriptions />} />
-      <Route path="marketing" element={<Marketing />} />
+      <Route path="tickets" element={<Lazy><Tickets /></Lazy>} />
+      <Route path="tickets/:id" element={<Lazy><TicketDetail /></Lazy>} />
+      <Route path="companies" element={<Lazy><Companies /></Lazy>} />
+      <Route path="funnel" element={<Lazy><Funnel /></Lazy>} />
+      <Route path="prospects" element={<Lazy><Prospects /></Lazy>} />
+      <Route path="configs" element={<Lazy><DevConfigs /></Lazy>} />
+      <Route path="time" element={<Lazy><TimeSheet /></Lazy>} />
+      <Route path="sources" element={<Lazy><Sources /></Lazy>} />
+      <Route path="subscriptions" element={<Lazy><CrmSubscriptions /></Lazy>} />
+      <Route path="marketing" element={<Lazy><Marketing /></Lazy>} />
 
       {/* Бух учет */}
-      <Route path="money" element={<MoneyOverview />} />
-      <Route path="money/docs" element={<MoneyDocs />} />
-      <Route path="money/payments" element={<MoneyPayments />} />
-      <Route path="money/expenses" element={<MoneyExpenses />} />
-      <Route path="money/entries" element={<MoneyEntries />} />
-      <Route path="money/reports" element={<MoneyReports />} />
-      <Route path="money/rate" element={<MoneyRate />} />
-      <Route path="money/close" element={<MoneyClose />} />
-      <Route path="money/tax" element={<MoneyTax />} />
+      <Route path="money" element={<Lazy><MoneyOverview /></Lazy>} />
+      <Route path="money/docs" element={<Lazy><MoneyDocs /></Lazy>} />
+      <Route path="money/payments" element={<Lazy><MoneyPayments /></Lazy>} />
+      <Route path="money/expenses" element={<Lazy><MoneyExpenses /></Lazy>} />
+      <Route path="money/entries" element={<Lazy><MoneyEntries /></Lazy>} />
+      <Route path="money/reports" element={<Lazy><MoneyReports /></Lazy>} />
+      <Route path="money/rate" element={<Lazy><MoneyRate /></Lazy>} />
+      <Route path="money/close" element={<Lazy><MoneyClose /></Lazy>} />
+      <Route path="money/tax" element={<Lazy><MoneyTax /></Lazy>} />
 
       {/* ИИ */}
-      <Route path="ai" element={<AiLive />} />
-      <Route path="ai/queue" element={<Queue />} />
-      <Route path="ai/spend" element={<AiSpend />} />
-      <Route path="ai/rights" element={<AiRights />} />
+      <Route path="ai" element={<Lazy><AiLive /></Lazy>} />
+      <Route path="ai/queue" element={<Lazy><Queue /></Lazy>} />
+      <Route path="ai/spend" element={<Lazy><AiSpend /></Lazy>} />
+      <Route path="ai/rights" element={<Lazy><AiRights /></Lazy>} />
 
       {/* Администрирование */}
-      <Route path="system" element={<SysHealth />} />
-      <Route path="system/people" element={<SysPeople />} />
-      <Route path="system/registry" element={<SysRegistry />} />
-      <Route path="site" element={<SitePages />} />
-      <Route path="site/content" element={<SiteContent />} />
-      <Route path="site/settings" element={<SiteSettings />} />
-      <Route path="site/reviews" element={<SiteReviews />} />
+      <Route path="system" element={<Lazy><SysHealth /></Lazy>} />
+      <Route path="system/people" element={<Lazy><SysPeople /></Lazy>} />
+      <Route path="system/registry" element={<Lazy><SysRegistry /></Lazy>} />
+      <Route path="site" element={<Lazy><SitePages /></Lazy>} />
+      <Route path="site/content" element={<Lazy><SiteContent /></Lazy>} />
+      <Route path="site/settings" element={<Lazy><SiteSettings /></Lazy>} />
+      <Route path="site/reviews" element={<Lazy><SiteReviews /></Lazy>} />
 
       {/* Прежний адрес очереди: ссылки из переписки и закладки должны работать.
           Сломанная закладка выглядит как сломанная панель. */}
