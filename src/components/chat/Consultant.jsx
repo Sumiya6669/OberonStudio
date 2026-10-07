@@ -121,7 +121,11 @@ export default function Consultant() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          messages: history.map(m => ({ role: m.role, content: m.content })),
+          // sig — подпись сервера у реплик модели: без неё сервер реплику консультанта
+          // из истории не примет (защита от подделки истории, см. api/chat.js).
+          messages: history.map(m => (m.sig
+            ? { role: m.role, content: m.content, sig: m.sig }
+            : { role: m.role, content: m.content })),
           session: chatSession(),
           text: raw,
           source: campaignSource(),
@@ -131,7 +135,9 @@ export default function Consultant() {
       if (data.agent) setAgentMode(true);
       if (!response.ok) return null;
       if (data.agent) return { text: data.reply?.trim() || '', buttons: data.buttons || [], agent: true };
-      return data.reply?.trim() ? { text: data.reply.trim(), buttons: [] } : null;
+      return data.reply?.trim()
+        ? { text: data.reply.trim(), buttons: [], sig: typeof data.sig === 'string' ? data.sig : undefined }
+        : null;
     } catch {
       return null;
     }
@@ -235,7 +241,8 @@ export default function Consultant() {
     setTyping(false);
     setMessages(prev => [
       ...prev,
-      { role: 'assistant', content: reply, link: local?.link, buttons: fromModel?.buttons?.length ? fromModel.buttons : undefined },
+      { role: 'assistant', content: reply, link: local?.link, buttons: fromModel?.buttons?.length ? fromModel.buttons : undefined,
+        sig: fromModel?.sig },
       ...(shouldAskLead ? [{ role: 'assistant', content: LEAD_PROMPT[lang] || LEAD_PROMPT.ru }] : []),
     ]);
     if (shouldAskLead) setLeadAsked(true);
@@ -289,7 +296,8 @@ export default function Consultant() {
             </div>
 
             {/* Лента сообщений */}
-            <div ref={scrollRef} className="h-80 overflow-y-auto px-4 py-4 space-y-3 scrollbar-none">
+            {/* ym-hide-content: переписка не записывается Вебвизором (в записи — размытый блок). */}
+            <div ref={scrollRef} className="h-80 overflow-y-auto px-4 py-4 space-y-3 scrollbar-none ym-hide-content">
               {messages.map((m, i) => (
                 <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                   <div
@@ -372,6 +380,7 @@ export default function Consultant() {
                   onChange={e => setInput(e.target.value)}
                   onKeyDown={e => e.key === 'Enter' && !e.shiftKey && send()}
                   placeholder={ct.placeholder}
+                  maxLength={1000}
                   className="flex-1 bg-transparent text-xs text-white/70 placeholder-white/20 outline-none ym-disable-keys"
                 />
                 <button
