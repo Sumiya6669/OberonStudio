@@ -82,5 +82,6 @@ end $$;
 -- Проверка после применения (должно вернуть 0 строк):
 -- select n.nspname||'.'||p.proname from pg_proc p join pg_namespace n on n.oid=p.pronamespace
 --  where n.nspname in ('crm','cms','core','acc') and p.prosecdef
+--    and p.prorettype <> 'trigger'::regtype  -- триггерные функции напрямую не вызываются
 --    and has_function_privilege('authenticated', p.oid, 'execute')
 --    and p.proname not in ('my_tenant','my_person','my_roles','is_owner','require_owner','link_me','next_number');
