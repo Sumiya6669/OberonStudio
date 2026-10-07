@@ -5,14 +5,17 @@
  * 08.10.2026): Общее/onec/core/Обновление.bsl (подпись Ed25519, https, запрет
  * понижения версии, автооткат, окна заморозки), Ядро.bsl (ЗащищенноеСоединение
  * с сертификатами ОС, ЗаписатьСекрет → безопасное хранилище БСП, проверка
- * администратора), Общее/onec/tinker_ext.py (роли <Префикс>_БазовыеПрава и
- * _ПолныеПрава, регламенты собираются выключенными), агенты продуктов
- * (Агент.bsl: что и как создаётся), сайт — vercel.json и api/_guard.js.
+ * администратора, СогласиеИИ / ПроверитьСогласиеИИ — отправка в Claude только
+ * после флажка администратора, НастройкиТолькоПросмотр), Общее/onec/tinker_ext.py
+ * (роли <Префикс>_БазовыеПрава и _ПолныеПрава: константы и регистры рабочих
+ * настроек меняет только _ПолныеПрава; регламенты собираются выключенными),
+ * агенты продуктов (Агент.bsl: что и как создаётся), сайт — vercel.json и
+ * api/_guard.js.
  *
  * Чего здесь нет и быть не должно: сертификаций, аудитов третьих сторон,
  * «банковского уровня защиты» — ничего такого не было. Слабые места названы
- * прямо: PDF-выписка уходит в Claude целиком, обычные настройки продукта
- * меняет любой, у кого есть роль продукта.
+ * прямо: если администратор включил отправку в ИИ, PDF/Excel-выписка уходит
+ * в Claude целиком.
  *
  * Казахский текст — первый вариант, требует вычитки носителем.
  */
@@ -38,16 +41,16 @@ const ru = {
         'Антикамералка, Контроль ВС и СНТ, Проверка контрагента, Маркировка, Дебиторка и Пульт типовые документы не создают и не меняют: читают базу и пишут только в свои регистры.',
         'ИИ-разбор первички, Импорт ЕАЭС, Kaspi и Акты сверки создают документы только по кнопке пользователя и черновиками — без проведения. Письмо с актом сверки уходит только после вашего подтверждения.',
         'ЭСФ-агент по вашей команде создаёт счёт-фактуру и черновик ЭСФ. В КА счёт-фактура проводится. Подписываете и отправляете ЭСФ вы, своей ЭЦП.',
-        'Робот разноски создаёт банковские документы по выписке, по умолчанию без проведения. Автопроведение включается настройкой — только для выбранных видов операций и только уверенных совпадений; спорное не проводится никогда. Выписки с почты загружаются только черновиками.',
+        'Робот разноски создаёт банковские документы по выписке, по умолчанию без проведения. Автопроведение включает администратор продукта — только для выбранных видов операций и только уверенных совпадений; спорное не проводится никогда. Выписки с почты загружаются только черновиками.',
       ],
     },
     {
       icon: 'send',
       title: 'Что уходит из базы наружу',
       points: [
-        'По умолчанию — ничего: регламентные задания поставляются выключенными, связь с внешним сервисом появляется только после того, как администратор введёт его токен или ключ.',
+        'По умолчанию — ничего: регламентные задания поставляются выключенными, связь с внешним сервисом появляется только после того, как администратор введёт его токен или ключ, а отправка в ИИ — только после того, как администратор отдельно её включит.',
         'Telegram — если указаны бот и чат: сводки с названием находки, контрагентом и суммой.',
-        'Claude (ИИ Anthropic) — если задан ключ ИИ. ИИ-разбор первички отправляет файл документа, Акты сверки — текст письма и вложения; оба — только при отмеченном согласии. Робот разноски для подсказки по операции отправляет назначение, сумму, дату, КНП и наименование второй стороны, без БИН/ИИН и счетов; выписку в PDF или Excel он отправляет целиком.',
+        'Claude (ИИ Anthropic) — только после того, как администратор продукта явно включит отправку в ИИ: по умолчанию она выключена, одного ключа ИИ мало. Что уходит: ИИ-разбор первички — файл документа (без этого продукт не работает), Акты сверки — текст письма контрагента и вложения, Робот разноски — выписка в PDF или Excel целиком, а для подсказки по операции — назначение, сумма, дата, КНП и наименование второй стороны, без БИН/ИИН и счетов. Рядом с флажком в продукте написано, что и куда уходит.',
         'Telegram и Claude — сервисы за пределами Казахстана.',
         'Сервер обновлений Tinker получает ключ клиента и версию конфигурации. Данные базы и БИН не передаются.',
         'Отчёты о сбоях — только если вы их включили: имя расширения, версии и текст ошибки, из которого вычищены числа от пяти цифр, почта и токены.',
@@ -71,7 +74,8 @@ const ru = {
       points: [
         'В каждом продукте две роли: пользователь и администратор продукта.',
         'Обновить, откатить версию, ввести или сменить ключи и токены может только администратор — это проверяется в коде, а не только в интерфейсе.',
-        'Рабочие настройки продукта (например, режим автопроведения в Роботе разноски) доступны тем, у кого есть роль продукта. Назначайте её тем, кому доверяете это решение.',
+        'Рабочие настройки продукта — расписания, получатели в Telegram, почта и отправители выписок, режим автопроведения в Роботе разноски, согласие на отправку в ИИ — меняет только администратор продукта. Это тоже проверяется на сервере; у пользователя настройки открыты только для просмотра.',
+        'Пользователь работает с продуктом: проверяет, разносит, создаёт черновики и отправляет по кнопке.',
       ],
     },
     {
@@ -121,16 +125,16 @@ const kz = {
         'Антикамералка, ВС және ТІЖ бақылауы, Контрагентті тексеру, Таңбалау, Дебиторлық берешек және Пульт типтік құжаттарды жасамайды және өзгертпейді: базаны оқиды және тек өз тізілімдеріне жазады.',
         'Бастапқы құжаттарды ИИ-талдау, ЕАЭО импорты, Kaspi және Салыстыру актілері құжаттарды тек пайдаланушының батырмасы бойынша және жоба ретінде — өткізбей жасайды. Салыстыру актісі бар хат тек сіз растағаннан кейін жіберіледі.',
         'ЭШФ-агент сіздің пәрменіңіз бойынша шот-фактура мен ЭШФ жобасын жасайды. КА-да шот-фактура өткізіледі. ЭШФ-ке сіз өз ЭЦҚ-ңызбен қол қойып, жібересіз.',
-        'Банк тарату роботы үзінді көшірме бойынша банк құжаттарын жасайды, әдепкі бойынша өткізбей. Автоматты өткізу баптаумен қосылады — тек таңдалған операция түрлері мен сенімді сәйкестіктер үшін; даулы операция ешқашан өткізілмейді. Поштадан келген үзінді көшірмелер тек жоба ретінде жүктеледі.',
+        'Банк тарату роботы үзінді көшірме бойынша банк құжаттарын жасайды, әдепкі бойынша өткізбей. Автоматты өткізуді өнім әкімшісі қосады — тек таңдалған операция түрлері мен сенімді сәйкестіктер үшін; даулы операция ешқашан өткізілмейді. Поштадан келген үзінді көшірмелер тек жоба ретінде жүктеледі.',
       ],
     },
     {
       icon: 'send',
       title: 'Базадан сыртқа не кетеді',
       points: [
-        'Әдепкі бойынша — ештеңе: регламенттік тапсырмалар өшірулі күйде жеткізіледі, сыртқы сервиспен байланыс әкімші оның токенін немесе кілтін енгізгеннен кейін ғана пайда болады.',
+        'Әдепкі бойынша — ештеңе: регламенттік тапсырмалар өшірулі күйде жеткізіледі, сыртқы сервиспен байланыс әкімші оның токенін немесе кілтін енгізгеннен кейін ғана пайда болады, ал ИИ-ге жіберу — әкімші оны бөлек қосқаннан кейін ғана.',
         'Telegram — бот пен чат көрсетілсе: табылған мәселенің атауы, контрагент және сомасы бар жиынтықтар.',
-        'Claude (Anthropic ИИ) — ИИ кілті берілсе. Бастапқы құжаттарды ИИ-талдау құжат файлын, Салыстыру актілері хат мәтіні мен тіркемелерді жібереді; екеуі де тек келісім белгіленгенде. Банк тарату роботы операция бойынша кеңес алу үшін төлем мақсатын, соманы, күнді, ТМБК мен екінші тараптың атауын жібереді, БСН/ЖСН мен шоттарсыз; PDF немесе Excel үзінді көшірмесін толығымен жібереді.',
+        'Claude (Anthropic ИИ) — тек өнім әкімшісі ИИ-ге жіберуді анық қосқаннан кейін: әдепкі бойынша ол өшірулі, ИИ кілтінің өзі жеткіліксіз. Не кетеді: Бастапқы құжаттарды ИИ-талдау — құжат файлы (онсыз өнім жұмыс істемейді), Салыстыру актілері — контрагент хатының мәтіні мен тіркемелер, Банк тарату роботы — PDF немесе Excel үзінді көшірмесі толығымен, ал операция бойынша кеңес үшін — төлем мақсаты, сома, күн, ТМБК мен екінші тараптың атауы, БСН/ЖСН мен шоттарсыз. Өнімде белгінің жанында не және қайда кететіні жазылған.',
         'Telegram мен Claude — Қазақстаннан тыс сервистер.',
         'Tinker жаңарту серверіне клиент кілті мен конфигурация нұсқасы ғана беріледі. База деректері мен БСН берілмейді.',
         'Ақаулар туралы есептер — тек сіз қоссаңыз: кеңейту атауы, нұсқалар және бес және одан көп цифрлы сандар, пошта мен токендер тазартылған қате мәтіні.',
@@ -154,7 +158,8 @@ const kz = {
       points: [
         'Әр өнімде екі рөл бар: пайдаланушы және өнім әкімшісі.',
         'Жаңарту, нұсқаны қайтару, кілттер мен токендерді енгізу немесе ауыстыру тек әкімшіге рұқсат — бұл интерфейсте ғана емес, кодта тексеріледі.',
-        'Өнімнің жұмыс баптаулары (мысалы, Банк тарату роботындағы автоматты өткізу режимі) өнім рөлі барларға қолжетімді. Бұл рөлді осы шешімді сеніп тапсыратын адамдарға беріңіз.',
+        'Өнімнің жұмыс баптауларын — кестелерді, Telegram алушыларын, үзінді көшірмелер поштасы мен жіберушілерін, Банк тарату роботындағы автоматты өткізу режимін, ИИ-ге жіберуге келісімді — тек өнім әкімшісі өзгертеді. Бұл да серверде тексеріледі; пайдаланушыға баптаулар тек қарау үшін ашық.',
+        'Пайдаланушы өніммен жұмыс істейді: тексереді, таратады, жобаларды жасайды және батырма бойынша жібереді.',
       ],
     },
     {
@@ -204,16 +209,16 @@ const en = {
         'Antikameralka, VS & SNT control, Counterparty check, Marking, Receivables and the Console do not create or change standard documents: they read the database and write only to their own registers.',
         'AI document recognition, EAEU import, Kaspi and Reconciliation acts create documents only when a user presses the button, and as drafts — not posted. A reconciliation e-mail is sent only after you confirm it.',
         'The ESF agent creates an invoice and an ESF draft on your command. In Complex Automation the invoice is posted. You sign and send the ESF yourself, with your own digital signature.',
-        'The bank posting robot creates bank documents from the statement, unposted by default. Auto-posting is turned on in settings — only for the operation types you choose and only for confident matches; disputed items are never posted. Statements from e-mail are loaded only as drafts.',
+        'The bank posting robot creates bank documents from the statement, unposted by default. Auto-posting is turned on by a product administrator — only for the operation types you choose and only for confident matches; disputed items are never posted. Statements from e-mail are loaded only as drafts.',
       ],
     },
     {
       icon: 'send',
       title: 'What leaves the database',
       points: [
-        'By default — nothing: scheduled jobs ship disabled, and a connection to an external service appears only after an administrator enters its token or key.',
+        'By default — nothing: scheduled jobs ship disabled, a connection to an external service appears only after an administrator enters its token or key, and sending to AI — only after an administrator separately turns it on.',
         'Telegram — if a bot and chat are set: digests with the finding, counterparty and amount.',
-        'Claude (Anthropic AI) — if an AI key is set. AI document recognition sends the document file, Reconciliation acts send the e-mail text and attachments; both only with the consent box ticked. The bank robot sends the payment purpose, amount, date, KNP code and the other party’s name to suggest an operation, without BIN/IIN or accounts; a PDF or Excel statement is sent in full.',
+        'Claude (Anthropic AI) — only after a product administrator explicitly turns on sending to AI: it is off by default, and an AI key alone is not enough. What is sent: AI document recognition — the document file (the product does not work without it), Reconciliation acts — the counterparty’s e-mail text and attachments, the bank robot — a PDF or Excel statement in full, and to suggest an operation — the payment purpose, amount, date, KNP code and the other party’s name, without BIN/IIN or accounts. The product states next to the checkbox what is sent and where.',
         'Telegram and Claude are services outside Kazakhstan.',
         'The Tinker update server receives the client key and the configuration version. Database data and the BIN are not sent.',
         'Crash reports — only if you turn them on: extension name, versions and the error text with numbers of five or more digits, e-mails and tokens removed.',
@@ -237,7 +242,8 @@ const en = {
       points: [
         'Each product has two roles: user and product administrator.',
         'Only an administrator can update, roll back, or enter and change keys and tokens — this is checked in code, not just hidden in the interface.',
-        'Working settings of a product (for example, the auto-posting mode of the bank robot) are available to anyone with the product role. Give it to people you trust with that decision.',
+        'Working settings of a product — schedules, Telegram recipients, the statement mailbox and senders, the auto-posting mode of the bank robot, consent to send data to AI — can be changed only by a product administrator. This is also checked on the server; users see the settings read-only.',
+        'Users work with the product: they run checks, post, create drafts and send on a button press.',
       ],
     },
     {
