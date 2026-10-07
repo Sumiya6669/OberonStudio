@@ -22,7 +22,7 @@
  * работу в панели — консультант знает о ней со следующего запроса.
  */
 
-import { clientIp, envInt, signTurn, takeQuota, verifyTurn } from './_guard.js';
+import { clientIp, envInt, ipHash, signTurn, takeQuota, verifyTurn } from './_guard.js';
 
 // Модель — самая дешёвая из актуальных: Haiku 4.5, около $0,005 за ответ (правила и каталог ~4 тыс. токенов на
 // входе, ответ до 400). Поменять без выкладки кода — CONSULTANT_MODEL в Vercel.
@@ -176,7 +176,7 @@ async function systemPrompt() {
  * Продажник не ответил — модель напрямую НЕ зовём: она получила бы переписку
  * без согласия. Виджет в этом случае отвечает по встроенной базе знаний.
  */
-async function askAgent(body) {
+async function askAgent(body, visitor) {
   const url = process.env.SALES_AGENT_URL;
   const key = process.env.SALES_AGENT_KEY;
   if (!url || !key) return null;
@@ -194,7 +194,8 @@ async function askAgent(body) {
   try {
     const result = await fetch(url, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'X-Sales-Key': key },
+      // Продажник считает лимит по посетителю; IP не отдаём — только хэш с солью.
+      headers: { 'Content-Type': 'application/json', 'X-Sales-Key': key, ...(visitor ? { 'X-Client-IP': visitor } : {}) },
       body: JSON.stringify({ session, text, source }),
       signal: AbortSignal.timeout(60000),
     });
@@ -282,7 +283,7 @@ export default async function handler(request, response) {
   }
 
   const body = typeof request.body === 'string' ? safeParse(request.body) : request.body || {};
-  const agent = await askAgent(body);
+  const agent = await askAgent(body, ipHash(clientIp(request), 'sales'));
   if (agent) {
     if (agent.error) return response.status(agent.error).json({ error: 'Agent unavailable', agent: true });
     return response.status(200).json({ reply: agent.reply, buttons: agent.buttons, agent: true });
