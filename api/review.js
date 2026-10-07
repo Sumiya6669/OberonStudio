@@ -7,13 +7,14 @@
  * ссылок, не больше 20 отзывов в час, повтор того же текста не дублируется,
  * обязательное согласие на публикацию имени.
  *
- * IP посетителя в базу не пишется — только его SHA-256 с солью дня: этого
- * хватает, чтобы заметить поток с одного адреса, и не хватает, чтобы узнать
- * адрес.
+ * IP посетителя в базу не пишется — только HMAC-SHA256 от «дня и адреса» с
+ * секретной солью IP_HASH_SALT: этого хватает, чтобы заметить поток с одного
+ * адреса, и не хватает, чтобы узнать адрес. Соли нет — хэш не пишется вовсе:
+ * хэш IPv4 без секрета перебирается за минуты, то есть это и есть адрес.
  *
- * Переменные окружения: SUPABASE_URL, SUPABASE_ANON_KEY (те же, что у /api/lead).
+ * Переменные окружения: SUPABASE_URL, SUPABASE_ANON_KEY (те же, что у /api/lead), IP_HASH_SALT.
  */
-import { createHash } from 'node:crypto';
+import { clientIp, ipHash } from './_guard.js';
 
 function safeParse(value) {
   try {
@@ -38,7 +39,7 @@ export default async function handler(request, response) {
   }
 
   const body = typeof request.body === 'string' ? safeParse(request.body) : request.body || {};
-  const ip = String(request.headers['x-forwarded-for'] || '').split(',')[0].trim();
+  const ip = clientIp(request);
   const day = new Date().toISOString().slice(0, 10);
   const rating = Number(body.rating);
 
@@ -53,7 +54,7 @@ export default async function handler(request, response) {
     contact: clip(body.contact, 200),
     consent: body.consent === true,
     page: clip(body.page, 300),
-    ip_hash: ip ? createHash('sha256').update(`${day}|${ip}`).digest('hex') : '',
+    ip_hash: ipHash(ip, `review|${day}`),
     user_agent: clip(request.headers['user-agent'], 300),
   };
 

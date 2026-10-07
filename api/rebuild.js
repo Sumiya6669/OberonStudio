@@ -58,10 +58,13 @@ export default async function handler(req, res) {
   const hook = process.env.DEPLOY_HOOK_URL;
   if (!hook) return json(res, 501, { error: 'адрес пересборки не задан' });
 
-  const body = typeof req.body === 'string' ? JSON.parse(req.body || '{}') : (req.body || {});
+  let body = req.body || {};
+  if (typeof body === 'string') {
+    try { body = JSON.parse(body || '{}'); } catch { return json(res, 400, { error: 'тело запроса — не JSON' }); }
+  }
 
   // 1. Разрешение и след — в базе. Здесь же срабатывает предел частоты.
-  const take = await rpc('rebuild_take', token, { p_reason: body.reason || 'publish' });
+  const take = await rpc('rebuild_take', token, { p_reason: String(body.reason || 'publish').slice(0, 200) });
   if (take.error) return json(res, take.status === 401 ? 401 : 502, { error: take.error });
   if (!take.data?.allowed) {
     return json(res, 429, { error: take.data?.reason || 'пересборка сейчас недоступна',

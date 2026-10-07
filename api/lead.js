@@ -22,27 +22,30 @@
  * задание ставит как раз запись в базу. Это последняя линия, и она не
  * дублирует Вестника, а закрывает дыру, где заявка исчезла бы совсем.
  *
- * Что уходит в этом случае — зависит от DATA_IN_RK (src/lib/dataResidency.js):
- *   false — заявка целиком (имя, телефон, текст) в Telegram, как раньше;
- *   true  — после переезда базы в РК персональные данные в Telegram не уходят:
- *           только «заявка не записана, смотрите журнал Vercel», форма,
- *           страница и метка для поиска. Сама заявка — одной строкой в журнале
- *           функции (Vercel → Logs) с той же меткой. Компромисс: журнал Vercel
- *           хранится недолго (срок зависит от тарифа), поэтому заявку надо
- *           переписать оттуда в панель сразу по сигналу; и пока строка жива,
- *           ПД лежат у Vercel (США) — это тот же получатель, что в Политике
- *           («транзитом»), но уже не совсем транзит. Если не прочитать журнал
- *           вовремя, заявка потеряется: это плата за то, что ПД не уходят
- *           в чат за рубежом.
+ * Аварийный канал ВЫКЛЮЧЕН по умолчанию (аудит 07.10.2026): раньше он слал
+ * заявку целиком — имя, телефон, текст — в Telegram, то есть ПД за рубеж.
+ * Теперь:
+ *   LEAD_TELEGRAM_FALLBACK не '1' (по умолчанию) — база не приняла заявку →
+ *           посетитель видит честное «не удалось, напишите нам», в журнал
+ *           Vercel уходит только метка, ПД никуда не уходят;
+ *   LEAD_TELEGRAM_FALLBACK = '1' — в Telegram уходит СИГНАЛ без ПД (метка,
+ *           форма, страница), а сама заявка — одной строкой в журнал функции
+ *           (Vercel → Logs) с той же меткой. Компромисс: журнал Vercel хранится
+ *           недолго и находится в США; заявку надо перенести в панель сразу.
+ * Полный текст заявки в Telegram отсюда не уходит ни при каком флаге.
  *
  * Переменные окружения (Vercel → Settings → Environment Variables):
- *   TELEGRAM_BOT_TOKEN — токен бота от @BotFather. Нужен ТОЛЬКО для случая
+ *   LEAD_TELEGRAM_FALLBACK — '1', чтобы включить сигнал выше; иначе выключен
+ *   TELEGRAM_BOT_TOKEN — токен бота от @BotFather. Нужен ТОЛЬКО для сигнала
  *                        выше; в обычной работе не используется
- *   TELEGRAM_CHAT_ID   — id чата для того же аварийного случая
+ *   TELEGRAM_CHAT_ID   — id чата для того же сигнала
  *   SUPABASE_URL       — адрес проекта Supabase
- *   SUPABASE_ANON_KEY  — публичный ключ. Ключ service_role здесь НЕ НУЖЕН:
- *                        запись идёт через функцию public.submit_lead
- *                        с ограниченными правами.
+ *   SUPABASE_SERVICE_ROLE_KEY — если задан, заявка пишется от имени сервера
+ *                        вместе с хэшем IP (предел частоты по адресу, миграция
+ *                        062). Не задан — как раньше, публичным ключом:
+ *   SUPABASE_ANON_KEY  — публичный ключ; функция public.submit_lead тогда
+ *                        сама требует согласие и держит пределы (миграция 062).
+ *   IP_HASH_SALT       — соль хэша IP (см. api/_guard.js); без неё хэш не шлётся.
  *   VITE_YM_ID         — номер счётчика Яндекс Метрики (тот же, что у сайта)
  *   YM_MS_TOKEN        — секретный токен Measurement Protocol (Метрика →
  *                        Настройки → Measurement Protocol). Без него цель
@@ -56,6 +59,7 @@
 
 // Относительный путь, а не «@/…»: у серверных функций нет алиаса сборки сайта.
 import { DATA_IN_RK } from '../src/lib/dataResidency.js';
+import { clientIp, escapeHtml, ipHash, serviceHeaders } from './_guard.js';
 
 const FIELD_LABELS = {
   name: 'Имя',
@@ -70,14 +74,6 @@ const FIELD_LABELS = {
   referrer: 'Переход с',
 };
 
-/** Экранирование под parse_mode: HTML. */
-function escapeHtml(value) {
-  return String(value)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;');
-}
-
 /**
  * Цель «лид» в Яндекс Метрику через Measurement Protocol. true — Метрика
  * приняла. Ошибка здесь заявку не роняет: она уже в базе.
@@ -87,12 +83,13 @@ async function sendMetrikaGoal(clientIdValue, page) {
   const token = process.env.YM_MS_TOKEN;
   if (!counter || !token || !/^\d{6,30}$/.test(clientIdValue || '')) return false;
   const site = process.env.VITE_SITE_URL || 'https://' + (process.env.VERCEL_PROJECT_PRODUCTION_URL || '');
-  const params = new URLSearchParams({
-    tid: counter, cid: clientIdValue, t: 'event', ea: 'lead', ms: token,
-    et: String(Math.floor(Date.now() / 1000)),
-    dl: new URL(page || '/', site).toString(),
-  });
   try {
+    // Разбор адреса — внутри try: кривой page или пустой адрес сайта не должны ронять ответ на заявку.
+    const params = new URLSearchParams({
+      tid: counter, cid: clientIdValue, t: 'event', ea: 'lead', ms: token,
+      et: String(Math.floor(Date.now() / 1000)),
+      dl: new URL(page || '/', site).toString(),
+    });
     const result = await fetch(`https://mc.yandex.ru/collect/?${params}`, { signal: AbortSignal.timeout(3000) });
     if (!result.ok) console.error('Метрика не приняла цель:', result.status, (await result.text()).slice(0, 200));
     return result.ok;
@@ -119,18 +116,18 @@ function safeParse(value) {
  * Время ответа берётся из базы, а не пишется в вёрстке: по этому же полю
  * панель считает просрочку, поэтому сайт и панель не могут разойтись.
  */
-async function saveToDatabase(body) {
+async function saveToDatabase(body, ipHashValue) {
   const url = process.env.SUPABASE_URL;
-  const key = process.env.SUPABASE_ANON_KEY;
-  if (!url || !key) return null;
+  const anon = process.env.SUPABASE_ANON_KEY;
+  // Ключ сервера, если он есть: тогда база верит хэшу IP из запроса. Иначе — публичный ключ, как раньше.
+  const headers = serviceHeaders()
+    || (url && anon ? { 'Content-Type': 'application/json', apikey: anon, Authorization: `Bearer ${anon}` } : null);
+  if (!url || !headers) return null;
 
   const response = await fetch(`${url}/rest/v1/rpc/submit_lead`, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      apikey: key,
-      Authorization: `Bearer ${key}`,
-    },
+    headers,
+    signal: AbortSignal.timeout(10000),
     body: JSON.stringify({
       payload: {
         name: body.name,
@@ -152,13 +149,25 @@ async function saveToDatabase(body) {
         consent_version: body.consent_version,
         channel: 'site',
         received_at: new Date().toISOString(),
+        // Хэш IP с солью (база учитывает его только от ключа сервера): предел заявок с одного адреса.
+        ip_hash: ipHashValue || undefined,
       },
     }),
   });
 
   if (!response.ok) {
     const details = await response.text();
-    throw new Error(`submit_lead: ${response.status} ${details}`);
+    const error = new Error(`submit_lead: ${response.status} ${details.slice(0, 300)}`);
+    // Проверки базы (P0001) пишут понятный текст по-русски — его можно показать посетителю.
+    try {
+      const data = JSON.parse(details);
+      if (data?.code === 'P0001' && typeof data.message === 'string' && data.message.length < 200) {
+        error.publicMessage = data.message;
+      }
+    } catch {
+      // не JSON — значит не наша проверка
+    }
+    throw error;
   }
   return response.json();
 }
@@ -218,12 +227,16 @@ export default async function handler(request, response) {
   let ticketId = null;
   let stored = false;
   try {
-    receipt = await saveToDatabase(cleaned);
+    receipt = await saveToDatabase(cleaned, ipHash(clientIp(request), 'lead'));
     ticketId = receipt?.ticket_id ?? null;
     stored = ticketId !== null;
   } catch (error) {
-    // Не роняем приём: заявка уйдёт в Telegram, а расхождение видно в журнале.
-    console.error('Не удалось записать заявку в базу:', error);
+    // Отказ проверки базы (нет согласия, слишком часто) — не авария: говорим посетителю как есть.
+    if (error?.publicMessage) {
+      const tooMany = /слишком/i.test(error.publicMessage);
+      return response.status(tooMany ? 429 : 400).json({ error: error.publicMessage });
+    }
+    console.error('Не удалось записать заявку в базу:', error?.message || error);
   }
 
   // Заявка в базе — дальше дело Вестника. Здесь больше ничего не отправляем.
@@ -236,37 +249,33 @@ export default async function handler(request, response) {
   }
 
   // Сюда попадаем, только если база заявку не приняла.
-  // После переезда в РК заявка сохраняется только в журнале функции, а в
-  // Telegram уходит сигнал без ПД с той же меткой, — см. шапку файла.
   const mark = `lead-${Date.now().toString(36)}`;
-  if (DATA_IN_RK) {
-    console.error(`Заявка не записана в базу [${mark}]:`, JSON.stringify(cleaned));
+  const failMessage = 'Не удалось принять заявку. Напишите нам в Telegram — ответим сразу.';
+
+  // Аварийный канал выключен по умолчанию: ПД никуда не уходят, посетитель видит честный отказ.
+  if (process.env.LEAD_TELEGRAM_FALLBACK !== '1') {
+    console.error(`Заявка не записана в базу [${mark}], аварийный канал выключен (LEAD_TELEGRAM_FALLBACK)`);
+    return response.status(500).json({ error: failMessage });
   }
 
   const token = process.env.TELEGRAM_BOT_TOKEN;
   const chatId = process.env.TELEGRAM_CHAT_ID;
 
   if (!token || !chatId) {
-    console.error('База не приняла заявку, а запасной канал не настроен');
-    return response.status(500).json({
-      error: 'Не удалось принять заявку. Напишите нам в Telegram — ответим сразу.',
-    });
+    console.error(`Заявка не записана в базу [${mark}], а сигнальный канал не настроен`);
+    return response.status(500).json({ error: failMessage });
   }
 
+  // Заявка — только в журнал функции (см. шапку), в Telegram — сигнал без ПД.
+  console.error(`Заявка не записана в базу [${mark}]${DATA_IN_RK ? ' (данные в РК)' : ''}:`, JSON.stringify(cleaned));
+
   const lines = ['<b>⚠ Заявка НЕ записана в базу</b>', ''];
-  if (DATA_IN_RK) {
-    lines.push('Проверьте журнал Vercel (функция /api/lead): заявка там, по метке ниже.', '');
-    lines.push(`<b>Метка:</b> ${mark}`);
-    if (cleaned.source) lines.push(`<b>Форма:</b> ${escapeHtml(cleaned.source)}`);
-    if (cleaned.page) lines.push(`<b>Страница:</b> ${escapeHtml(cleaned.page)}`);
-    lines.push('', '<i>Журнал Vercel хранится недолго — перенесите заявку в панель сразу.</i>');
-  } else {
-    for (const [key, label] of Object.entries(FIELD_LABELS)) {
-      if (cleaned[key]) lines.push(`<b>${label}:</b> ${escapeHtml(cleaned[key])}`);
-    }
-    lines.push('', '<i>Это запасной канал: заявки нет ни в панели, ни у Вестника.</i>');
-  }
-  lines.push('', `<i>${new Date().toLocaleString('ru-RU', { timeZone: 'Asia/Almaty' })}</i>`);
+  lines.push('Проверьте журнал Vercel (функция /api/lead): заявка там, по метке ниже.', '');
+  lines.push(`<b>Метка:</b> ${escapeHtml(mark)}`);
+  if (cleaned.source) lines.push(`<b>Форма:</b> ${escapeHtml(cleaned.source)}`);
+  if (cleaned.page) lines.push(`<b>Страница:</b> ${escapeHtml(cleaned.page)}`);
+  lines.push('', '<i>Журнал Vercel хранится недолго — перенесите заявку в панель сразу.</i>');
+  lines.push('', `<i>${escapeHtml(new Date().toLocaleString('ru-RU', { timeZone: 'Asia/Almaty' }))}</i>`);
 
   try {
     const telegram = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
@@ -281,10 +290,10 @@ export default async function handler(request, response) {
     });
 
     if (!telegram.ok) {
-      console.error('Telegram API error:', telegram.status, await telegram.text());
+      console.error('Telegram API error:', telegram.status, (await telegram.text()).slice(0, 200));
       // Ни базы, ни Telegram. Врать «принято» нельзя: заявки нет нигде.
       return response.status(502).json({
-        error: 'Не удалось принять заявку. Напишите нам в Telegram — ответим сразу.',
+        error: failMessage,
       });
     }
 
@@ -292,9 +301,9 @@ export default async function handler(request, response) {
     // здесь было бы обещанием, которого система не держит.
     return response.status(200).json({ ok: true, ticketId: null, delivered: false, ref: null, reactBy: null });
   } catch (error) {
-    console.error('Запасной канал тоже не сработал:', error);
+    console.error('Сигнальный канал тоже не сработал:', error?.name || error);
     return response.status(500).json({
-      error: 'Не удалось принять заявку. Напишите нам в Telegram — ответим сразу.',
+      error: failMessage,
     });
   }
 }
