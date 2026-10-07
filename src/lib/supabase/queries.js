@@ -634,6 +634,31 @@ export const fetchDeals = async () =>
 export const updateDeal = async (id, patch) =>
   unwrap(await crmDb.from('deal').update(patch).eq('id', id).select().single());
 
+// ── Кандидаты ИИ-поиска клиентов (миграция 064) ──────────────────────────
+// Агент ничего не отправляет: здесь только список, статус и заметка. Добавляет
+// кандидатов раннер (prospects.collect); панель менять может лишь status и note
+// (права на колонки в базе), удалить — только владелец.
+export const PROSPECT_STATUSES = [
+  ['new', 'Новый'], ['contacted', 'Написал'], ['replied', 'Ответил'], ['rejected', 'Не подходит'], ['client', 'Клиент'],
+];
+
+export const fetchProspects = async () =>
+  unwrap(await crmDb.from('prospect').select('*')
+    .order('created_at', { ascending: false }).order('score', { ascending: false }).limit(500));
+
+export const updateProspect = async (id, { status, note }) =>
+  unwrap(await crmDb.from('prospect').update({ status, note }).eq('id', id).select().single());
+
+export const deleteProspect = async (id) =>
+  unwrap(await crmDb.from('prospect').delete().eq('id', id));
+
+/** Живое задание сбора — чтобы показать «уже в очереди», а не ошибку повторного нажатия. */
+export const fetchLiveProspectJobs = async () =>
+  unwrap(await coreDb.from('job')
+    .select('id, job_type, status, dedupe_key, error_text, created_at, finished_at, result')
+    .eq('job_type', 'prospects.collect')
+    .order('created_at', { ascending: false }).limit(5));
+
 // ── Отзывы с сайта (миграция 052): карантин и решение о публикации ─────────
 export const fetchReviewInbox = async (status = 'pending') =>
   unwrap(await cmsDb.from('review_inbox')

@@ -48,6 +48,7 @@ import MoneyRate from './pages/admin/MoneyRate';
 import MoneyClose from './pages/admin/MoneyClose';
 import MoneyTax from './pages/admin/MoneyTax';
 import Funnel from './pages/admin/Funnel';
+import Prospects from './pages/admin/Prospects';
 import SiteReviews from './pages/admin/SiteReviews';
 import Marketing from './pages/admin/Marketing';
 import AiLive from './pages/admin/AiLive';
@@ -124,6 +125,7 @@ const AppRoutes = () => (
       <Route path="tickets/:id" element={<TicketDetail />} />
       <Route path="companies" element={<Companies />} />
       <Route path="funnel" element={<Funnel />} />
+      <Route path="prospects" element={<Prospects />} />
       <Route path="configs" element={<DevConfigs />} />
       <Route path="time" element={<TimeSheet />} />
       <Route path="sources" element={<Sources />} />
