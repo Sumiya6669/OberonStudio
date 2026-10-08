@@ -210,15 +210,17 @@ async function checkAboutAndArticles(paths) {
       'в разметке реквизиты или рейтинг, которых нет на странице');
   }
 
+  // Статьи могут быть все в черновиках (draft: true — ждут вычитки автором): тогда
+  // список пуст, ItemList и статьи в карте сайта не ждём.
+  const articles = paths.filter((p) => /^\/stati\/.+/.test(p));
   for (const path of ['/stati', '/kz/stati', '/en/stati']) {
     const { status, body } = await get(path);
     if (status !== 200) { bad(path, `отдался как ${status}`); continue; }
-    check(`${path}: список статей в разметке`, types(body).includes('ItemList'), 'нет ItemList');
+    if (articles.length) check(`${path}: список статей в разметке`, types(body).includes('ItemList'), 'нет ItemList');
     check(`${path}: блок «Станьте автором»`, /href="(\/kz|\/en)?\/contact"/.test(body), 'нет ссылки на контакт');
   }
 
-  const articles = paths.filter((p) => /^\/stati\/.+/.test(p));
-  check('статьи в карте сайта', articles.length > 0, 'ни одной статьи /stati/<slug>');
+  if (!articles.length) console.log('  —     статей пока нет (все в черновиках) — проверки статей пропущены');
   for (const path of articles) {
     const { body } = await get(path);
     const art = jsonLd(body).find((j) => j['@type'] === 'Article');
