@@ -25,6 +25,9 @@ import AnswerPage from './pages/AnswerPage';
 import PrivacyPage from './pages/PrivacyPage';
 import ProverkaPage from './pages/ProverkaPage';
 import SecurityPage from './pages/SecurityPage';
+import AboutPage from './pages/AboutPage';
+import ArticlesPage from './pages/ArticlesPage';
+import ArticlePage from './pages/ArticlePage';
 
 // Админка: своя раскладка, свой вход. Данные защищает RLS в базе,
 // страж маршрута — только удобство.
@@ -87,6 +90,10 @@ export const SITE_PAGES = [
   { path: '/reviews', element: <ReviewsPage /> },
   { path: '/faq', element: <FaqPage /> },
   { path: '/contact', element: <ContactPage /> },
+  // О компании: только факты с сайта и из кода продуктов (src/lib/content/about.js).
+  { path: '/o-kompanii', element: <AboutPage /> },
+  // Статьи экспертов: список на трёх языках, сами статьи — на языке оригинала.
+  { path: '/stati', element: <ArticlesPage /> },
   // Политика ПД: текст один, на русском; на /kz и /en — строка о языке документа.
   { path: '/privacy', element: <PrivacyPage /> },
 ];
@@ -119,6 +126,10 @@ const AppRoutes = () => (
           страницами без читателей и с машинным переводом. */}
       <Route path="/1c" element={<AnswersPage />} />
       <Route path="/1c/:slug" element={<AnswerPage />} />
+
+      {/* Статья — на языке оригинала и без перевода, поэтому один адрес
+          без языковой приставки; список /stati при этом на трёх языках. */}
+      <Route path="/stati/:slug" element={<ArticlePage />} />
 
       {/* Что можно купить, с ценами. Тоже только по-русски: цена и условия
           обсуждаются на русском, а переведённый прайс без переведённого

@@ -32,6 +32,7 @@ export const OG_IMAGE_SIZE = { width: 1200, height: 630 };
 export const SEO_ROUTES = [
   '/', '/services', '/projects', '/products', '/proverka', '/bezopasnost',
   '/process', '/stack', '/reviews', '/faq', '/contact', '/privacy',
+  '/o-kompanii', '/stati',
 ];
 
 /**
@@ -74,6 +75,16 @@ const FALLBACK_DESC = {
     ru: 'Связаться: Telegram, WhatsApp, почта. Ответ в течение часа.',
     kz: 'Байланысу: Telegram, WhatsApp, пошта. Бір сағат ішінде жауап.',
     en: 'Get in touch: Telegram, WhatsApp, email. Reply within an hour.',
+  },
+  '/o-kompanii': {
+    ru: 'Tinker: расширения 1С для БухКз 3.0 и КА 2.4, боты и разработка под заказ. Как идёт работа, принципы продуктов — типовая не меняется, документы черновиками, ничего наружу без согласия — отзывы и контакты.',
+    kz: 'Tinker: БухКз 3.0 және КА 2.4 үшін 1С кеңейтімдері, боттар және тапсырыс бойынша әзірлеу. Жұмыс қалай жүреді, өнім қағидаттары, пікірлер және байланыс.',
+    en: 'Tinker: 1C extensions for Accounting KZ 3.0 and Complex Automation 2.4, bots and custom development. How the work is done, product principles, reviews and contacts.',
+  },
+  '/stati': {
+    ru: 'Авторские статьи о 1С и учёте в Казахстане: НДС 16 % в 2026 году, закрытие месяца, сроки ЭСФ. С нормами, сверенными с источником, и тем, что проверить в своей базе.',
+    kz: 'Қазақстандағы 1С және есеп туралы авторлық мақалалар: 2026 жылғы 16 % ҚҚС, айды жабу, ЭШФ мерзімдері. Дереккөзбен салыстырылған нормалармен. Мақалалар орыс тілінде.',
+    en: 'Expert articles on 1C and accounting in Kazakhstan: 16% VAT in 2026, month-end closing, e-invoice deadlines. Rules checked against the source. Articles are in Russian.',
   },
   '/privacy': {
     ru: 'Какие персональные данные собирает Tinker, зачем, где хранит и кому передаёт; текст согласия, cookie и ваши права.',
@@ -124,6 +135,16 @@ const TITLE_OVERRIDE = {
     kz: 'Қауіпсіздік: Tinker өнімдері 1С базасымен не істейді',
     en: 'Security: what Tinker products do with your 1C database',
   },
+  '/o-kompanii': {
+    ru: 'О компании: 1С для Казахстана и ИИ-автоматизация',
+    kz: 'Компания туралы: Қазақстанға арналған 1С және ИИ',
+    en: 'About Tinker: 1C for Kazakhstan and AI automation',
+  },
+  '/stati': {
+    ru: 'Статьи экспертов о 1С и учёте в Казахстане',
+    kz: 'Қазақстандағы 1С және есеп туралы сарапшылар мақалалары',
+    en: 'Expert articles on 1C and accounting in Kazakhstan',
+  },
   '/contact': {
     ru: 'Контакты и связь',
     kz: 'Байланыс',
@@ -145,6 +166,7 @@ function pageTitle(path, t, lang) {
     '/': 'home', '/services': 'services', '/projects': 'works',
     '/products': 'products', '/process': 'process', '/stack': 'stack',
     '/reviews': 'reviews', '/faq': 'faq', '/contact': 'contact',
+    '/o-kompanii': 'about', '/stati': 'articles',
   };
   const section = SECTION[path];
   const fromSection = section && t?.[section]

@@ -37,6 +37,7 @@ const SITE_URL = (process.env.VITE_SITE_URL || 'https://tinker-kz.vercel.app')
 const ROUTES = [
   '/', '/services', '/projects', '/products', '/proverka', '/bezopasnost',
   '/process', '/stack', '/reviews', '/faq', '/contact', '/privacy',
+  '/o-kompanii', '/stati',
 ];
 
 /**
@@ -146,9 +147,19 @@ function outFile(url) {
  * против сайта. Теперь у страницы своя дата, а у раздела — наибольшая из
  * дат его записей, что и правда означает «в разделе что-то новое».
  */
-function buildLastmodMap(content) {
+function buildLastmodMap(content, articles = []) {
   const day = (value) => (value ? new Date(value).toISOString().slice(0, 10) : null);
   const map = new Map();
+
+  // Статьи — из файлов: дата правки записана в самой статье.
+  let newestArticle = null;
+  for (const a of articles) {
+    const d = day(a.updatedAt || a.publishedAt);
+    if (!a?.slug || !d) continue;
+    map.set(`/stati/${a.slug}`, d);
+    if (!newestArticle || d > newestArticle) newestArticle = d;
+  }
+  if (newestArticle) map.set('/stati', newestArticle);
 
   for (const page of content?.pages || []) {
     const d = day(page.updated_at || page.published_at);
@@ -169,11 +180,11 @@ function buildLastmodMap(content) {
   return map;
 }
 
-function buildSitemap(routes, content, ruOnly = []) {
+function buildSitemap(routes, content, ruOnly = [], articles = []) {
   const fallback = content?.updated_at
     ? new Date(content.updated_at).toISOString().slice(0, 10)
     : new Date().toISOString().slice(0, 10);
-  const byUrl = buildLastmodMap(content);
+  const byUrl = buildLastmodMap(content, articles);
   const lastmodOf = (route) => byUrl.get(route) || fallback;
 
   // Главная важнее внутренних, контакты — реже остальных. Числа тут не
@@ -245,7 +256,7 @@ Sitemap: ${SITE_URL}/sitemap.xml
 }
 
 /** Короткая карта сайта для агентов: складывающаяся, но дешёвая договорённость. */
-function buildLlmsTxt(content) {
+function buildLlmsTxt(content, articles = []) {
   const settings = content?.settings || {};
 
   // Дата у записи — не украшение. Модель, выбирая между двумя ответами про
@@ -266,6 +277,9 @@ function buildLlmsTxt(content) {
   const offers = section('offer', '/uslugi', (i) => i.text?.tagline || '');
   const answers = section('answer', '/1c', (i) => i.text?.question || '');
   const cases = section('case', '/keysy', (i) => i.text?.tagline || '');
+  const stati = articles
+    .map((a) => `- [${a.title}](${SITE_URL}/stati/${a.slug}): ${a.description}; обновлено ${a.updatedAt || a.publishedAt}`)
+    .join('\n');
 
   const contacts = [
     settings.telegram_url && `- Telegram: ${settings.telegram_url}`,
@@ -283,9 +297,11 @@ function buildLlmsTxt(content) {
 ## Страницы
 
 - [Главная](${SITE_URL}/): о студии и подходе
+- [О компании](${SITE_URL}/o-kompanii): кто мы, что делаем, как работаем, принципы продуктов, отзывы и контакты
 - [Услуги](${SITE_URL}/services): что разрабатывается
 - [Работы и цены](${SITE_URL}/uslugi): что можно заказать, со сроками и стоимостью
 - [Ответы по 1С](${SITE_URL}/1c): разборы частых проблем
+- [Статьи экспертов](${SITE_URL}/stati): авторские статьи о 1С и учёте в Казахстане, с источниками
 - [Кейсы](${SITE_URL}/keysy): что уже делалось
 - [Проекты](${SITE_URL}/projects): реализованные работы
 - [Готовые решения](${SITE_URL}/products): CRM, агенты, онлайн-запись
@@ -299,6 +315,7 @@ function buildLlmsTxt(content) {
 - [Политика обработки персональных данных](${SITE_URL}/privacy): какие данные собираются, где хранятся, права
 
 ${offers.length ? `## Что можно заказать\n\n${offers}\n` : ''}
+${stati.length ? `## Статьи экспертов\n\n${stati}\n` : ''}
 ${answers.length ? `## Разборы частых проблем 1С\n\n${answers}\n` : ''}
 ${cases.length ? `## Кейсы\n\n${cases}\n` : ''}
 ${contacts ? `## Связаться\n\n${contacts}\n` : ''}`;
@@ -332,7 +349,7 @@ async function main() {
   }
 
   // URL, а не путь: на Windows import('C:…') падает (ERR_UNSUPPORTED_ESM_URL_SCHEME).
-  const { render } = await import(pathToFileURL(SSR).href);
+  const { render, ARTICLES = [] } = await import(pathToFileURL(SSR).href);
 
   // Содержимое CMS запрашивается один раз на язык, а не на страницу.
   const contentByLang = {};
@@ -416,10 +433,30 @@ async function main() {
     log(`${url.padEnd(30)} → ${path.relative(ROOT, file)}  (${Math.round(page.length / 1024)} КБ)`);
   }
 
+  // Статьи экспертов: адрес без языковой приставки, язык страницы — язык
+  // самой статьи. Список берётся из сборки (файлы src/lib/content/articles).
+  const articleUrls = [];
+  for (const article of ARTICLES) {
+    const url = `/stati/${article.slug}`;
+    const htmlLang = article.lang === 'kz' ? 'kk' : (article.lang || 'ru');
+    const { html, head } = render(url, { content: ru });
+    const page = template
+      .replace(/<!--seo-->[\s\S]*?<!--\/seo-->/, `<!--seo-->\n    ${head}\n    <!--\/seo-->`)
+      .replace('<html lang="ru">', `<html lang="${htmlLang}" data-prerendered="1">`)
+      .replace('<div id="root"></div>', `<div id="root">${html}</div>`)
+      .replace('</body>', `  ${embedContent(ru)}\n  </body>`);
+    const file = outFile(url);
+    await mkdir(path.dirname(file), { recursive: true });
+    await writeFile(file, page, 'utf8');
+    articleUrls.push(url);
+    done += 1;
+    log(`${url.padEnd(30)} → ${path.relative(ROOT, file)}  (${Math.round(page.length / 1024)} КБ)`);
+  }
+
   await writeFile(path.join(DIST, 'sitemap.xml'),
-    buildSitemap(ROUTES, ru, ruOnlyUrls), 'utf8');
+    buildSitemap(ROUTES, ru, [...ruOnlyUrls, ...articleUrls], ARTICLES), 'utf8');
   await writeFile(path.join(DIST, 'robots.txt'), buildRobots(), 'utf8');
-  await writeFile(path.join(DIST, 'llms.txt'), buildLlmsTxt(ru), 'utf8');
+  await writeFile(path.join(DIST, 'llms.txt'), buildLlmsTxt(ru, ARTICLES), 'utf8');
 
   log(`собрано страниц: ${done}; app.html, admin/index.html, sitemap.xml, robots.txt, llms.txt на месте`);
 }

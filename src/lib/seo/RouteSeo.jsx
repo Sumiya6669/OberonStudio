@@ -15,14 +15,17 @@ import {
   useSettings,
 } from '@/lib/site/SiteContentContext';
 import { Seo } from './Seo';
-import { resolvePageSeo } from './pages';
+import { OG_IMAGE, resolvePageSeo } from './pages';
 import {
-  answerLd, answersListLd, breadcrumbLd, caseLd, casesListLd, faqLd, offerLd, offersListLd,
-  organizationLd, productsLd, reviewsLd, servicesLd, websiteLd,
+  aboutPageLd, answerLd, answersListLd, articleLd, articlesListLd, breadcrumbLd, caseLd,
+  casesListLd, faqLd, offerLd, offersListLd, organizationLd, productsLd, reviewsLd, servicesLd,
+  websiteLd,
 } from './jsonld';
 import { SITE_NAME } from './pages';
 import { useTestimonials } from '@/lib/site/SiteContentContext';
-import { splitLocale } from '@/lib/i18n/locales';
+import { HREFLANG, localePath, splitLocale } from '@/lib/i18n/locales';
+import { ARTICLES, ARTICLES_UI, getArticle, wordCount } from '@/lib/content/articles';
+import { AUTHORS, getAuthor } from '@/lib/content/authors';
 
 export default function RouteSeo() {
   const { pathname: fullPath } = useLocation();
@@ -62,7 +65,23 @@ export default function RouteSeo() {
     return (cases || []).find((c) => c.slug === slug) || null;
   }, [pathname, cases]);
 
+  // Статьи живут в файлах репозитория, а не в CMS: ищутся по адресу сразу.
+  const article = React.useMemo(() => {
+    if (!pathname.startsWith('/stati/')) return null;
+    return getArticle(pathname.slice('/stati/'.length).replace(/\/$/, ''));
+  }, [pathname]);
+
   const seo = React.useMemo(() => {
+    if (article) {
+      return {
+        ...resolvePageSeo({ path: pathname, t, lang, cmsText, localised: false }),
+        pageName: article.title,
+        title: `${article.title} — ${SITE_NAME}`,
+        description: article.description,
+        type: 'article',
+        lang: HREFLANG[article.lang] || article.lang || 'ru',
+      };
+    }
     if (pathname === '/keysy') {
       return {
         ...resolvePageSeo({ path: '/keysy', t, lang, cmsText, localised: false }),
@@ -115,7 +134,7 @@ export default function RouteSeo() {
       };
     }
     return resolvePageSeo({ path: pathname, t, lang, cmsText });
-  }, [pathname, t, lang, cmsText, answer, offer, kase]);
+  }, [pathname, t, lang, cmsText, answer, offer, kase, article]);
 
   const jsonLd = React.useMemo(() => {
     const blocks = [organizationLd(settings), websiteLd()];
@@ -126,6 +145,7 @@ export default function RouteSeo() {
     if (/^\/1c\/.+/.test(pathname)) parents.push({ name: 'Ответы по 1С', path: '/1c' });
     if (/^\/uslugi\/.+/.test(pathname)) parents.push({ name: 'Работы и цены', path: '/uslugi' });
     if (/^\/keysy\/.+/.test(pathname)) parents.push({ name: 'Кейсы', path: '/keysy' });
+    if (/^\/stati\/.+/.test(pathname)) parents.push({ name: ARTICLES_UI.ru.label, path: '/stati' });
     const crumb = breadcrumbLd(pathname, seo.pageName || seo.title, parents);
     if (crumb) blocks.push(crumb);
 
@@ -169,6 +189,27 @@ export default function RouteSeo() {
       const block = offersListLd(offers);
       if (block) blocks.push(block);
     }
+    if (pathname === '/stati') {
+      const block = articlesListLd(ARTICLES);
+      if (block) blocks.push(block);
+    }
+    if (article) {
+      const block = articleLd(article, {
+        author: getAuthor(article.author), words: wordCount(article), image: OG_IMAGE,
+      });
+      if (block) blocks.push(block);
+    }
+    if (pathname === '/o-kompanii') {
+      // Ведущий разработчик — первый автор справочника: имя и роль подтверждены владельцем.
+      const lead = AUTHORS['albert-gaan'];
+      blocks.push(aboutPageLd({
+        path: localePath(lang, '/o-kompanii'),
+        name: seo.pageName || seo.title,
+        description: seo.description,
+        lang: HREFLANG[lang] || lang,
+        person: lead ? { name: lead.name, role: lead.role.replace(/, Tinker$/, '') } : null,
+      }));
+    }
     if (pathname === '/keysy') {
       const block = casesListLd(cases);
       if (block) blocks.push(block);
@@ -191,7 +232,7 @@ export default function RouteSeo() {
       if (block) blocks.push(block);
     }
     return blocks.filter(Boolean);
-  }, [pathname, settings, seo.pageName, seo.title, services, faq, products, projects,
+  }, [pathname, settings, seo.pageName, seo.title, seo.description, article, services, faq, products, projects,
       reviewsDb, answers, answer, offers, offer, cases, kase, t, lang]);
 
   const verification = React.useMemo(() => [

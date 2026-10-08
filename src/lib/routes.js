@@ -10,10 +10,12 @@ export const SITE_ROUTES = [
   { path: '/products', navKey: 'products', icon: 'Package' },
   { path: '/proverka', navKey: 'proverka', icon: 'ScanSearch' },
   { path: '/bezopasnost', navKey: 'security', icon: 'ShieldCheck' },
+  { path: '/o-kompanii', navKey: 'about', icon: 'Building2' },
   { path: '/process', navKey: 'process', icon: 'Workflow' },
   { path: '/stack', navKey: 'stack', icon: 'Layers' },
   { path: '/reviews', navKey: 'reviews', icon: 'Star' },
   { path: '/faq', navKey: 'faq', icon: 'HelpCircle' },
+  { path: '/stati', navKey: 'articles', icon: 'PenLine' },
   { path: '/contact', navKey: 'contact', icon: 'Mail' },
 ];
 
@@ -35,6 +37,11 @@ export const SITE_ROUTES = [
  * `ruOnly` — страница есть только по-русски (/1c), ссылка на неё не
  * получает языковую приставку: /kz/1c не существует.
  *
+ * «О компании» и «Статьи экспертов» встроены подпунктами, а не седьмым и
+ * восьмым пунктом: «О компании» — в «Услуги» (кто делает эти услуги и как),
+ * статьи — в «Ответы по 1С» (тот же раздел знаний, только длиннее разбора).
+ * Обе страницы есть и в подвале (SITE_ROUTES).
+ *
  * Подписи короткие намеренно: колонка подменю узкая, а перенос в две
  * строки читается как ошибка вёрстки.
  */
@@ -53,6 +60,7 @@ export const NAV_MENU = [
     path: '/services', navKey: 'services', icon: 'Briefcase',
     also: ['/uslugi', '/keysy'],
     children: [
+      { to: '/o-kompanii', navKey: 'about', icon: 'Building2' },
       { to: '/services', navKey: 'whatIDo', icon: 'Sparkles' },
       { to: '/projects', navKey: 'works', icon: 'FolderKanban' },
       { to: '/process', navKey: 'howIWork', icon: 'Workflow' },
@@ -62,6 +70,7 @@ export const NAV_MENU = [
   {
     path: '/1c', navKey: 'answers', icon: 'BookOpen', ruOnly: true,
     children: [
+      { to: '/stati', navKey: 'articles', icon: 'PenLine' },
       { to: '/1c', navKey: 'answers1c', icon: 'Wrench', ruOnly: true },
       { to: '/faq', navKey: 'faqFull', icon: 'HelpCircle' },
     ],

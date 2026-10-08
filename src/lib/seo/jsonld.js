@@ -421,3 +421,104 @@ export function offersListLd(offers) {
     })),
   };
 }
+
+/* ── О компании и статьи ─────────────────────────────────────────────────── */
+
+/**
+ * Страница «О компании». Организация та же, что в organizationLd (тот же
+ * @id), здесь к ней добавляется только то, что на странице и правда есть:
+ * страна работы, что делаем и ведущий разработчик — его имя и роль владелец
+ * подтвердил. Реквизиты (taxID, адрес) приходят из настроек сайта, пока их
+ * нет — их нет и в разметке.
+ */
+export function aboutPageLd({ path, name, description, lang, person }) {
+  const url = `${SITE_URL}${path}`;
+  return clean({
+    '@context': 'https://schema.org',
+    '@type': 'AboutPage',
+    '@id': `${url}#page`,
+    url,
+    name,
+    description,
+    inLanguage: lang,
+    isPartOf: { '@id': `${SITE_URL}/#website` },
+    about: { '@id': `${SITE_URL}/#organization` },
+    mainEntity: clean({
+      '@type': 'Organization',
+      '@id': `${SITE_URL}/#organization`,
+      name: SITE_NAME,
+      url: SITE_URL,
+      areaServed: { '@type': 'Country', name: 'Kazakhstan' },
+      knowsAbout: [
+        '1С:Бухгалтерия для Казахстана 3.0',
+        '1С:Комплексная автоматизация для Казахстана 2.4',
+        'Расширения 1С',
+        'ЭСФ',
+        'ИИ-автоматизация',
+      ],
+      employee: person?.name
+        ? clean({ '@type': 'Person', name: person.name, jobTitle: person.role || undefined })
+        : undefined,
+    }),
+  });
+}
+
+/** Автор статьи: человек из справочника, иначе — сама организация. */
+function authorLd(author) {
+  if (!author?.name) return { '@type': 'Organization', name: SITE_NAME, url: `${SITE_URL}/` };
+  return clean({
+    '@type': 'Person',
+    name: author.name,
+    jobTitle: author.role || undefined,
+    description: author.bio || undefined,
+    image: author.photo ? `${SITE_URL}${author.photo}` : undefined,
+    url: author.url ? `${SITE_URL}${author.url}` : undefined,
+    worksFor: { '@id': `${SITE_URL}/#organization` },
+  });
+}
+
+/**
+ * Статья эксперта. В разметке — то же, что на странице: заголовок,
+ * описание, автор, даты из файла статьи, метки и число слов. Картинка —
+ * общая карточка сайта: своей у статей нет, а Article без картинки
+ * поисковик в расширенную выдачу не берёт.
+ */
+export function articleLd(article, { author, words, image } = {}) {
+  if (!article?.slug || !article?.title) return null;
+  const url = `${SITE_URL}/stati/${article.slug}`;
+  return clean({
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    '@id': `${url}#article`,
+    mainEntityOfPage: url,
+    url,
+    headline: article.title,
+    description: article.description,
+    inLanguage: article.lang || 'ru',
+    articleSection: 'Статьи экспертов',
+    keywords: article.tags?.length ? article.tags.join(', ') : undefined,
+    wordCount: words || undefined,
+    datePublished: article.publishedAt,
+    dateModified: article.updatedAt || article.publishedAt,
+    image: image || undefined,
+    author: authorLd(author),
+    publisher: { '@id': `${SITE_URL}/#organization` },
+    isPartOf: { '@id': `${SITE_URL}/#website` },
+  });
+}
+
+/** Список статей — перечень ссылок, как у разборов. */
+export function articlesListLd(articles) {
+  if (!articles?.length) return null;
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'Статьи экспертов',
+    itemListElement: articles.slice(0, 50).map((a, i) => ({
+      '@type': 'ListItem',
+      position: i + 1,
+      name: a.title,
+      url: `${SITE_URL}/stati/${a.slug}`,
+    })),
+  };
+}

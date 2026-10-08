@@ -15,6 +15,10 @@ import { StaticRouter } from 'react-router-dom/server';
 import { AppShell } from '@/App';
 import { SeoCollector, renderHead } from '@/lib/seo/Seo';
 
+// Статьи экспертов лежат в файлах репозитория, а не в CMS: сборке страниц
+// нужен их список, и берётся он из той же сборки, что рисует страницы.
+export { ARTICLES } from '@/lib/content/articles';
+
 export function render(url, { content = null } = {}) {
   // Сюда компонент Seo складывает теги во время прохода рендера.
   const seo = {};

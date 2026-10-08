@@ -6,6 +6,7 @@ import { LocaleLink as Link, useLocaleHref } from '@/components/nav/LocaleLink';
 import {
   Home, Sparkles, FolderKanban, Package, Workflow, Layers, Star, HelpCircle, Mail,
   Menu, X, ChevronRight, ScanSearch, ShieldCheck, Puzzle, Bot, Briefcase, BookOpen, Wrench,
+  Building2, PenLine,
 } from 'lucide-react';
 import { useLang } from '@/lib/i18n/LangContext';
 import { splitLocale } from '@/lib/i18n/locales';
@@ -18,7 +19,7 @@ import Mark from '@/components/brand/Mark';
 
 const ICONS = {
   Home, Sparkles, FolderKanban, Package, Workflow, Layers, Star, HelpCircle, Mail,
-  ScanSearch, ShieldCheck, Puzzle, Bot, Briefcase, BookOpen, Wrench,
+  ScanSearch, ShieldCheck, Puzzle, Bot, Briefcase, BookOpen, Wrench, Building2, PenLine,
 };
 
 function Logo({ onClick }) {

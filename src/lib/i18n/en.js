@@ -21,6 +21,8 @@ const en = {
     tech: 'Technology',
     answers1c: '1C fixes (in Russian)',
     faqFull: 'Common questions',
+    about: 'About',
+    articles: 'Expert articles',
     submenu: 'Submenu',
     cta: 'Discuss a Project',
   },

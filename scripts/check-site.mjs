@@ -29,7 +29,8 @@ const DIST = resolve(args.find((a) => !a.startsWith('--') && a !== BASE) || 'dis
 
 const LOCALES = ['ru', 'kk', 'en'];
 /** Разделы только на русском: у них не должно быть языковых альтернатив. */
-const RU_ONLY = [/^\/1c(\/|$)/, /^\/uslugi(\/|$)/, /^\/keysy(\/|$)/];
+// Статья эксперта — на языке оригинала, без перевода; сам список /stati — на трёх языках.
+const RU_ONLY = [/^\/1c(\/|$)/, /^\/uslugi(\/|$)/, /^\/keysy(\/|$)/, /^\/stati\/.+/];
 
 let failed = 0;
 let passed = 0;
@@ -191,6 +192,57 @@ async function checkFiles() {
     'приложение само показывает «страница не найдена», значит адрес должен доходить до него');
 }
 
+/**
+ * «О компании» и «Статьи экспертов»: страницы есть, разметка та, что
+ * обещана, и в ней нет того, чего нет на странице.
+ */
+async function checkAboutAndArticles(paths) {
+  console.log('\nО компании и статьи');
+  const types = (html) => jsonLd(html).map((j) => j['@type']);
+
+  for (const path of ['/o-kompanii', '/kz/o-kompanii', '/en/o-kompanii']) {
+    const { status, body } = await get(path);
+    if (status !== 200) { bad(path, `отдался как ${status}`); continue; }
+    const about = jsonLd(body).find((j) => j['@type'] === 'AboutPage');
+    check(`${path}: разметка AboutPage`, Boolean(about?.mainEntity?.['@id']), 'нет AboutPage с организацией');
+    // Реквизитов пока нет — в разметке их быть не должно (заполнятся из настроек).
+    check(`${path}: без выдуманных реквизитов`, !/"taxID"|"aggregateRating"/.test(body),
+      'в разметке реквизиты или рейтинг, которых нет на странице');
+  }
+
+  for (const path of ['/stati', '/kz/stati', '/en/stati']) {
+    const { status, body } = await get(path);
+    if (status !== 200) { bad(path, `отдался как ${status}`); continue; }
+    check(`${path}: список статей в разметке`, types(body).includes('ItemList'), 'нет ItemList');
+    check(`${path}: блок «Станьте автором»`, /href="(\/kz|\/en)?\/contact"/.test(body), 'нет ссылки на контакт');
+  }
+
+  const articles = paths.filter((p) => /^\/stati\/.+/.test(p));
+  check('статьи в карте сайта', articles.length > 0, 'ни одной статьи /stati/<slug>');
+  for (const path of articles) {
+    const { body } = await get(path);
+    const art = jsonLd(body).find((j) => j['@type'] === 'Article');
+    const problems = [];
+    if (!art) problems.push('нет разметки Article');
+    else {
+      if (!art.author?.name) problems.push('у статьи нет автора');
+      if (!art.datePublished) problems.push('нет даты публикации');
+      if (!art.headline) problems.push('нет заголовка');
+    }
+    if (!types(body).includes('BreadcrumbList')) problems.push('нет хлебных крошек');
+    if (!body.includes('href="/proverka"')) problems.push('нет ссылки на /proverka');
+    if (problems.length) bad(path, problems.join('; '));
+    else ok(path, `Article, автор ${art.author.name}`);
+  }
+
+  const { body: home } = await get('/');
+  check('подвал ведёт на обе страницы', home.includes('href="/o-kompanii"') && home.includes('href="/stati"'),
+    'в подвале нет ссылки на /o-kompanii или /stati');
+  const llms = await get('/llms.txt');
+  check('llms.txt знает о статьях', llms.body.includes('/stati') && llms.body.includes('/o-kompanii'),
+    'в llms.txt нет /stati или /o-kompanii');
+}
+
 async function checkInternalLinks(paths) {
   console.log('\nВнутренние ссылки');
   const known = new Set(paths);
@@ -226,6 +278,7 @@ const paths = await checkSitemap();
 console.log('\nСтраницы');
 for (const path of paths) await checkPage(path);
 await checkFiles();
+await checkAboutAndArticles(paths);
 await checkInternalLinks(paths);
 
 console.log(`\nИтог: прошло ${passed}, не прошло ${failed}.`);
