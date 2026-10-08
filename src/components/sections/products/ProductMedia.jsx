@@ -42,22 +42,26 @@ function Figure({ children, caption, note }) {
 
 function Panel({ tab, media, lang }) {
   if (tab === 'screen') {
-    const s = media.screens[0];
+    // У продукта может быть несколько экранов 1С (у пульта — «Закрытие месяца» и клиенты) — один под другим
     return (
-      <Figure caption={pick(s.caption, lang)} note={pick(s.note, lang)}>
-        <picture>
-          <source media="(max-width: 640px)" srcSet={s.srcSmall} />
-          <img
-            src={s.src}
-            width={s.width}
-            height={s.height}
-            alt={pick(s.alt, lang)}
-            loading="lazy"
-            decoding="async"
-            className="block h-auto w-full rounded-xl border border-line bg-white"
-          />
-        </picture>
-      </Figure>
+      <div className="space-y-8">
+        {media.screens.map((s) => (
+          <Figure key={s.src} caption={pick(s.caption, lang)} note={pick(s.note, lang)}>
+            <picture>
+              <source media="(max-width: 640px)" srcSet={s.srcSmall} />
+              <img
+                src={s.src}
+                width={s.width}
+                height={s.height}
+                alt={pick(s.alt, lang)}
+                loading="lazy"
+                decoding="async"
+                className="block h-auto w-full rounded-xl border border-line bg-white"
+              />
+            </picture>
+          </Figure>
+        ))}
+      </div>
     );
   }
   if (tab === 'telegram') {

@@ -22,6 +22,8 @@ const t = (ru, kz, en) => ({ ru, kz, en });
 
 const SHOT = { width: 1316, height: 880, smallWidth: 720 };
 const VIDEO = { width: 720, height: 720 };
+// экран «Закрытие месяца» пульта — настоящий размер файла screen-close-1c.webp
+const CLOSE_SHOT = { width: 1316, height: 880 };
 
 const NOTE_1C = t(
   'Настоящий экран 1С:Бухгалтерии для Казахстана на тестовой базе. Данные вымышленные.',
@@ -39,10 +41,23 @@ const NOTE_VIDEO = t(
   'No sound: everything is in the on-screen captions.',
 );
 
-function entry(id, { screen, telegram, video, tgHeight }) {
+/**
+ * extraScreens — дополнительные экраны 1С продукта ПЕРЕД основным: { file, width, height, alt, caption }
+ * (file — имя без расширения в public/media/products/<id>/, рядом лежит <file>-720.webp).
+ */
+function entry(id, { screen, telegram, video, tgHeight, extraScreens = [] }) {
   const base = `/media/products/${id}`;
   return {
-    screens: [{
+    screens: [...extraScreens.map((x) => ({
+      src: `${base}/${x.file}.webp`,
+      srcSmall: `${base}/${x.file}-720.webp`,
+      width: x.width,
+      height: x.height,
+      smallWidth: SHOT.smallWidth,
+      alt: x.alt,
+      caption: x.caption,
+      note: NOTE_1C,
+    })), {
       src: `${base}/screen-1c.webp`,
       srcSmall: `${base}/screen-1c-720.webp`,
       ...SHOT,
@@ -196,6 +211,22 @@ export const PRODUCT_MEDIA = {
 
   pult: entry('pult', {
     tgHeight: 2052,
+    // «Закрытие месяца на автопилоте» (ТнкПульт 1.0.0.9) — главная возможность, поэтому первым экраном
+    extraScreens: [{
+      file: 'screen-close-1c',
+      width: CLOSE_SHOT.width,
+      height: CLOSE_SHOT.height,
+      alt: t(
+        'Закрытие месяца в 1С: клиенты бухгалтерской фирмы красные, жёлтые и зелёные, сначала с ошибками; ниже — проблемы первого клиента с объяснением, что сделать, и примерами документов',
+        '1С-тегі ай жабу: бухгалтерлік фирма клиенттері қызыл, сары және жасыл, алдымен қателері барлар; төменде — бірінші клиенттің мәселелері түсіндірмесімен, не істеу керегімен және құжат мысалдарымен',
+        'Month-end close in 1C: the firm’s clients in red, yellow and green, errors first; below, the first client’s issues with an explanation, what to do and sample documents',
+      ),
+      caption: t(
+        'Закрытие месяца на автопилоте: кто из клиентов готов, у кого замечания и ошибки — и что сделать по каждой.',
+        'Айды автопилотпен жабу: қай клиент дайын, кімде ескертулер мен қателер бар — және әрқайсысы бойынша не істеу керек.',
+        'Month-end close on autopilot: which clients are ready, who has warnings or errors, and what to do about each.',
+      ),
+    }],
     screen: {
       alt: t(
         'Пульт бухгалтерской фирмы в 1С: клиенты с ответственным, числом замечаний, суммой под риском, ближайшим сроком и главным',
