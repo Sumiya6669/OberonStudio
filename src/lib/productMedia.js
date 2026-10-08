@@ -138,14 +138,14 @@ export const PRODUCT_MEDIA = {
     tgHeight: 1518,
     screen: {
       alt: t(
-        'Рабочее место Дебиторки в 1С: должники с долгом, просрочкой, стадией и готовым текстом сообщения',
-        '1С-тегі Дебиторка жұмыс орны: қарызы, мерзімі өткені, сатысы және дайын хабар мәтіні бар борышкерлер',
-        'Receivables workplace in 1C: debtors with debt, overdue amount, stage and a ready message text',
+        'Рабочее место Дебиторки в 1С: карточки «Просрочили оплату», «Сумма просрочки», «Больше 60 дней — претензия», должники со стадией просрочки цветом и подробности с документами долга и текстом сообщения',
+        '1С-тегі Дебиторка жұмыс орны: «Төлемді кешіктірді», «Мерзімі өткен сома», «60 күннен астам — талап-арыз» карточкалары, кешіктіру сатысы түспен белгіленген борышкерлер және қарыз құжаттары мен хабар мәтіні',
+        'Receivables workplace in 1C: cards for overdue debtors, overdue amount and over-60-days claims, debtors coloured by overdue stage, with debt documents and a ready message in the details',
       ),
       caption: t(
-        'Кто должен, насколько просрочил и кому написать сегодня — с готовым текстом.',
-        'Кім қарыз, қанша кешіктірді және бүгін кімге жазу керек — дайын мәтінмен.',
-        'Who owes, how overdue, and whom to message today — with the text ready.',
+        'Кто должен и насколько просрочил — карточками сверху; по каждому должнику — документы долга и готовый текст для WhatsApp.',
+        'Кім қарыз және қанша кешіктірді — жоғарыда карточкамен; әр борышкер бойынша — қарыз құжаттары және WhatsApp үшін дайын мәтін.',
+        'Who owes and how overdue — as cards on top; for each debtor, the debt documents and a ready WhatsApp text.',
       ),
     },
     telegram: {
@@ -188,9 +188,9 @@ export const PRODUCT_MEDIA = {
     tgHeight: 612,
     screen: {
       alt: t(
-        'Рабочее место актов сверки в 1С: журнал актов со статусами и подробный разбор расхождения по одному контрагенту',
-        '1С-тегі салыстыру актілерінің жұмыс орны: мәртебелері бар актілер журналы және бір контрагент бойынша айырмашылықты талдау',
-        'Reconciliation workplace in 1C: a log of statements with statuses and a detailed breakdown of one discrepancy',
+        'Рабочее место актов сверки в 1С: карточки «Расхождения», «Молчат или нет e-mail», «Согласовано», журнал актов со статусом цветом и разбор расхождения по одному контрагенту',
+        '1С-тегі салыстыру актілерінің жұмыс орны: «Айырмашылықтар», «Жауап жоқ немесе e-mail жоқ», «Келісілді» карточкалары, мәртебесі түспен белгіленген актілер журналы және бір контрагент бойынша айырмашылықты талдау',
+        'Reconciliation workplace in 1C: cards for discrepancies, silent or missing e-mail and agreed, a log of statements coloured by status and a breakdown of one discrepancy',
       ),
       caption: t(
         'Ответ контрагента разобран: чего нет у него, чего нет у нас, где другая сумма.',
