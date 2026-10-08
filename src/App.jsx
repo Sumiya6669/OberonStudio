@@ -24,7 +24,6 @@ import CasePage from './pages/CasePage';
 import AnswerPage from './pages/AnswerPage';
 import PrivacyPage from './pages/PrivacyPage';
 import ProverkaPage from './pages/ProverkaPage';
-import CalculatorPage from './pages/CalculatorPage';
 import SecurityPage from './pages/SecurityPage';
 
 // Админка: своя раскладка, свой вход. Данные защищает RLS в базе,
@@ -81,8 +80,6 @@ export const SITE_PAGES = [
   { path: '/products', element: <ProductsPage /> },
   // Бесплатная экспресс-проверка базы 1С: файл .epf после заявки.
   { path: '/proverka', element: <ProverkaPage /> },
-  // «Сколько вы теряете»: расчёт в браузере, данные никуда не уходят.
-  { path: '/kalkulyator', element: <CalculatorPage /> },
   // Что продукты делают с базой 1С: только сверенное по коду продуктов.
   { path: '/bezopasnost', element: <SecurityPage /> },
   { path: '/process', element: <ProcessPage /> },

@@ -160,7 +160,6 @@ const PAGE_LABELS = {
   '/projects': 'Работы',
   '/products': 'Продукты',
   '/proverka': 'Экспресс-проверка 1С',
-  '/kalkulyator': 'Калькулятор потерь',
   '/bezopasnost': 'Безопасность',
   '/process': 'Процесс',
   '/stack': 'Стек',

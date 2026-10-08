@@ -30,7 +30,7 @@ export const OG_IMAGE_SIZE = { width: 1200, height: 630 };
 
 /** Страницы, которые попадают в карту сайта и получают свои мета-теги. */
 export const SEO_ROUTES = [
-  '/', '/services', '/projects', '/products', '/proverka', '/kalkulyator', '/bezopasnost',
+  '/', '/services', '/projects', '/products', '/proverka', '/bezopasnost',
   '/process', '/stack', '/reviews', '/faq', '/contact', '/privacy',
 ];
 
@@ -59,11 +59,6 @@ const FALLBACK_DESC = {
     ru: 'Внешняя обработка .epf для Бухгалтерии для Казахстана 3.0 и КА 2.4: за пару минут находит ЭСФ без выписки, просроченную дебиторку, ошибки СНТ и ВС, неразнесённый банк, неверные ИИН/БИН и встречные долги. Только чтение.',
     kz: 'Қазақстанға арналған Бухгалтерия 3.0 және КА 2.4 үшін .epf сыртқы өңдеуі: бірнеше минутта жазылмаған ЭШФ, мерзімі өткен дебиторлық берешек, ТІЖ мен виртуалды қойма қателері, банк түсімдері, қате ЖСН/БСН және қарсы қарыздарды табады. Тек оқу.',
     en: 'An external .epf processor for 1C:Accounting for Kazakhstan 3.0 and Complex Automation 2.4: in a couple of minutes it finds missing e-invoices, overdue receivables, SNT and virtual-warehouse errors, unposted bank receipts, invalid IIN/BIN and mutual debts. Read-only.',
-  },
-  '/kalkulyator': {
-    ru: 'Калькулятор: какой оборот под риском из-за ЭСФ, выписанных позже 15 календарных дней, и сколько часов в месяц уходит на ЭСФ, разноску выписки и сверки. Считается в браузере, данные никуда не отправляются.',
-    kz: 'Калькулятор: 15 күнтізбелік күннен кеш жазылған ЭШФ салдарынан қандай айналым тәуекелде және ЭШФ, үзінді көшірмені тарату мен салыстыруға айына қанша сағат кетеді. Есеп браузерде жүреді, деректер ешқайда жіберілмейді.',
-    en: 'Calculator: how much turnover is at risk from e-invoices issued later than 15 calendar days, and how many hours a month go into ESF, bank statement posting and reconciliations. Runs in the browser; nothing is sent.',
   },
   '/bezopasnost': {
     ru: 'Что расширения Tinker делают с базой 1С: типовую конфигурацию не меняют, какие документы создают и как, что и куда уходит наружу, подписанные обновления Ed25519, роли, HTTPS и хранение ключей.',
@@ -123,11 +118,6 @@ const TITLE_OVERRIDE = {
     ru: 'Бесплатная экспресс-проверка базы 1С',
     kz: '1С базасын тегін жедел тексеру',
     en: 'Free express check of your 1C database',
-  },
-  '/kalkulyator': {
-    ru: 'Калькулятор потерь на ЭСФ и рутине',
-    kz: 'ЭШФ мен күнделікті жұмыстағы шығын калькуляторы',
-    en: 'Loss calculator: e-invoices and routine',
   },
   '/bezopasnost': {
     ru: 'Безопасность: что продукты Tinker делают с базой 1С',

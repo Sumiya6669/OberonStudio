@@ -47,7 +47,11 @@ export default function TinkerProducts() {
   const [params, setParams] = useSearchParams();
   const izAdresa = params.get('cat');
   const [search, setSearch] = useState('');
-  const [activeCategory, setActiveCategory] = useState(izAdresa || 'Все');
+  // Первая отрисовка — всегда «Все», как в заранее собранном /products:
+  // html страницы собран без `?cat=`, и сетка с фильтром не совпала бы
+  // с ним — ошибка гидратации и перерисовка всей страницы. Раздел из
+  // адреса включает эффект ниже, сразу после монтирования.
+  const [activeCategory, setActiveCategory] = useState('Все');
   const setka = useRef(null);
   const pervyyRaz = useRef(true);
 

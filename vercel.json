@@ -1,6 +1,11 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "trailingSlash": false,
+  "redirects": [
+    { "source": "/kalkulyator", "destination": "/proverka", "statusCode": 301 },
+    { "source": "/kz/kalkulyator", "destination": "/kz/proverka", "statusCode": 301 },
+    { "source": "/en/kalkulyator", "destination": "/en/proverka", "statusCode": 301 }
+  ],
   "rewrites": [
     {
       "source": "/((?!api/|downloads/).*)",
