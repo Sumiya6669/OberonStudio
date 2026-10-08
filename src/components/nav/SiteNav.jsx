@@ -511,14 +511,14 @@ export default function SiteNav() {
               exit={{ opacity: 0 }}
               transition={{ duration: 0.25 }}
               onClick={() => setOpen(false)}
-              className="lg:hidden fixed inset-0 z-40 bg-black/70 backdrop-blur-sm"
+              className="lg:hidden fixed inset-0 z-[65] bg-black/70 backdrop-blur-sm"
             />
             <motion.div
               initial={{ x: '-100%' }}
               animate={{ x: 0 }}
               exit={{ x: '-100%' }}
               transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-              className="lg:hidden fixed left-0 top-0 bottom-0 z-50 w-[85%] max-w-xs
+              className="lg:hidden fixed left-0 top-0 bottom-0 z-[70] w-[85%] max-w-xs
                 flex flex-col border-r border-line bg-background px-5 py-6 overflow-y-auto"
             >
               <div className="flex items-center justify-between mb-8">
