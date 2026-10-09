@@ -85,6 +85,8 @@ export function organizationLd(settings = {}) {
     name: settings.company_legal || SITE_NAME,
     alternateName: settings.company_legal ? SITE_NAME : undefined,
     url: SITE_URL,
+    // Логотип для поисковиков (квадрат 512, тот же знак [T], что и значок сайта).
+    logo: `${SITE_URL}/icon-512.png`,
     email: settings.email || undefined,
     telephone: settings.phone || undefined,
     taxID: settings.bin || undefined,
@@ -448,6 +450,7 @@ export function aboutPageLd({ path, name, description, lang, person }) {
       '@id': `${SITE_URL}/#organization`,
       name: SITE_NAME,
       url: SITE_URL,
+      logo: `${SITE_URL}/icon-512.png`,
       areaServed: { '@type': 'Country', name: 'Kazakhstan' },
       knowsAbout: [
         '1С:Бухгалтерия для Казахстана 3.0',
