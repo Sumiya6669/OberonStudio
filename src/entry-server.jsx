@@ -19,6 +19,11 @@ import { SeoCollector, renderHead } from '@/lib/seo/Seo';
 // нужен их список, и берётся он из той же сборки, что рисует страницы.
 export { ARTICLES } from '@/lib/content/articles';
 
+// Страницы расширений 1С (/products/<id>): список и тексты — тоже из файлов
+// репозитория, сборке страниц, карте сайта и llms.txt нужен тот же список.
+export { PRODUCT_PAGE_IDS, PRODUCT_PAGES, PRODUCT_PAGES_UPDATED } from '@/lib/content/productPages';
+export { PRODUCTS } from '@/lib/content/site';
+
 export function render(url, { content = null } = {}) {
   // Сюда компонент Seo складывает теги во время прохода рендера.
   const seo = {};

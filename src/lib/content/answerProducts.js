@@ -55,10 +55,13 @@ export const ANSWER_PRODUCTS = {
 };
 
 /**
- * Ссылка на продукт: каталог с фильтром по самой узкой метке продукта, чтобы
- * человек оказался рядом с карточкой, а не в начале всего каталога.
+ * Ссылка на продукт. У расширения 1С — своя страница /products/<id>
+ * (src/pages/ProductPage.jsx); у остального — каталог с фильтром по самой
+ * узкой метке продукта, чтобы человек оказался рядом с карточкой, а не в
+ * начале всего каталога.
  */
 export function productHref(product) {
+  if (product?.group === '1c' && product.id) return `/products/${product.id}`;
   const narrow = product.categories?.find((c) => c !== '1С') || product.categories?.[0];
   return narrow ? `/products?cat=${encodeURIComponent(narrow)}` : '/products';
 }

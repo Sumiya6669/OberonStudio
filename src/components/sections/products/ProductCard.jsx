@@ -1,5 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { Link as RouterLink } from 'react-router-dom';
 import { Check, ArrowRight, Zap, PlayCircle } from 'lucide-react';
 import { hasProductMedia } from './ProductMedia';
 import { tenge } from '@/lib/money';
@@ -22,6 +23,9 @@ function fmt(n) {
  * так что в ряду они на одной линии независимо от длины описания.
  */
 export default function ProductCard({ product, index, onDemo, onOrder, onMedia }) {
+  // У расширения 1С есть своя страница. Она только по-русски (как разборы /1c),
+  // поэтому ссылка без языковой приставки и с /kz/products, и с /en/products.
+  const page = product.group === '1c' && product.id ? `/products/${product.id}` : null;
   return (
     <motion.div
       initial={{ opacity: 0, y: 30 }}
@@ -52,7 +56,11 @@ export default function ProductCard({ product, index, onDemo, onOrder, onMedia }
           )}
         </div>
 
-        <h3 className="text-[17px] font-bold text-white/90 leading-tight mb-1.5">{product.name}</h3>
+        <h3 className="text-[17px] font-bold text-white/90 leading-tight mb-1.5">
+          {page ? (
+            <RouterLink to={page} className="transition-colors hover:text-primary">{product.name}</RouterLink>
+          ) : product.name}
+        </h3>
         <p className="text-[12px] text-white/40 leading-snug mb-4">{product.tagline}</p>
 
         <p className="text-[13px] text-white/45 leading-relaxed mb-4">{product.description}</p>
@@ -84,6 +92,14 @@ export default function ProductCard({ product, index, onDemo, onOrder, onMedia }
 
         {/* Цена и кнопки — всегда внизу карточки */}
         <div className="mt-auto">
+          {page && (
+            <RouterLink
+              to={page}
+              className="mb-3 flex w-full items-center justify-center gap-2 rounded-xl border border-line py-2.5 text-[12px] font-semibold text-white/60 transition-all hover:border-white/20 hover:text-white"
+            >
+              Подробнее: что находит, вопросы и ответы <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
+            </RouterLink>
+          )}
           {/* Экран 1С, сообщение в Telegram и ролик — только у продуктов, для которых они сняты */}
           {onMedia && hasProductMedia(product.id) && (
             <button

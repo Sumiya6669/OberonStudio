@@ -232,6 +232,9 @@ export function reviewsLd(testimonials) {
 
 export function productsLd(products) {
   if (!products?.length) return null;
+  // У расширений 1С есть своя страница — ссылка на неё связывает список с ней.
+  const pageUrl = (product) => (product.group === '1c' && product.id
+    ? `${SITE_URL}/products/${product.id}` : undefined);
   return {
     '@context': 'https://schema.org',
     '@type': 'ItemList',
@@ -243,6 +246,7 @@ export function productsLd(products) {
         '@type': 'Product',
         name: product.name,
         description: product.description || product.tagline,
+        url: pageUrl(product),
         brand: { '@id': `${SITE_URL}/#organization` },
         offers: product.price
           ? {
@@ -524,4 +528,68 @@ export function articlesListLd(articles) {
       url: `${SITE_URL}/stati/${a.slug}`,
     })),
   };
+}
+
+/**
+ * Страница одного расширения 1С (/products/<id>).
+ *
+ * SoftwareApplication, а не Product: это программа, которая ставится в базу
+ * 1С. В разметке — только то, что на странице: название, описание, для каких
+ * конфигураций, экран 1С и цены «от» из каталога. Рейтинга, отзывов и
+ * aggregateRating нет и не будет, пока нет настоящих отзывов о продукте:
+ * выдуманные звёздочки — ровно то, за что поисковик наказывает.
+ */
+export function productPageLd({ product, page, image, updated }) {
+  if (!product?.id || !page) return null;
+  const url = `${SITE_URL}/products/${product.id}`;
+  const offers = [];
+  if (Number(product.price) > 0) {
+    offers.push({
+      '@type': 'Offer',
+      name: 'Внедрение',
+      price: Number(product.price),
+      priceCurrency: 'KZT',
+      // «от» — нижняя граница, а не точная цена.
+      priceSpecification: {
+        '@type': 'PriceSpecification', minPrice: Number(product.price), priceCurrency: 'KZT',
+      },
+      availability: 'https://schema.org/InStock',
+      url,
+    });
+  }
+  if (Number(product.subscription) > 0) {
+    offers.push({
+      '@type': 'Offer',
+      name: 'Подписка в месяц',
+      price: Number(product.subscription),
+      priceCurrency: 'KZT',
+      priceSpecification: {
+        '@type': 'UnitPriceSpecification',
+        minPrice: Number(product.subscription),
+        priceCurrency: 'KZT',
+        unitText: 'месяц',
+      },
+      availability: 'https://schema.org/InStock',
+      url,
+    });
+  }
+  return clean({
+    '@context': 'https://schema.org',
+    '@type': 'SoftwareApplication',
+    '@id': `${url}#software`,
+    url,
+    name: product.name,
+    alternateName: page.h1,
+    description: page.seoDesc || product.description,
+    applicationCategory: 'BusinessApplication',
+    applicationSubCategory: 'Расширение 1С',
+    softwareRequirements: '1С:Бухгалтерия для Казахстана 3.0 или 1С:Комплексная автоматизация для Казахстана 2.4',
+    featureList: (page.finds || []).join('; ') || undefined,
+    inLanguage: 'ru',
+    image: image ? `${SITE_URL}${image}` : undefined,
+    dateModified: updated || undefined,
+    countriesSupported: 'KZ',
+    publisher: { '@id': `${SITE_URL}/#organization` },
+    offers: offers.length ? offers : undefined,
+  });
 }

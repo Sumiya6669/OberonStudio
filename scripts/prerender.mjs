@@ -147,9 +147,14 @@ function outFile(url) {
  * против сайта. Теперь у страницы своя дата, а у раздела — наибольшая из
  * дат его записей, что и правда означает «в разделе что-то новое».
  */
-function buildLastmodMap(content, articles = []) {
+function buildLastmodMap(content, articles = [], productPages = {}) {
   const day = (value) => (value ? new Date(value).toISOString().slice(0, 10) : null);
   const map = new Map();
+
+  // Страницы расширений 1С — из файлов: дата правки записана рядом с текстами.
+  for (const url of productPages.urls || []) {
+    if (productPages.updated) map.set(url, productPages.updated);
+  }
 
   // Статьи — из файлов: дата правки записана в самой статье.
   let newestArticle = null;
@@ -180,11 +185,11 @@ function buildLastmodMap(content, articles = []) {
   return map;
 }
 
-function buildSitemap(routes, content, ruOnly = [], articles = []) {
+function buildSitemap(routes, content, ruOnly = [], articles = [], productPages = {}) {
   const fallback = content?.updated_at
     ? new Date(content.updated_at).toISOString().slice(0, 10)
     : new Date().toISOString().slice(0, 10);
-  const byUrl = buildLastmodMap(content, articles);
+  const byUrl = buildLastmodMap(content, articles, productPages);
   const lastmodOf = (route) => byUrl.get(route) || fallback;
 
   // Главная важнее внутренних, контакты — реже остальных. Числа тут не
@@ -222,7 +227,8 @@ function buildSitemap(routes, content, ruOnly = [], articles = []) {
       '  <url>',
       `    <loc>${SITE_URL}${url}</loc>`,
       `    <lastmod>${lastmodOf(url)}</lastmod>`,
-      '    <priority>0.7</priority>',
+      // Страница продукта — то, что покупают; разбор и статья — то, что читают.
+      `    <priority>${url.startsWith('/products/') ? '0.8' : '0.7'}</priority>`,
       '  </url>',
     ].join('\n'));
   }
@@ -256,7 +262,7 @@ Sitemap: ${SITE_URL}/sitemap.xml
 }
 
 /** Короткая карта сайта для агентов: складывающаяся, но дешёвая договорённость. */
-function buildLlmsTxt(content, articles = []) {
+function buildLlmsTxt(content, articles = [], productPages = {}) {
   const settings = content?.settings || {};
 
   // Дата у записи — не украшение. Модель, выбирая между двумя ответами про
@@ -279,6 +285,10 @@ function buildLlmsTxt(content, articles = []) {
   const cases = section('case', '/keysy', (i) => i.text?.tagline || '');
   const stati = articles
     .map((a) => `- [${a.title}](${SITE_URL}/stati/${a.slug}): ${a.description}; обновлено ${a.updatedAt || a.publishedAt}`)
+    .join('\n');
+
+  const products = (productPages.items || [])
+    .map((p) => `- [${p.name}](${SITE_URL}/products/${p.id}): ${p.h1}. ${p.tagline}`)
     .join('\n');
 
   const contacts = [
@@ -304,7 +314,7 @@ function buildLlmsTxt(content, articles = []) {
 - [Статьи экспертов](${SITE_URL}/stati): авторские статьи о 1С и учёте в Казахстане, с источниками
 - [Кейсы](${SITE_URL}/keysy): что уже делалось
 - [Проекты](${SITE_URL}/projects): реализованные работы
-- [Готовые решения](${SITE_URL}/products): CRM, агенты, онлайн-запись
+- [Продукты](${SITE_URL}/products): 12 расширений 1С для БухКз 3.0 и КА 2.4, боты и сервисы, разработка под заказ — с ценами
 - [Бесплатная экспресс-проверка базы 1С](${SITE_URL}/proverka): обработка .epf для БухКз 3.0 и КА 2.4, только чтение — ЭСФ, дебиторка, СНТ и ВС, банк, ИИН/БИН, встречные расчёты
 - [Безопасность](${SITE_URL}/bezopasnost): что расширения делают с базой 1С, что уходит наружу, подписанные обновления, роли
 - [Процесс](${SITE_URL}/process): как проходит работа
@@ -314,6 +324,7 @@ function buildLlmsTxt(content, articles = []) {
 - [Контакты](${SITE_URL}/contact): связаться
 - [Политика обработки персональных данных](${SITE_URL}/privacy): какие данные собираются, где хранятся, права
 
+${products.length ? `## Расширения 1С для БухКз 3.0 и КА 2.4\n\nСтраница на каждый продукт: что находит, что остаётся за бухгалтером, цена и вопросы.\n\n${products}\n` : ''}
 ${offers.length ? `## Что можно заказать\n\n${offers}\n` : ''}
 ${stati.length ? `## Статьи экспертов\n\n${stati}\n` : ''}
 ${answers.length ? `## Разборы частых проблем 1С\n\n${answers}\n` : ''}
@@ -349,7 +360,9 @@ async function main() {
   }
 
   // URL, а не путь: на Windows import('C:…') падает (ERR_UNSUPPORTED_ESM_URL_SCHEME).
-  const { render, ARTICLES = [] } = await import(pathToFileURL(SSR).href);
+  const {
+    render, ARTICLES = [], PRODUCT_PAGE_IDS = [], PRODUCT_PAGES = {}, PRODUCT_PAGES_UPDATED = null, PRODUCTS = [],
+  } = await import(pathToFileURL(SSR).href);
 
   // Содержимое CMS запрашивается один раз на язык, а не на страницу.
   const contentByLang = {};
@@ -453,10 +466,37 @@ async function main() {
     log(`${url.padEnd(30)} → ${path.relative(ROOT, file)}  (${Math.round(page.length / 1024)} КБ)`);
   }
 
+  // Страницы расширений 1С: /products/<id>, только по-русски (тексты продуктов
+  // в каталоге есть только на русском). Список — из сборки приложения.
+  const productUrls = [];
+  for (const id of PRODUCT_PAGE_IDS) {
+    const url = `/products/${id}`;
+    const { html, head } = render(url, { content: ru });
+    const page = template
+      .replace(/<!--seo-->[\s\S]*?<!--\/seo-->/, `<!--seo-->\n    ${head}\n    <!--\/seo-->`)
+      .replace('<html lang="ru">', '<html lang="ru" data-prerendered="1">')
+      .replace('<div id="root"></div>', `<div id="root">${html}</div>`)
+      .replace('</body>', `  ${embedContent(ru)}\n  </body>`);
+    const file = outFile(url);
+    await mkdir(path.dirname(file), { recursive: true });
+    await writeFile(file, page, 'utf8');
+    productUrls.push(url);
+    done += 1;
+    log(`${url.padEnd(30)} → ${path.relative(ROOT, file)}  (${Math.round(page.length / 1024)} КБ)`);
+  }
+  const productPages = {
+    urls: productUrls,
+    updated: PRODUCT_PAGES_UPDATED,
+    items: PRODUCT_PAGE_IDS.map((id) => {
+      const p = PRODUCTS.find((x) => x.id === id) || {};
+      return { id, name: p.name || id, tagline: p.tagline || '', h1: PRODUCT_PAGES[id]?.h1 || '' };
+    }),
+  };
+
   await writeFile(path.join(DIST, 'sitemap.xml'),
-    buildSitemap(ROUTES, ru, [...ruOnlyUrls, ...articleUrls], ARTICLES), 'utf8');
+    buildSitemap(ROUTES, ru, [...productUrls, ...ruOnlyUrls, ...articleUrls], ARTICLES, productPages), 'utf8');
   await writeFile(path.join(DIST, 'robots.txt'), buildRobots(), 'utf8');
-  await writeFile(path.join(DIST, 'llms.txt'), buildLlmsTxt(ru, ARTICLES), 'utf8');
+  await writeFile(path.join(DIST, 'llms.txt'), buildLlmsTxt(ru, ARTICLES, productPages), 'utf8');
 
   log(`собрано страниц: ${done}; app.html, admin/index.html, sitemap.xml, robots.txt, llms.txt на месте`);
 }

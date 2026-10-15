@@ -28,6 +28,7 @@ import SecurityPage from './pages/SecurityPage';
 import AboutPage from './pages/AboutPage';
 import ArticlesPage from './pages/ArticlesPage';
 import ArticlePage from './pages/ArticlePage';
+import ProductPage from './pages/ProductPage';
 
 // Админка: своя раскладка, свой вход. Данные защищает RLS в базе,
 // страж маршрута — только удобство.
@@ -130,6 +131,11 @@ const AppRoutes = () => (
       {/* Статья — на языке оригинала и без перевода, поэтому один адрес
           без языковой приставки; список /stati при этом на трёх языках. */}
       <Route path="/stati/:slug" element={<ArticlePage />} />
+
+      {/* Страница одного расширения 1С. Только по-русски: тексты продуктов в
+          каталоге (src/lib/content/site.js) есть только на русском, а
+          /kz/products/<id> с русским текстом был бы дублем, а не переводом. */}
+      <Route path="/products/:id" element={<ProductPage />} />
 
       {/* Что можно купить, с ценами. Тоже только по-русски: цена и условия
           обсуждаются на русском, а переведённый прайс без переведённого

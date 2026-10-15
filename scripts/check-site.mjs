@@ -30,7 +30,17 @@ const DIST = resolve(args.find((a) => !a.startsWith('--') && a !== BASE) || 'dis
 const LOCALES = ['ru', 'kk', 'en'];
 /** Разделы только на русском: у них не должно быть языковых альтернатив. */
 // Статья эксперта — на языке оригинала, без перевода; сам список /stati — на трёх языках.
-const RU_ONLY = [/^\/1c(\/|$)/, /^\/uslugi(\/|$)/, /^\/keysy(\/|$)/, /^\/stati\/.+/];
+// Страница расширения 1С /products/<id> — тоже только по-русски; сам каталог /products — на трёх.
+const RU_ONLY = [/^\/1c(\/|$)/, /^\/uslugi(\/|$)/, /^\/keysy(\/|$)/, /^\/stati\/.+/, /^\/products\/.+/];
+/**
+ * Двенадцать расширений 1С, у каждого — своя страница /products/<id>
+ * (src/lib/content/productPages.js). Список здесь, а не из сборки, намеренно:
+ * пропавший из сборки продукт должен ронять проверку, а не тихо исчезать из неё.
+ */
+const PRODUCT_PAGE_IDS = [
+  'bank-robot', 'esf', 'vs-snt', 'antikameralka', 'eaes-import', 'kaspi',
+  'pervichka', 'akty-sverki', 'pult', 'counterparty', 'marking', 'receivables',
+];
 /** Разборы из каталога сайта (ключи ANSWER_PRODUCTS) — для проверки ссылок, когда сборка без базы. */
 const KNOWN_ANSWERS = new Set(
   [...readFileSync(resolve('src/lib/content/answerProducts.js'), 'utf8').matchAll(/^\s*'([a-z0-9-]+)':\s*\{/gm)]
@@ -256,6 +266,80 @@ async function checkAboutAndArticles(paths) {
     'в llms.txt нет /stati или /o-kompanii');
 }
 
+/**
+ * Страницы расширений 1С: все двенадцать собраны заранее, у каждой свой
+ * заголовок и один H1, разметка SoftwareApplication + FAQPage + хлебные
+ * крошки без рейтингов, ссылка на экспресс-проверку. Каталог ведёт на
+ * каждую, карта сайта и llms.txt о них знают.
+ */
+async function checkProductPages(paths) {
+  console.log('\nСтраницы расширений 1С');
+  const known = new Set(paths);
+  const titles = new Map();
+  const h1s = new Map();
+  for (const id of PRODUCT_PAGE_IDS) {
+    const path = `/products/${id}`;
+    const res = await get(path);
+    if (res.status !== 200) { bad(path, `отдался как ${res.status}`); continue; }
+    if (res.from === 'app.html (переписывание)' || (!BASE && res.from === 'app.html')) {
+      bad(path, 'страница не собрана заранее'); continue;
+    }
+    const body = res.body;
+    const problems = [];
+    const t = title(body);
+    if (!t) problems.push('нет заголовка');
+    else if (titles.has(t)) problems.push(`заголовок совпадает с ${titles.get(t)}`);
+    else titles.set(t, path);
+    const h1 = body.match(/<h1\b[^>]*>([\s\S]*?)<\/h1>/gi) || [];
+    if (h1.length !== 1) problems.push(`H1 на странице: ${h1.length}, а нужен один`);
+    else {
+      const text = h1[0].replace(/<[^>]+>/g, '').trim();
+      if (!text) problems.push('H1 пустой');
+      else if (h1s.has(text)) problems.push(`H1 совпадает с ${h1s.get(text)}`);
+      else h1s.set(text, path);
+    }
+    const ld = jsonLd(body);
+    const types = ld.map((j) => j['@type']);
+    for (const need of ['SoftwareApplication', 'FAQPage', 'BreadcrumbList']) {
+      if (!types.includes(need)) problems.push(`нет разметки ${need}`);
+    }
+    const app = ld.find((j) => j['@type'] === 'SoftwareApplication');
+    if (app && !(app.offers || []).length) problems.push('в SoftwareApplication нет цены');
+    if (/"aggregateRating"|"review"|"ratingValue"/.test(body)) problems.push('в разметке рейтинг или отзывы');
+    const faq = ld.find((j) => j['@type'] === 'FAQPage');
+    if (faq && (faq.mainEntity || []).length < 3) problems.push('в FAQ меньше трёх вопросов');
+    if (!body.includes('href="/proverka"')) problems.push('нет ссылки на /proverka');
+    if (!body.includes('href="/contact"')) problems.push('нет ссылки на /contact');
+    const canon = links(body, 'canonical')[0];
+    if (!canon || !attr(canon, 'href')?.endsWith(path)) problems.push('канонический адрес не на эту страницу');
+    if (lang(body) !== 'ru') problems.push(`язык страницы ${lang(body)}, а нужен ru`);
+    if (!known.has(path)) problems.push('нет в карте сайта');
+    if (problems.length) bad(path, problems.join('; '));
+    else ok(path, t);
+  }
+
+  // Русских страниц продуктов на других языках нет: /kz/products/<id> не собирается.
+  const kz = await get(`/kz/products/${PRODUCT_PAGE_IDS[0]}`);
+  check('/kz/products/<id> не собирается',
+    kz.status !== 200 || /app\.html/.test(kz.from || '') || !kz.body.includes('data-prerendered'),
+    'нашлась собранная казахская страница продукта — текстов на казахском нет');
+
+  const all = paths.filter((p) => /^\/products\/.+/.test(p));
+  check('в карте сайта ровно 12 страниц продуктов', all.length === PRODUCT_PAGE_IDS.length,
+    `в карте ${all.length}: ${all.join(', ')}`);
+
+  for (const path of ['/products', '/kz/products', '/en/products']) {
+    const { body } = await get(path);
+    const missing = PRODUCT_PAGE_IDS.filter((id) => !body.includes(`href="/products/${id}"`));
+    check(`${path}: карточки ведут на страницы продуктов`, missing.length === 0,
+      `нет ссылок на: ${missing.join(', ')}`);
+  }
+
+  const llms = await get('/llms.txt');
+  const notInLlms = PRODUCT_PAGE_IDS.filter((id) => !llms.body.includes(`/products/${id})`));
+  check('llms.txt знает о страницах продуктов', notInLlms.length === 0, `нет: ${notInLlms.join(', ')}`);
+}
+
 async function checkInternalLinks(paths) {
   console.log('\nВнутренние ссылки');
   const known = new Set(paths);
@@ -300,6 +384,7 @@ console.log('\nСтраницы');
 for (const path of paths) await checkPage(path);
 await checkFiles();
 await checkAboutAndArticles(paths);
+await checkProductPages(paths);
 await checkInternalLinks(paths);
 
 console.log(`\nИтог: прошло ${passed}, не прошло ${failed}.`);

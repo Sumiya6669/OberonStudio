@@ -231,3 +231,23 @@ export function resolvePageSeo({ path, t, lang, cmsText, localised = true }) {
     type: clean === '/' ? 'website' : 'article',
   };
 }
+
+/**
+ * Страница одного расширения 1С (/products/<id>): свои заголовок и описание
+ * из src/lib/content/productPages.js — под главный запрос продукта, а не
+ * общий заголовок каталога. Только по-русски, поэтому без hreflang.
+ * Продукта нет — null, и страница описывается как обычная.
+ */
+export function resolveProductPageSeo({ path, t, lang, found }) {
+  if (!found) return null;
+  const { product, page } = found;
+  return {
+    ...resolvePageSeo({ path, t, lang, cmsText: null, localised: false }),
+    pageName: product.name,
+    title: `${clip(page.seoTitle, 60)} — ${SITE_NAME}`,
+    description: clip(page.seoDesc, 300),
+    type: 'website',
+    lang: 'ru',
+    ogLocale: OG_LOCALE.ru,
+  };
+}

@@ -15,10 +15,11 @@ import {
   useSettings,
 } from '@/lib/site/SiteContentContext';
 import { Seo } from './Seo';
-import { OG_IMAGE, resolvePageSeo } from './pages';
+import { OG_IMAGE, resolvePageSeo, resolveProductPageSeo } from './pages';
 import {
   aboutPageLd, answerLd, answersListLd, articleLd, articlesListLd, breadcrumbLd, caseLd,
-  casesListLd, faqLd, offerLd, offersListLd, organizationLd, productsLd, reviewsLd, servicesLd,
+  casesListLd, faqLd, offerLd, offersListLd, organizationLd, productPageLd, productsLd, reviewsLd,
+  servicesLd,
   websiteLd,
 } from './jsonld';
 import { SITE_NAME } from './pages';
@@ -26,6 +27,8 @@ import { useTestimonials } from '@/lib/site/SiteContentContext';
 import { HREFLANG, localePath, splitLocale } from '@/lib/i18n/locales';
 import { ARTICLES, ARTICLES_UI, getArticle, wordCount } from '@/lib/content/articles';
 import { AUTHORS, getAuthor } from '@/lib/content/authors';
+import { PRODUCTS } from '@/lib/content/site';
+import { PRODUCT_PAGES_UPDATED, getProductPage, productScreens } from '@/lib/content/productPages';
 
 export default function RouteSeo() {
   const { pathname: fullPath } = useLocation();
@@ -71,7 +74,17 @@ export default function RouteSeo() {
     return getArticle(pathname.slice('/stati/'.length).replace(/\/$/, ''));
   }, [pathname]);
 
+  // Страница одного расширения 1С: /products/<id>. Тексты — из файлов, не из CMS.
+  // По полному адресу, а не по пути без приставки: /kz/products/<id> не существует.
+  const productPage = React.useMemo(() => {
+    const m = /^\/products\/([^/]+)\/?$/.exec(fullPath);
+    return m ? getProductPage(m[1]) : null;
+  }, [fullPath]);
+
   const seo = React.useMemo(() => {
+    if (productPage) {
+      return resolveProductPageSeo({ path: pathname, t, lang, found: productPage });
+    }
     if (article) {
       return {
         ...resolvePageSeo({ path: pathname, t, lang, cmsText, localised: false }),
@@ -134,7 +147,7 @@ export default function RouteSeo() {
       };
     }
     return resolvePageSeo({ path: pathname, t, lang, cmsText });
-  }, [pathname, t, lang, cmsText, answer, offer, kase, article]);
+  }, [pathname, t, lang, cmsText, answer, offer, kase, article, productPage]);
 
   const jsonLd = React.useMemo(() => {
     const blocks = [organizationLd(settings), websiteLd()];
@@ -146,6 +159,7 @@ export default function RouteSeo() {
     if (/^\/uslugi\/.+/.test(pathname)) parents.push({ name: 'Работы и цены', path: '/uslugi' });
     if (/^\/keysy\/.+/.test(pathname)) parents.push({ name: 'Кейсы', path: '/keysy' });
     if (/^\/stati\/.+/.test(pathname)) parents.push({ name: ARTICLES_UI.ru.label, path: '/stati' });
+    if (productPage) parents.push({ name: 'Продукты', path: '/products' });
     const crumb = breadcrumbLd(pathname, seo.pageName || seo.title, parents);
     if (crumb) blocks.push(crumb);
 
@@ -164,8 +178,18 @@ export default function RouteSeo() {
       if (block) blocks.push(block);
     }
     if (pathname === '/products') {
-      const block = productsLd(products);
+      // Продуктов в CMS нет — на странице показан каталог из кода, его и размечаем.
+      const block = productsLd(products?.length ? products : PRODUCTS);
       if (block) blocks.push(block);
+    }
+    if (productPage) {
+      const { product, page } = productPage;
+      blocks.push(productPageLd({
+        product, page, image: productScreens(product.id)[0]?.src, updated: PRODUCT_PAGES_UPDATED,
+      }));
+      // Вопросы и ответы — те же, что на странице, слово в слово.
+      const faqBlock = faqLd(page.faq);
+      if (faqBlock) blocks.push(faqBlock);
     }
     if (pathname === '/reviews') {
       // Только отзывы из базы (прошли модерацию). Выдуманные в разметку не идут никогда.
@@ -233,7 +257,7 @@ export default function RouteSeo() {
     }
     return blocks.filter(Boolean);
   }, [pathname, settings, seo.pageName, seo.title, seo.description, article, services, faq, products, projects,
-      reviewsDb, answers, answer, offers, offer, cases, kase, t, lang]);
+      reviewsDb, answers, answer, offers, offer, cases, kase, t, lang, productPage]);
 
   const verification = React.useMemo(() => [
     { name: 'google-site-verification', content: settings.google_verify },
