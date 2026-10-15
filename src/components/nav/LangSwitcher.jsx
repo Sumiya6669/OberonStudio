@@ -61,7 +61,7 @@ export default function LangSwitcher() {
             exit={{ opacity: 0, y: up ? 6 : -6, scale: 0.97 }}
             transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
             className={`absolute right-0 w-36 rounded-xl border border-line bg-surface-2
-              glass-strong overflow-hidden z-50 shadow-[0_8px_32px_rgba(0,0,0,0.4)]
+              glass-strong overflow-hidden z-50 shadow-[0_8px_32px_rgb(0_0_0/calc(0.4*var(--tk-sh)))]
               ${up ? 'bottom-full mb-2' : 'top-full mt-2'}`}
           >
             {LANGUAGES.map(l => (

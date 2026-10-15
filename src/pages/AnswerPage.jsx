@@ -57,7 +57,7 @@ function FollowUp({ slug }) {
         {check && (
           <Link
             to={PROVERKA_PATH}
-            className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-bold text-white transition-colors hover:bg-primary/80">
+            className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-bold text-snow transition-colors hover:bg-primary/80">
             Проверить базу бесплатно <Arrow />
           </Link>
         )}
@@ -66,7 +66,7 @@ function FollowUp({ slug }) {
             to={productHref(product)}
             className={check
               ? 'inline-flex items-center gap-2 rounded-xl border border-white/10 px-5 py-3 text-sm font-semibold text-white/70 transition-colors hover:border-white/20 hover:text-white'
-              : 'inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-bold text-white transition-colors hover:bg-primary/80'}>
+              : 'inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-bold text-snow transition-colors hover:bg-primary/80'}>
             {product.name} <Arrow />
           </Link>
         )}
@@ -75,7 +75,7 @@ function FollowUp({ slug }) {
             to={CONTACT_PATH}
             className={product
               ? 'inline-flex items-center gap-2 rounded-xl border border-white/10 px-5 py-3 text-sm font-semibold text-white/70 transition-colors hover:border-white/20 hover:text-white'
-              : 'inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-bold text-white transition-colors hover:bg-primary/80'}>
+              : 'inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-bold text-snow transition-colors hover:bg-primary/80'}>
             Обсудить задачу <Arrow />
           </Link>
         )}

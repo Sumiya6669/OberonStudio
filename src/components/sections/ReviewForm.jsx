@@ -96,7 +96,7 @@ export default function ReviewForm({ lang = 'ru', onClose }) {
           <div className="space-y-4">
             <p className="text-sm text-white/70">{t.done}</p>
             <button type="button" onClick={onClose}
-              className="rounded-full bg-primary px-5 py-2 text-sm font-semibold text-white hover:bg-primary/90">{t.close}</button>
+              className="rounded-full bg-primary px-5 py-2 text-sm font-semibold text-snow hover:bg-primary/90">{t.close}</button>
           </div>
         ) : (
           <form onSubmit={submit} className="space-y-3">
@@ -123,7 +123,7 @@ export default function ReviewForm({ lang = 'ru', onClose }) {
             </label>
             {state.error && <p className="text-xs text-red-400">{state.error}</p>}
             <button type="submit" disabled={state.busy}
-              className="w-full rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-white hover:bg-primary/90 disabled:opacity-50">
+              className="w-full rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-snow hover:bg-primary/90 disabled:opacity-50">
               {state.busy ? t.sending : t.send}
             </button>
           </form>

@@ -11,7 +11,7 @@ function MarqueeLine({ text, reverse = false, duration = 32 }) {
   return (
     <div className="overflow-hidden">
       <motion.p
-        className="text-[clamp(2rem,8vw,7rem)] font-black text-white/[0.04] leading-none whitespace-nowrap tracking-tight"
+        className="text-[clamp(2rem,8vw,7rem)] font-black text-[rgb(var(--tk-ink)/0.04)] leading-none whitespace-nowrap tracking-tight"
         animate={{ x: reverse ? ['0%', '33.33%'] : ['0%', '-33.33%'] }}
         transition={{ duration, ease: 'linear', repeat: Infinity }}
         style={{ willChange: 'transform' }}

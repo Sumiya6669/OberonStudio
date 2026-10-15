@@ -47,8 +47,8 @@ export default function Process() {
                       <div className="flex items-center gap-3 mb-1 flex-wrap">
                         <h3 className="text-sm font-semibold text-white/70 group-hover:text-white transition-colors duration-300">{s.title}</h3>
                         <span
-                          className="text-[9px] px-2 py-0.5 rounded-full border font-medium"
-                          style={{ color: STEP_COLORS[i], borderColor: `${STEP_COLORS[i]}30`, background: `${STEP_COLORS[i]}10` }}
+                          className="tk-tint text-[9px] px-2 py-0.5 rounded-full border font-medium"
+                          style={{ '--tint': STEP_COLORS[i], borderColor: `${STEP_COLORS[i]}30`, background: `${STEP_COLORS[i]}10` }}
                         >
                           {s.tag}
                         </span>
@@ -68,10 +68,13 @@ export default function Process() {
                         )}
                       </AnimatePresence>
                     </div>
+                    {/* Цвет точки — классом и style, а не через animate: серый
+                        неактивной точки зависит от темы (CSS-переменная), а её
+                        framer-motion плавно не перекрашивает. */}
                     <motion.div
-                      className="w-1.5 h-1.5 rounded-full flex-shrink-0 mt-1"
+                      className={`w-1.5 h-1.5 rounded-full flex-shrink-0 mt-1 transition-colors duration-300 ${active === i ? '' : 'bg-white/[0.08]'}`}
+                      style={active === i ? { backgroundColor: STEP_COLORS[i] } : undefined}
                       animate={{
-                        backgroundColor: active === i ? STEP_COLORS[i] : 'rgba(255,255,255,0.08)',
                         boxShadow: active === i ? `0 0 8px ${STEP_COLORS[i]}80` : 'none',
                       }}
                       transition={{ duration: 0.25 }}
@@ -98,7 +101,7 @@ export default function Process() {
                         <div key={i} className="flex items-center gap-4">
                           <div
                             className="w-3.5 h-3.5 rounded-full border-2 flex-shrink-0 relative z-10"
-                            style={{ borderColor: i <= 4 ? STEP_COLORS[i] : 'rgba(255,255,255,0.1)', background: i <= 4 ? `${STEP_COLORS[i]}20` : 'transparent' }}
+                            style={{ borderColor: i <= 4 ? STEP_COLORS[i] : 'rgb(var(--tk-ink) / 0.1)', background: i <= 4 ? `${STEP_COLORS[i]}20` : 'transparent' }}
                           />
                           <div className="flex-1 flex items-center gap-2">
                             <div className="flex-1 h-1 rounded-full bg-white/5 overflow-hidden">

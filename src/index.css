@@ -6,8 +6,77 @@
 @tailwind utilities;
 
 @layer base {
+  /*
+   * Две темы. Без атрибута — светлая (её же собирает пререндер), тёмная — по
+   * переключателю или по системе. Атрибут data-theme на <html> ставит
+   * public/theme-init.js до первой отрисовки, поэтому вспышки нет.
+   * Тёмные значения — ровно те, что были у сайта до появления светлой темы.
+   *
+   * data-theme="dark" можно поставить и на отдельный блок: внутри него
+   * переменные тёмные (так сделана витрина в первом экране — это «экран
+   * устройства», он тёмный в обеих темах).
+   */
   :root {
-    /* Сайт только тёмный: системные элементы (календарь в полях даты, полосы прокрутки) — тоже тёмные. */
+    color-scheme: light;
+    --background: 240 14% 97%;
+    --foreground: 240 24% 8%;
+    --card: 0 0% 100%;
+    --card-foreground: 240 24% 8%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 24% 8%;
+    --primary: 252 75% 58%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 240 10% 94%;
+    --secondary-foreground: 240 24% 8%;
+    --muted: 240 10% 94%;
+    --muted-foreground: 240 5% 38%;
+    --accent: 252 75% 58%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 72% 48%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 8% 88%;
+    --input: 240 8% 86%;
+    --ring: 252 75% 58%;
+    --radius: 0.75rem;
+
+    --violet: 252 75% 58%;
+    --violet-dim: 252 70% 50%;
+    --gold: 38 85% 34%;
+    --surface: 0 0% 100%;
+    --surface-2: 240 12% 95%;
+    --surface-3: 240 10% 92%;
+    --line: 240 8% 87%;
+
+    /* «Чернила» — то, что в классах называется white (tailwind.config.js). */
+    --tk-ink: 17 17 30;
+    /* Прозрачность текста: alpha * ta + tb. 0.2 -> 0.59 (около 4.7:1 к фону). */
+    --tk-ta: 0.55;
+    --tk-tb: 0.48;
+    /* Подложки bg-white/... чуть плотнее: 2 % тени на светлом почти не видно. */
+    --tk-ba: 1.6;
+    /* Множитель чёрных теней: тень 0.85 на светлом — грязное пятно. */
+    --tk-sh: 0.22;
+
+    --tk-emerald-400: 4 120 87;
+    --tk-emerald-500: 5 150 105;
+    --tk-sky-400: 3 105 161;
+    --tk-sky-500: 2 132 199;
+    --tk-red-300: 185 28 28;
+    --tk-red-400: 200 30 30;
+    --tk-pink-400: 190 24 93;
+    --tk-pink-500: 219 39 119;
+    --tk-cyan-400: 14 116 144;
+
+    --tk-glass-bg: rgb(255 255 255 / 0.72);
+    --tk-glass-border: rgb(17 17 30 / 0.09);
+    --tk-glass-strong-bg: rgb(255 255 255 / 0.9);
+    --tk-glass-strong-border: rgb(17 17 30 / 0.12);
+    --tk-glass-shadow: 0 1px 2px rgb(17 17 30 / 0.04), 0 8px 24px -12px rgb(17 17 30 / 0.12);
+    --tk-grid: hsl(252 60% 50% / 0.07);
+    --tk-glow: 0.5;
+  }
+
+  [data-theme='dark'] {
     color-scheme: dark;
     --background: 0 0% 3%;
     --foreground: 0 0% 97%;
@@ -28,7 +97,6 @@
     --border: 0 0% 10%;
     --input: 0 0% 10%;
     --ring: 252 100% 68%;
-    --radius: 0.75rem;
 
     --violet: 252 100% 68%;
     --violet-dim: 252 85% 52%;
@@ -37,6 +105,30 @@
     --surface-2: 0 0% 9%;
     --surface-3: 0 0% 12%;
     --line: 0 0% 12%;
+
+    --tk-ink: 255 255 255;
+    --tk-ta: 1;
+    --tk-tb: 0;
+    --tk-ba: 1;
+    --tk-sh: 1;
+
+    --tk-emerald-400: 52 211 153;
+    --tk-emerald-500: 16 185 129;
+    --tk-sky-400: 56 189 248;
+    --tk-sky-500: 14 165 233;
+    --tk-red-300: 252 165 165;
+    --tk-red-400: 248 113 113;
+    --tk-pink-400: 244 114 182;
+    --tk-pink-500: 236 72 153;
+    --tk-cyan-400: 34 211 238;
+
+    --tk-glass-bg: hsl(0 0% 100% / 0.03);
+    --tk-glass-border: hsl(0 0% 100% / 0.07);
+    --tk-glass-strong-bg: hsl(0 0% 100% / 0.06);
+    --tk-glass-strong-border: hsl(0 0% 100% / 0.1);
+    --tk-glass-shadow: none;
+    --tk-grid: hsl(252 100% 68% / 0.04);
+    --tk-glow: 1;
   }
 }
 
@@ -69,8 +161,8 @@
 /* ── Grid overlay ── */
 .grid-bg {
   background-image:
-    linear-gradient(hsl(252 100% 68% / 0.04) 1px, transparent 1px),
-    linear-gradient(90deg, hsl(252 100% 68% / 0.04) 1px, transparent 1px);
+    linear-gradient(var(--tk-grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--tk-grid) 1px, transparent 1px);
   background-size: 60px 60px;
 }
 
@@ -86,32 +178,51 @@
 
 /* ── Glass ── */
 .glass {
-  background: hsl(0 0% 100% / 0.03);
+  background: var(--tk-glass-bg);
   backdrop-filter: blur(24px) saturate(180%);
   -webkit-backdrop-filter: blur(24px) saturate(180%);
-  border: 1px solid hsl(0 0% 100% / 0.07);
+  border: 1px solid var(--tk-glass-border);
+  box-shadow: var(--tk-glass-shadow);
 }
 .glass-strong {
-  background: hsl(0 0% 100% / 0.06);
+  background: var(--tk-glass-strong-bg);
   backdrop-filter: blur(40px) saturate(200%);
   -webkit-backdrop-filter: blur(40px) saturate(200%);
-  border: 1px solid hsl(0 0% 100% / 0.1);
+  border: 1px solid var(--tk-glass-strong-border);
 }
 
-/* ── Gradient text ── */
+/* ── Gradient text ── (в светлой теме — тёмные концы градиентов) */
 .text-gradient-violet {
+  background: linear-gradient(135deg, #2b1d80 0%, #5b3df0 45%, #7C5CFF 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+[data-theme='dark'] .text-gradient-violet {
   background: linear-gradient(135deg, #fff 0%, #B9A6FF 40%, #7C5CFF 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 .text-gradient-white {
+  background: linear-gradient(180deg, #11111e 0%, hsl(240 8% 34%) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+[data-theme='dark'] .text-gradient-white {
   background: linear-gradient(180deg, #ffffff 0%, hsl(0 0% 60%) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 .text-gradient-gold {
+  background: linear-gradient(135deg, #9a6a06 0%, #7a5200 50%, #9a6a06 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+[data-theme='dark'] .text-gradient-gold {
   background: linear-gradient(135deg, #e8c97c 0%, #c9a84c 50%, #e8c97c 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -119,9 +230,25 @@
 }
 
 /* ── Glow ── */
-.glow-violet { box-shadow: 0 0 60px hsl(252 100% 68% / 0.15), 0 0 120px hsl(252 100% 68% / 0.05); }
-.glow-violet-strong { box-shadow: 0 0 40px hsl(252 100% 68% / 0.4), 0 0 80px hsl(252 100% 68% / 0.15); }
-.glow-text { text-shadow: 0 0 80px hsl(252 100% 68% / 0.4); }
+/* В светлой теме свечения вдвое мягче (--tk-glow). */
+.glow-violet { box-shadow: 0 0 60px hsl(252 100% 68% / calc(0.15 * var(--tk-glow))), 0 0 120px hsl(252 100% 68% / calc(0.05 * var(--tk-glow))); }
+.glow-violet-strong { box-shadow: 0 0 40px hsl(252 100% 68% / calc(0.4 * var(--tk-glow))), 0 0 80px hsl(252 100% 68% / calc(0.15 * var(--tk-glow))); }
+.glow-text { text-shadow: 0 0 80px hsl(252 100% 68% / calc(0.4 * var(--tk-glow))); }
+
+/* Цвет продукта/шага, заданный в данных (style="--tint: #10d4a8"). Яркие
+   оттенки сделаны под тёмный фон; на светлом их темним на треть. */
+.tk-tint { color: color-mix(in srgb, var(--tint) 62%, #000); }
+[data-theme='dark'] .tk-tint { color: var(--tint); }
+
+/* Скриншоты 1С — светлые картинки: на светлой странице без тени они
+   сливаются с фоном. На тёмной тень не нужна — там их отделяет сам фон. */
+.shot-frame { box-shadow: 0 1px 2px rgb(17 17 30 / 0.06), 0 14px 36px -18px rgb(17 17 30 / 0.3); }
+[data-theme='dark'] .shot-frame { box-shadow: none; }
+
+/* Фоновая сеть в первом экране: на тёмном точки «светятся» (screen),
+   на светлом ложатся тёмным (multiply), иначе их не видно. */
+.neural-canvas { mix-blend-mode: multiply; }
+[data-theme='dark'] .neural-canvas { mix-blend-mode: screen; }
 
 
 /* ── Знак Tinker ──────────────────────────────────────────────────────────

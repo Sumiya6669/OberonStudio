@@ -111,7 +111,7 @@ export default function Hero() {
                   <Link
                     to={CONTACT_PATH}
                     className="group relative inline-flex items-center gap-2.5 px-7 py-3.5 rounded-xl
-                      bg-primary text-white text-sm font-semibold overflow-hidden
+                      bg-primary text-snow text-sm font-semibold overflow-hidden
                       shadow-[0_0_30px_hsl(220_100%_60%/0.3)] hover:shadow-[0_0_50px_hsl(220_100%_60%/0.5)]
                       transition-shadow duration-500"
                   >

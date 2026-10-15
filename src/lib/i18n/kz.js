@@ -24,6 +24,10 @@ const kz = {
     about: 'Компания туралы',
     articles: 'Сарапшылар мақалалары',
     submenu: 'Ішкі мәзір',
+    theme: 'Сайт тақырыбы',
+    themeSystem: 'Жүйелік',
+    themeLight: 'Ашық',
+    themeDark: 'Қараңғы',
     cta: 'Жобаны талқылау',
   },
 

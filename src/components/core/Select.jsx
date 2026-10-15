@@ -189,7 +189,7 @@ export default function Select({
               style={{ left: place.left, width: place.width, top: place.top, bottom: place.bottom, maxHeight: PANEL_MAX }}
               className="fixed z-[70] overflow-y-auto rounded-2xl border border-line bg-surface/95 p-1.5 backdrop-blur-2xl
                 [scrollbar-width:thin] [scrollbar-color:rgb(255_255_255/0.15)_transparent]
-                shadow-[0_24px_60px_-12px_rgba(0,0,0,0.85)]"
+                shadow-[0_24px_60px_-12px_rgb(0_0_0/calc(0.85*var(--tk-sh)))]"
             >
               <div
                 className="pointer-events-none absolute inset-0"

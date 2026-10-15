@@ -121,6 +121,23 @@ const embedded = (html) => {
 };
 const isRuOnly = (path) => RU_ONLY.some((re) => re.test(path));
 
+/**
+ * Тема ставится скриптом /theme-init.js до первой отрисовки. Он обязан стоять
+ * в <head> раньше стилей: иначе человек с тёмной темой увидит вспышку
+ * светлой. Возвращает текст проблемы или null.
+ */
+function themeInitProblem(html) {
+  const head = (html.match(/<head\b[^>]*>([\s\S]*?)<\/head>/i) || [])[1] || '';
+  const script = head.search(/<script\b[^>]*\bsrc="\/theme-init\.js"[^>]*>\s*<\/script>/i);
+  if (script < 0) return 'в <head> нет <script src="/theme-init.js">';
+  if (/<script\b[^>]*\bsrc="\/theme-init\.js"[^>]*\b(async|defer|type="module")/i.test(head)) {
+    return '/theme-init.js должен быть синхронным (без async, defer, type="module")';
+  }
+  const style = head.search(/<link\b[^>]*rel="stylesheet"|<style\b/i);
+  if (style >= 0 && style < script) return '/theme-init.js стоит после стилей — будет вспышка темы';
+  return null;
+}
+
 /* ── Проверки ───────────────────────────────────────────────────────────── */
 
 async function checkSitemap() {
@@ -175,6 +192,8 @@ async function checkPage(path) {
   if (/>(\s*)(undefined|NaN)(\s*)</.test(body)) problems.push('в тексте страницы есть undefined или NaN');
   const content = embedded(body);
   if (content?.__broken) problems.push('встроенное содержимое сайта не разбирается');
+  const theme = themeInitProblem(body);
+  if (theme) problems.push(theme);
   if (problems.length) return bad(name, problems.join('; '));
   return ok(name, `${pageLang}, ${alts.length ? alts.length + ' альтернатив' : 'только ru'}`);
 }
@@ -200,7 +219,21 @@ async function checkFiles() {
     check('og.png', size > 10000, size ? `всего ${size} байт` : 'файла нет');
   }
 
-  const admin = await get('/admin');
+  // Скрипт темы: файл есть и это он, а не заготовка /app.html по переписыванию.
+  const themeJs = BASE
+    ? await fromWeb('/theme-init.js')
+    : (existsSync(join(DIST, 'theme-init.js'))
+      ? { status: 200, body: readFileSync(join(DIST, 'theme-init.js'), 'utf8') }
+      : { status: 404, body: '' });
+  check('theme-init.js', themeJs.status === 200 && themeJs.body.includes('tk_theme') && !/<html/i.test(themeJs.body),
+    themeJs.status === 200 ? 'отдаётся не скрипт темы' : `отдался как ${themeJs.status}`);
+  const shell = await get('/admin');
+  if (shell.status === 200) {
+    const why = themeInitProblem(shell.body);
+    check('панель /admin: скрипт темы в <head>', !why, why);
+  }
+
+  const admin = shell;
   check('/admin открывается', admin.status === 200, `отдался как ${admin.status}`);
   const unknown = await get('/такой-страницы-нет');
   check('неизвестный адрес не 404 от Vercel', unknown.status === 200,

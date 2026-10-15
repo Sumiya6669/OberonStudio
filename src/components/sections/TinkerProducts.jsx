@@ -254,7 +254,7 @@ export default function TinkerProducts() {
               </p>
               <div className="flex flex-wrap gap-3 justify-center">
                 <Link to={CONTACT_PATH}
-                  className="px-7 py-3.5 rounded-2xl bg-primary text-white font-bold text-sm hover:bg-primary/80 transition-all shadow-[0_0_30px_hsl(220_100%_60%/0.3)]">
+                  className="px-7 py-3.5 rounded-2xl bg-primary text-snow font-bold text-sm hover:bg-primary/80 transition-all shadow-[0_0_30px_hsl(220_100%_60%/0.3)]">
                   Получить консультацию
                 </Link>
                 <button onClick={() => setDemoProduct({ name: 'Tinker Products', icon: '🚀' })}

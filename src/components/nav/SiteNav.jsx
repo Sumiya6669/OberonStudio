@@ -15,6 +15,7 @@ import {
 } from '@/lib/routes';
 import { PRODUCTS } from '@/lib/content/site';
 import LangSwitcher from './LangSwitcher';
+import ThemeSwitcher from './ThemeSwitcher';
 import Mark from '@/components/brand/Mark';
 
 const ICONS = {
@@ -140,7 +141,7 @@ function PodmenyuFlyout({ item, id, open, anchor, panelRef, fokusVnutr, onEnter,
             role="group"
             aria-label={t.nav[item.navKey]}
             className="relative w-[17rem] rounded-2xl border border-line bg-surface/95 backdrop-blur-2xl
-              p-2 shadow-[0_24px_60px_-12px_rgba(0,0,0,0.85)] overflow-hidden"
+              p-2 shadow-[0_24px_60px_-12px_rgb(0_0_0/calc(0.85*var(--tk-sh)))] overflow-hidden"
           >
             <div
               className="absolute inset-0 pointer-events-none"
@@ -476,7 +477,12 @@ export default function SiteNav() {
         </div>
 
         <div className="pt-6 mt-6 border-t border-line space-y-4">
-          <LangSwitcher />
+          <div className="flex items-center justify-between gap-2">
+            {/* Тема слева, язык справа: список языков открывается влево от
+                правого края кнопки и иначе вылез бы за край панели. */}
+            <ThemeSwitcher />
+            <LangSwitcher />
+          </div>
           <Link
             to={CONTACT_PATH}
             className="flex items-center justify-center gap-2 w-full px-4 py-3 rounded-xl
@@ -539,11 +545,12 @@ export default function SiteNav() {
 
               <div className="pt-6 mt-6 border-t border-line space-y-4">
                 <LangSwitcher />
+                <ThemeSwitcher withLabels />
                 <Link
                   to={CONTACT_PATH}
                   onClick={() => setOpen(false)}
                   className="flex items-center justify-center w-full px-4 py-3.5 rounded-xl
-                    bg-primary text-white text-sm font-bold"
+                    bg-primary text-snow text-sm font-bold"
                 >
                   {t.nav.cta}
                 </Link>

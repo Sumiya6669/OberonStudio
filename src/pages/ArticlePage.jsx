@@ -163,7 +163,7 @@ export default function ArticlePage() {
           )}
           <div className="mt-6 flex flex-col gap-3 sm:flex-row">
             <Link to="/proverka"
-                  className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3.5 text-sm font-bold text-white transition-colors hover:bg-primary/80">
+                  className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3.5 text-sm font-bold text-snow transition-colors hover:bg-primary/80">
               <ScanSearch className="h-4 w-4" aria-hidden="true" /> {ui.ctaCheck}
             </Link>
             <Link to="/products?cat=1С"

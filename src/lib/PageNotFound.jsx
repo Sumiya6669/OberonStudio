@@ -21,7 +21,7 @@ export default function PageNotFound() {
         <div className="flex flex-wrap gap-3 justify-center">
           <Link
             to="/"
-            className="px-6 py-3 rounded-xl bg-primary text-white text-sm font-bold hover:bg-primary/80 transition-colors"
+            className="px-6 py-3 rounded-xl bg-primary text-snow text-sm font-bold hover:bg-primary/80 transition-colors"
           >
             На главную
           </Link>

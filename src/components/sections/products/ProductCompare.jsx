@@ -96,7 +96,7 @@ export default function ProductCompare({ onClose }) {
 
         <div className="px-6 py-5 border-t border-line flex items-center justify-between gap-4">
           <p className="text-xs text-white/25">Tinker — единственный вариант, где все критерии соответствуют ✓</p>
-          <button onClick={onClose} className="px-5 py-2.5 rounded-xl bg-primary text-white text-sm font-semibold hover:bg-primary/80 transition-colors flex-shrink-0">
+          <button onClick={onClose} className="px-5 py-2.5 rounded-xl bg-primary text-snow text-sm font-semibold hover:bg-primary/80 transition-colors flex-shrink-0">
             Выбрать решение
           </button>
         </div>

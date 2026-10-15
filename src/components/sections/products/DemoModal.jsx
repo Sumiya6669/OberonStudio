@@ -86,7 +86,7 @@ export default function DemoModal({ product, onClose }) {
               <ConsentCheckbox checked={consent} onChange={setConsent} />
               <button type="submit"
                 disabled={saving || !consent}
-                className="w-full py-3.5 rounded-xl bg-primary text-white text-sm font-bold hover:bg-primary/80 transition-colors mt-2 disabled:opacity-50">
+                className="w-full py-3.5 rounded-xl bg-primary text-snow text-sm font-bold hover:bg-primary/80 transition-colors mt-2 disabled:opacity-50">
                 {saving ? 'Отправляем...' : 'Отправить запрос на демо'}
               </button>
               {error && <p className="text-xs text-red-300 text-center">{error}</p>}

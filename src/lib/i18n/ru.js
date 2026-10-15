@@ -24,6 +24,10 @@ const ru = {
     about: 'О компании',
     articles: 'Статьи экспертов',
     submenu: 'Подменю',
+    theme: 'Тема сайта',
+    themeSystem: 'Системная',
+    themeLight: 'Светлая',
+    themeDark: 'Тёмная',
     cta: 'Обсудить проект',
   },
 

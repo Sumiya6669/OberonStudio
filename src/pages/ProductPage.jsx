@@ -32,7 +32,7 @@ import {
 const label = 'mb-5 text-xs uppercase tracking-[0.3em] text-white/25';
 const h2 = 'mb-5 text-xl font-black tracking-[-0.02em] text-white sm:text-2xl';
 
-const btnMain = 'inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3.5 text-sm font-bold text-white transition-colors hover:bg-primary/80';
+const btnMain = 'inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3.5 text-sm font-bold text-snow transition-colors hover:bg-primary/80';
 const btnSecond = 'inline-flex items-center justify-center gap-2 rounded-xl border border-white/10 px-6 py-3.5 text-sm font-semibold text-white/70 transition-colors hover:border-white/20 hover:text-white';
 
 function Buttons() {
@@ -76,7 +76,7 @@ function Bullets({ items, marker = 'check', color }) {
       {items.map((line) => (
         <li key={line} className="flex gap-3 text-sm leading-relaxed text-white/60">
           {marker === 'check'
-            ? <Check className="mt-[3px] h-4 w-4 shrink-0" style={{ color }} aria-hidden="true" />
+            ? <Check className="tk-tint mt-[3px] h-4 w-4 shrink-0" style={{ '--tint': color }} aria-hidden="true" />
             : <span className="mt-[1px] shrink-0 select-none text-primary/60" aria-hidden="true">—</span>}
           <span>{line}</span>
         </li>
@@ -97,7 +97,7 @@ function Screen({ s, first }) {
           alt={s.alt}
           loading={first ? 'eager' : 'lazy'}
           decoding="async"
-          className="block h-auto w-full rounded-xl border border-line bg-white"
+          className="block h-auto w-full rounded-xl border border-line bg-snow shot-frame"
         />
       </picture>
       <figcaption className="mt-3 text-sm leading-relaxed text-white/55">

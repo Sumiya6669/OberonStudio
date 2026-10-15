@@ -111,14 +111,15 @@ export default function Stack() {
                 <div className="flex items-center gap-3 mb-4">
                   <span className="text-base">{cat.icon}</span>
                   <p
-                    className="text-xs uppercase tracking-[0.25em] font-semibold transition-colors duration-300"
-                    style={{ color: hoveredCat === ci ? cat.color : 'rgba(255,255,255,0.2)' }}
+                    className={`text-xs uppercase tracking-[0.25em] font-semibold transition-colors duration-300 ${
+                      hoveredCat === ci ? 'tk-tint' : 'text-white/20'}`}
+                    style={hoveredCat === ci ? { '--tint': cat.color } : undefined}
                   >
                     {labels[ci]}
                   </p>
                   <div
                     className="flex-1 h-px transition-all duration-500"
-                    style={{ background: hoveredCat === ci ? `linear-gradient(to right, ${cat.color}40, transparent)` : 'rgba(255,255,255,0.05)' }}
+                    style={{ background: hoveredCat === ci ? `linear-gradient(to right, ${cat.color}40, transparent)` : 'rgb(var(--tk-ink) / 0.05)' }}
                   />
                 </div>
                 <div className="flex flex-wrap gap-2">

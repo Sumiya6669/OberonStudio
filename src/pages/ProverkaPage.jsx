@@ -101,7 +101,7 @@ function LeadForm({ tx }) {
           href={EPF_URL}
           download={EPF_FILE}
           onClick={() => reachGoal('express_check_download')}
-          className="mt-6 inline-flex items-center gap-2.5 rounded-xl bg-primary px-6 py-3.5 text-sm font-bold text-white transition-colors hover:bg-primary/80"
+          className="mt-6 inline-flex items-center gap-2.5 rounded-xl bg-primary px-6 py-3.5 text-sm font-bold text-snow transition-colors hover:bg-primary/80"
         >
           <FileDown className="h-4 w-4" />
           {tx.download}
@@ -187,7 +187,7 @@ function LeadForm({ tx }) {
       <button
         type="submit"
         disabled={saving || !consent}
-        className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary py-3.5 text-sm font-bold text-white transition-colors hover:bg-primary/80 disabled:opacity-50"
+        className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary py-3.5 text-sm font-bold text-snow transition-colors hover:bg-primary/80 disabled:opacity-50"
       >
         {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <FileDown className="h-4 w-4" />}
         {saving ? tx.sending : tx.submit}
@@ -227,7 +227,7 @@ export default function ProverkaPage() {
             <a
               href="#poluchit"
               onClick={scrollTo('poluchit')}
-              className="inline-flex items-center gap-2 rounded-2xl bg-primary px-7 py-3.5 text-sm font-bold text-white shadow-[0_0_30px_hsl(220_100%_60%/0.3)] transition-all hover:bg-primary/80"
+              className="inline-flex items-center gap-2 rounded-2xl bg-primary px-7 py-3.5 text-sm font-bold text-snow shadow-[0_0_30px_hsl(220_100%_60%/0.3)] transition-all hover:bg-primary/80"
             >
               <FileDown className="h-4 w-4" />
               {tx.hero.ctaPrimary}

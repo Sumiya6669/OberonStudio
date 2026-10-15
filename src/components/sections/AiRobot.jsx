@@ -80,7 +80,7 @@ export default function AiRobot() {
           <div className="flex flex-wrap gap-3 pointer-events-auto">
             <Link
               to={CONTACT_PATH}
-              className="px-7 py-3.5 rounded-xl bg-primary text-white text-sm font-bold
+              className="px-7 py-3.5 rounded-xl bg-primary text-snow text-sm font-bold
                 hover:bg-primary/80 transition-all duration-300
                 shadow-[0_0_30px_hsl(220_100%_60%/0.3)] hover:shadow-[0_0_50px_hsl(220_100%_60%/0.5)]"
             >

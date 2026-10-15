@@ -388,8 +388,7 @@ export default function HeroShowcase() {
       <div className="absolute -inset-8 rounded-3xl bg-primary/5 blur-3xl pointer-events-none" />
 
       <div className="relative flex items-center gap-3 mb-3">
-        <span className="font-mono text-[11px] px-2 py-0.5 rounded-full"
-          style={{ color: '#a48bff', background: 'rgba(124,92,255,.12)', border: '1px solid rgba(124,92,255,.3)' }}>
+        <span className="font-mono text-[11px] px-2 py-0.5 rounded-full text-primary [[data-theme=dark]_&]:text-[#a48bff] bg-primary/[0.12] border border-primary/30">
           {String(index + 1).padStart(2, '0')} / {String(SCENES.length).padStart(2, '0')}
         </span>
         <div className="min-w-0 flex-1">
@@ -410,7 +409,10 @@ export default function HeroShowcase() {
         </button>
       </div>
 
+      {/* «Экран устройства» тёмный в обеих темах сайта: data-theme="dark"
+          переключает переменные внутри блока (src/index.css). */}
       <div
+        data-theme="dark"
         role="region"
         aria-roledescription="карусель"
         aria-label={`Пример ${index + 1} из ${SCENES.length}: ${scene.title}`}
@@ -459,8 +461,8 @@ export default function HeroShowcase() {
         {SCENES.map((s, i) => (
           <button key={s.key} type="button" onClick={() => go(i, i > index ? 1 : -1)} aria-label={`Пример ${i + 1}: ${s.title}`}
             aria-current={i === index}
-            className="relative h-1.5 rounded-full overflow-hidden transition-all duration-300"
-            style={{ width: i === index ? 34 : 10, background: i === index ? 'rgba(124,92,255,.25)' : 'rgba(255,255,255,.12)' }}>
+            className={`relative h-1.5 rounded-full overflow-hidden transition-all duration-300 ${i === index ? 'bg-primary/25' : 'bg-white/[0.12]'}`}
+            style={{ width: i === index ? 34 : 10 }}>
             {i === index && !reduce && (
               <span key={`${index}-${paused}`} className="absolute inset-0 origin-left" style={{
                 background: 'linear-gradient(90deg,#7C5CFF,#c3b2ff)',

@@ -56,7 +56,7 @@ function Panel({ tab, media, lang }) {
                 alt={pick(s.alt, lang)}
                 loading="lazy"
                 decoding="async"
-                className="block h-auto w-full rounded-xl border border-line bg-white"
+                className="block h-auto w-full rounded-xl border border-line bg-snow shot-frame"
               />
             </picture>
           </Figure>

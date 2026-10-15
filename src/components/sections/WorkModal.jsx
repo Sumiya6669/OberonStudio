@@ -48,7 +48,7 @@ export default function WorkModal({ item, color, onClose }) {
         transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
         onClick={event => event.stopPropagation()}
         className="relative w-full max-w-2xl max-h-[88vh] overflow-y-auto scrollbar-none
-          rounded-3xl border border-line bg-surface shadow-[0_30px_80px_rgba(0,0,0,0.7)]"
+          rounded-3xl border border-line bg-surface shadow-[0_30px_80px_rgb(0_0_0/calc(0.7*var(--tk-sh)))]"
       >
         {/* Шапка с подсветкой в цвет карточки */}
         <div className="relative px-6 sm:px-8 pt-8 pb-6 border-b border-line">
@@ -67,8 +67,8 @@ export default function WorkModal({ item, color, onClose }) {
 
           <div className="relative">
             <span
-              className="inline-block text-[10px] font-medium px-2.5 py-1 rounded-full border mb-4"
-              style={{ color, borderColor: `${color}35`, background: `${color}12` }}
+              className="tk-tint inline-block text-[10px] font-medium px-2.5 py-1 rounded-full border mb-4"
+              style={{ '--tint': color, borderColor: `${color}35`, background: `${color}12` }}
             >
               {item.industry}
             </span>
@@ -115,7 +115,7 @@ export default function WorkModal({ item, color, onClose }) {
               to={CONTACT_PATH}
               onClick={onClose}
               className="flex-1 flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl
-                bg-primary text-white text-sm font-bold hover:bg-primary/80 transition-colors"
+                bg-primary text-snow text-sm font-bold hover:bg-primary/80 transition-colors"
             >
               {dt.cta}
             </Link>

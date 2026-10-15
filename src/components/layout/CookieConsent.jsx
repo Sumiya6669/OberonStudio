@@ -24,21 +24,21 @@ import {
 const TEXT = {
   ru: {
     title: 'Cookie и аналитика',
-    body: 'Сайт хранит в браузере только то, что нужно для работы: язык, ваш выбор в этом окне и отметку, что страница уже засчитана. Посещения сайт считает сам — без cookie и данных о вас. Яндекс Метрику включаем только с вашего согласия — она показывает, откуда приходят посетители, какие страницы полезны и как ими пользуются (без того, что вы вводите в формы). Данные о визите обрабатывает Яндекс, в том числе за пределами Казахстана.',
+    body: 'Сайт хранит в браузере только то, что нужно для работы: язык, тему, ваш выбор в этом окне и отметку, что страница уже засчитана. Посещения сайт считает сам — без cookie и данных о вас. Яндекс Метрику включаем только с вашего согласия — она показывает, откуда приходят посетители, какие страницы полезны и как ими пользуются (без того, что вы вводите в формы). Данные о визите обрабатывает Яндекс, в том числе за пределами Казахстана.',
     link: 'Политика обработки персональных данных',
     yes: 'Принять',
     no: 'Только необходимые',
   },
   kz: {
     title: 'Cookie және аналитика',
-    body: 'Сайт браузерде тек жұмысқа қажеттісін сақтайды: тіл, осы терезедегі таңдауыңыз және бет есепке алынғаны туралы белгі. Кірулерді сайт өзі санайды — cookie-сіз және сіз туралы деректерсіз. Яндекс Метриканы тек сіздің келісіміңізбен қосамыз — ол келушілер қайдан келетінін, қай беттер пайдалы екенін және оларды қалай қолданатынын көрсетеді (формаларға енгізгеніңізсіз). Сапар деректерін Яндекс өңдейді, оның ішінде Қазақстаннан тыс жерде.',
+    body: 'Сайт браузерде тек жұмысқа қажеттісін сақтайды: тіл, тақырып, осы терезедегі таңдауыңыз және бет есепке алынғаны туралы белгі. Кірулерді сайт өзі санайды — cookie-сіз және сіз туралы деректерсіз. Яндекс Метриканы тек сіздің келісіміңізбен қосамыз — ол келушілер қайдан келетінін, қай беттер пайдалы екенін және оларды қалай қолданатынын көрсетеді (формаларға енгізгеніңізсіз). Сапар деректерін Яндекс өңдейді, оның ішінде Қазақстаннан тыс жерде.',
     link: 'Дербес деректерді өңдеу саясаты',
     yes: 'Қабылдау',
     no: 'Тек қажеттілері',
   },
   en: {
     title: 'Cookies and analytics',
-    body: 'The site keeps in your browser only what it needs to work: language, your choice in this window and a note that the page has been counted. The site counts visits itself — without cookies or data about you. Yandex Metrica is switched on only with your consent — it shows where visitors come from, which pages help and how they are used (without what you type into forms). Visit data is processed by Yandex, including outside Kazakhstan.',
+    body: 'The site keeps in your browser only what it needs to work: language, theme, your choice in this window and a note that the page has been counted. The site counts visits itself — without cookies or data about you. Yandex Metrica is switched on only with your consent — it shows where visitors come from, which pages help and how they are used (without what you type into forms). Visit data is processed by Yandex, including outside Kazakhstan.',
     link: 'Personal data policy',
     yes: 'Accept',
     no: 'Necessary only',
@@ -122,7 +122,7 @@ export default function CookieConsent() {
         <button
           type="button"
           onClick={() => choose('yes')}
-          className="text-xs font-semibold px-4 py-2 rounded-full bg-primary text-white hover:bg-primary/90 transition-colors"
+          className="text-xs font-semibold px-4 py-2 rounded-full bg-primary text-snow hover:bg-primary/90 transition-colors"
         >
           {t.yes}
         </button>

@@ -35,8 +35,18 @@ export default function NeuralCanvas() {
       gold: i < 6,
     }));
 
+    // Цвета — по теме сайта, каждый кадр: тема переключается без перезагрузки.
+    // На тёмном фоне точки светлые и «светятся» (screen), на светлом — тёмные
+    // и ложатся поверх (multiply, класс neural-canvas в index.css).
+    const root = document.documentElement;
+    const PALETTE = {
+      dark: { line: '80,130,255', gold: '200,170,80', node: 'rgba(100,150,255,0.6)', goldNode: 'rgba(200,170,80,0.7)', k: 1 },
+      light: { line: '70,60,200', gold: '160,120,20', node: 'rgba(80,70,210,0.55)', goldNode: 'rgba(170,125,20,0.7)', k: 1.4 },
+    };
+
     const draw = () => {
       ctx.clearRect(0, 0, W, H);
+      const c = root.getAttribute('data-theme') === 'dark' ? PALETTE.dark : PALETTE.light;
 
       // Move
       nodes.forEach(n => {
@@ -56,12 +66,12 @@ export default function NeuralCanvas() {
           const dy = nodes[i].y - nodes[j].y;
           const d = Math.sqrt(dx * dx + dy * dy);
           if (d < maxDist) {
-            const alpha = (1 - d / maxDist) * 0.18;
+            const alpha = (1 - d / maxDist) * 0.18 * c.k;
             const isGold = nodes[i].gold || nodes[j].gold;
             ctx.beginPath();
             ctx.strokeStyle = isGold
-              ? `rgba(200,170,80,${alpha * 0.6})`
-              : `rgba(80,130,255,${alpha})`;
+              ? `rgba(${c.gold},${alpha * 0.6})`
+              : `rgba(${c.line},${alpha})`;
             ctx.lineWidth = 0.5;
             ctx.moveTo(nodes[i].x, nodes[i].y);
             ctx.lineTo(nodes[j].x, nodes[j].y);
@@ -74,11 +84,7 @@ export default function NeuralCanvas() {
       nodes.forEach(n => {
         ctx.beginPath();
         ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
-        if (n.gold) {
-          ctx.fillStyle = 'rgba(200,170,80,0.7)';
-        } else {
-          ctx.fillStyle = 'rgba(100,150,255,0.6)';
-        }
+        ctx.fillStyle = n.gold ? c.goldNode : c.node;
         ctx.fill();
       });
 
@@ -97,8 +103,7 @@ export default function NeuralCanvas() {
   return (
     <canvas
       ref={canvasRef}
-      className="absolute inset-0 w-full h-full opacity-60"
-      style={{ mixBlendMode: 'screen' }}
+      className="neural-canvas absolute inset-0 w-full h-full opacity-60"
     />
   );
 }

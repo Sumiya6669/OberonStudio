@@ -32,7 +32,7 @@ export default function ProductCard({ product, index, onDemo, onOrder, onMedia }
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-60px' }}
       transition={{ delay: (index % 3) * 0.08, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-      className="group relative rounded-3xl border border-line bg-surface flex flex-col transition-all duration-500 hover:border-white/10 hover:shadow-[0_0_40px_rgba(0,0,0,0.4)]"
+      className="group relative rounded-3xl border border-line bg-surface flex flex-col transition-all duration-500 hover:border-white/10 hover:shadow-[0_0_40px_rgb(0_0_0/calc(0.4*var(--tk-sh)))]"
     >
       <div
         className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none rounded-3xl"
@@ -69,8 +69,8 @@ export default function ProductCard({ product, index, onDemo, onOrder, onMedia }
           {product.categories.map(c => (
             <span
               key={c}
-              className="text-[10px] px-2.5 py-1 rounded-full border font-medium"
-              style={{ color: product.color, borderColor: `${product.color}30`, background: `${product.color}0d` }}
+              className="tk-tint text-[10px] px-2.5 py-1 rounded-full border font-medium"
+              style={{ '--tint': product.color, borderColor: `${product.color}30`, background: `${product.color}0d` }}
             >
               {c}
             </span>
@@ -82,8 +82,8 @@ export default function ProductCard({ product, index, onDemo, onOrder, onMedia }
           {product.features.map(f => (
             <li key={f} className="flex items-start gap-2">
               <Check
-                className="w-3.5 h-3.5 flex-shrink-0 mt-0.5"
-                style={{ color: product.color, opacity: 0.75 }}
+                className="tk-tint w-3.5 h-3.5 flex-shrink-0 mt-0.5"
+                style={{ '--tint': product.color, opacity: 0.75 }}
               />
               <span className="text-[12px] text-white/45 leading-snug">{f}</span>
             </li>

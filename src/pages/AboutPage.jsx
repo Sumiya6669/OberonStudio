@@ -233,7 +233,7 @@ export default function AboutPage() {
               ))}
             </ul>
             <Link to={CONTACT_PATH}
-                  className="mt-6 inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3.5 text-sm font-bold text-white transition-colors hover:bg-primary/80">
+                  className="mt-6 inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3.5 text-sm font-bold text-snow transition-colors hover:bg-primary/80">
               {tx.contactCta} <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </Link>
           </div>

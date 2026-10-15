@@ -268,7 +268,7 @@ export default function Consultant() {
             exit={{ opacity: 0, y: 16, scale: 0.96 }}
             transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
             className="w-[360px] max-w-[calc(100vw-3rem)] rounded-2xl overflow-hidden
-              glass-strong border border-white/10 shadow-[0_20px_60px_rgba(0,0,0,0.6)]"
+              glass-strong border border-white/10 shadow-[0_20px_60px_rgb(0_0_0/calc(0.6*var(--tk-sh)))]"
           >
             {/* Шапка */}
             <div className="flex items-center gap-3 px-5 py-4 border-b border-white/[0.06]">

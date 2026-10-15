@@ -1,6 +1,7 @@
 import { Toaster } from "@/components/ui/toaster"
 import { lazy, Suspense } from 'react';
-import { BrowserRouter as Router, Navigate, Route, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Navigate, Route, Routes, useLocation } from 'react-router-dom';
+import { useThemeSync } from '@/lib/theme';
 import { LOCALE_PREFIX } from '@/lib/i18n/locales';
 import PageNotFound from './lib/PageNotFound';
 import { LangProvider } from '@/lib/i18n/LangContext';
@@ -205,9 +206,16 @@ const AppRoutes = () => (
  * Всё остальное — провайдеры, маршруты, уведомления — общее, и раздваивать
  * его нельзя: разошлись бы разметка сборки и первый кадр в браузере.
  */
+/** Тема сайта после загрузки: системная на лету, панель /admin — тёмная. Ничего не рисует. */
+function ThemeSync() {
+  useThemeSync(useLocation().pathname);
+  return null;
+}
+
 export function AppShell({ initialContent = null }) {
   return (
     <LangProvider>
+      <ThemeSync />
       {/* Содержимое сайта из базы. Провайдер внутри LangProvider, потому что
           запрос зависит от языка, и снаружи AuthProvider — публичному сайту
           вход не нужен, содержимое читается ключом anon через одну функцию. */}

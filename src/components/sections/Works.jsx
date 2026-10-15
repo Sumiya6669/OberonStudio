@@ -58,7 +58,7 @@ function WorkCard({ item, color, onOpen }) {
           </div>
         </div>
         <div className="absolute top-5 right-5">
-          <span className="text-[9px] font-medium px-2 py-1 rounded-full border" style={{ color, borderColor: `${color}35`, background: `${color}12` }}>
+          <span className="tk-tint text-[9px] font-medium px-2 py-1 rounded-full border" style={{ '--tint': color, borderColor: `${color}35`, background: `${color}12` }}>
             {item.industry || 'Case'}
           </span>
         </div>

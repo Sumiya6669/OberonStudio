@@ -24,6 +24,10 @@ const en = {
     about: 'About',
     articles: 'Expert articles',
     submenu: 'Submenu',
+    theme: 'Site theme',
+    themeSystem: 'System',
+    themeLight: 'Light',
+    themeDark: 'Dark',
     cta: 'Discuss a Project',
   },
 

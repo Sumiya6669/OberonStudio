@@ -10,10 +10,46 @@ module.exports = {
         md: 'calc(var(--radius) - 2px)',
         sm: 'calc(var(--radius) - 4px)',
       },
+      /*
+       * Две темы. «white» в классах сайта — это не белый цвет, а «чернила»:
+       * в тёмной теме белые, в светлой почти чёрные (переменная --tk-ink,
+       * src/index.css). Поэтому `text-white/40` в светлой теме — серый текст
+       * на светлом фоне, `bg-white/5` — лёгкая тень, `border-white/10` — линия.
+       * Где белый нужен буквально в обеих темах (текст на фиолетовой кнопке,
+       * подложка под скриншотом), — цвет `snow`.
+       *
+       * Прозрачность текста в светлой теме приподнята (--tk-ta, --tk-tb):
+       * text-white/20 на тёмном фоне — тихая подпись, а та же прозрачность
+       * тёмного текста на светлом фоне не читается. В тёмной теме множители
+       * 1 и 0 — цвета ровно прежние.
+       */
+      textColor: {
+        white: 'rgb(var(--tk-ink) / calc(<alpha-value> * var(--tk-ta) + var(--tk-tb)))',
+        // Подписи text-primary/60 на светлом фоне тоже бледнеют — тот же подъём.
+        primary: {
+          DEFAULT: 'hsl(var(--primary) / calc(<alpha-value> * var(--tk-ta) + var(--tk-tb)))',
+          foreground: 'hsl(var(--primary-foreground))',
+        },
+      },
+      placeholderColor: {
+        white: 'rgb(var(--tk-ink) / calc(<alpha-value> * var(--tk-ta) + var(--tk-tb)))',
+      },
+      backgroundColor: {
+        white: 'rgb(var(--tk-ink) / calc(<alpha-value> * var(--tk-ba)))',
+      },
       colors: {
+        white: 'rgb(var(--tk-ink) / <alpha-value>)',
+        snow: 'rgb(255 255 255 / <alpha-value>)',
+        // Светлые оттенки палитры (…-400) на светлом фоне не читаются:
+        // в светлой теме переменные подменяют их на тёмные (…-600/700).
+        emerald: { 400: 'rgb(var(--tk-emerald-400) / <alpha-value>)', 500: 'rgb(var(--tk-emerald-500) / <alpha-value>)' },
+        sky: { 400: 'rgb(var(--tk-sky-400) / <alpha-value>)', 500: 'rgb(var(--tk-sky-500) / <alpha-value>)' },
+        red: { 300: 'rgb(var(--tk-red-300) / <alpha-value>)', 400: 'rgb(var(--tk-red-400) / <alpha-value>)' },
+        pink: { 400: 'rgb(var(--tk-pink-400) / <alpha-value>)', 500: 'rgb(var(--tk-pink-500) / <alpha-value>)' },
+        violet: 'hsl(var(--violet))',
+        cyan: { 400: 'rgb(var(--tk-cyan-400) / <alpha-value>)' },
         background: 'hsl(var(--background))',
         foreground: 'hsl(var(--foreground))',
-        violet: 'hsl(var(--violet))',
         'violet-dim': 'hsl(var(--violet-dim))',
         gold: 'hsl(var(--gold))',
         surface: 'hsl(var(--surface))',

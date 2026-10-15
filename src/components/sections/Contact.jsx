@@ -238,7 +238,7 @@ export default function Contact() {
 
                   {error && <p className="text-sm text-red-300">{error}</p>}
 
-                  <button type="submit" disabled={saving || !consent} className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl bg-primary text-white text-sm font-bold hover:bg-primary/80 transition-colors disabled:opacity-50">
+                  <button type="submit" disabled={saving || !consent} className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl bg-primary text-snow text-sm font-bold hover:bg-primary/80 transition-colors disabled:opacity-50">
                     {saving && <Loader2 className="w-4 h-4 animate-spin" />}
                     {saving ? 'Отправляем...' : ct.cta}
                   </button>
