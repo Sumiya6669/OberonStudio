@@ -31,6 +31,11 @@ const LOCALES = ['ru', 'kk', 'en'];
 /** Разделы только на русском: у них не должно быть языковых альтернатив. */
 // Статья эксперта — на языке оригинала, без перевода; сам список /stati — на трёх языках.
 const RU_ONLY = [/^\/1c(\/|$)/, /^\/uslugi(\/|$)/, /^\/keysy(\/|$)/, /^\/stati\/.+/];
+/** Разборы из каталога сайта (ключи ANSWER_PRODUCTS) — для проверки ссылок, когда сборка без базы. */
+const KNOWN_ANSWERS = new Set(
+  [...readFileSync(resolve('src/lib/content/answerProducts.js'), 'utf8').matchAll(/^\s*'([a-z0-9-]+)':\s*\{/gm)]
+    .map((m) => `/1c/${m[1]}`),
+);
 
 let failed = 0;
 let passed = 0;
@@ -255,6 +260,8 @@ async function checkInternalLinks(paths) {
   console.log('\nВнутренние ссылки');
   const known = new Set(paths);
   const dead = new Set();
+  const offline = new Set();
+  const answersBuilt = paths.some((p) => /^\/1c\/.+/.test(p));
   let checked = 0;
   for (const path of paths.slice(0, 60)) {
     const { status, body } = await get(path);
@@ -266,12 +273,18 @@ async function checkInternalLinks(paths) {
       if (known.has(href)) continue;
       const res = await get(href);
       const prerendered = res.status === 200 && res.from !== 'app.html (переписывание)' && res.from !== 'app.html';
+      // Разборы /1c/<slug> собираются из базы. Локальная сборка без базы их не видит — тогда ссылку
+      // на разбор из каталога answerProducts.js считаем живой (проверка по живому сайту — --url).
+      if (!prerendered && !BASE && !answersBuilt && KNOWN_ANSWERS.has(href)) { offline.add(href); continue; }
       if (!prerendered) dead.add(`${href} (со страницы ${path})`);
     }
   }
   check('ссылки ведут на собранные страницы', dead.size === 0,
     [...dead].slice(0, 8).join('; '));
   ok('проверено ссылок', String(checked));
+  if (offline.size) {
+    ok('разборы /1c из каталога (сборка без базы, проверятся по живому сайту)', [...offline].join(', '));
+  }
 }
 
 /* ── Запуск ─────────────────────────────────────────────────────────────── */
