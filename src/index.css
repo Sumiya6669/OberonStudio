@@ -1,4 +1,5 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+/* Шрифт Inter подключён в index.html (<link> + preconnect): @import здесь выстраивал цепочку
+   HTML → CSS → fonts.googleapis.com и задерживал первую отрисовку. */
 
 @tailwind base;
 @tailwind components;

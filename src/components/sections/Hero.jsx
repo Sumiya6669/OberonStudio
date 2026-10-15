@@ -85,7 +85,9 @@ export default function Hero() {
                 <span className="text-xs text-white/50 tracking-wide">{h.available}</span>
               </motion.div>
 
-              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6, duration: 1 }}>
+              {/* Заголовок, подзаголовок и кнопки видны сразу из пререндера: анимация появления
+                  ждала скрипты и отодвигала первый экран на телефоне (LCP ~3,3 с). Анимируется только декор. */}
+              <div>
                 {heroTitle ? (
                   <h1 className="text-[clamp(2.5rem,6vw,5rem)] font-black leading-[1.0] tracking-[-0.04em] mb-6 text-gradient-white">
                     {heroTitle}
@@ -98,23 +100,13 @@ export default function Hero() {
                     <span className="text-gradient-violet block">{h.headline4}</span>
                   </h1>
                 )}
-              </motion.div>
+              </div>
 
-              <motion.p
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.9, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-                className="text-base text-white/40 leading-relaxed max-w-md mb-10 font-light"
-              >
+              <p className="text-base text-white/40 leading-relaxed max-w-md mb-10 font-light">
                 {heroSubtitle}
-              </motion.p>
+              </p>
 
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 1.1, duration: 0.8 }}
-                className="flex flex-col sm:flex-row gap-3 mb-14"
-              >
+              <div className="flex flex-col sm:flex-row gap-3 mb-14">
                 <MagBtn>
                   <Link
                     to={CONTACT_PATH}
@@ -138,7 +130,7 @@ export default function Hero() {
                     {secondaryCta}
                   </Link>
                 </MagBtn>
-              </motion.div>
+              </div>
 
               <motion.div
                 initial={{ opacity: 0 }}
