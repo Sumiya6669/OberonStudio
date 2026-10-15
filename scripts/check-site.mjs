@@ -213,11 +213,16 @@ async function checkAboutAndArticles(paths) {
   // Статьи могут быть все в черновиках (draft: true — ждут вычитки автором): тогда
   // список пуст, ItemList и статьи в карте сайта не ждём.
   const articles = paths.filter((p) => /^\/stati\/.+/.test(p));
+  // Счётчик просмотров (миграция 065) рисуется только в браузере, когда ответила база. В собранном
+  // html его быть не должно: сборка без сети показала бы выдуманное или устаревшее число.
+  const VIEWS_IN_HTML = /data-article-views|\d[\d  ]*(?:&nbsp;|\s)(?:просмотр(?:а|ов)?|қаралым|views?)(?!\p{L})/iu;
   for (const path of ['/stati', '/kz/stati', '/en/stati']) {
     const { status, body } = await get(path);
     if (status !== 200) { bad(path, `отдался как ${status}`); continue; }
     if (articles.length) check(`${path}: список статей в разметке`, types(body).includes('ItemList'), 'нет ItemList');
     check(`${path}: блок «Станьте автором»`, /href="(\/kz|\/en)?\/contact"/.test(body), 'нет ссылки на контакт');
+    check(`${path}: без числа просмотров в собранном html`, !VIEWS_IN_HTML.test(body),
+      'число просмотров попало в пререндер — оно должно приходить из базы уже в браузере');
   }
 
   if (!articles.length) console.log('  —     статей пока нет (все в черновиках) — проверки статей пропущены');
@@ -233,6 +238,7 @@ async function checkAboutAndArticles(paths) {
     }
     if (!types(body).includes('BreadcrumbList')) problems.push('нет хлебных крошек');
     if (!body.includes('href="/proverka"')) problems.push('нет ссылки на /proverka');
+    if (VIEWS_IN_HTML.test(body)) problems.push('число просмотров попало в пререндер');
     if (problems.length) bad(path, problems.join('; '));
     else ok(path, `Article, автор ${art.author.name}`);
   }

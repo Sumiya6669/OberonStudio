@@ -699,3 +699,11 @@ export const fetchContentTopics = async () => {
   ]);
   return { topics: unwrap(topics), posts: unwrap(posts) };
 };
+
+/* ── Просмотры статей ─────────────────────────────────────────────────────
+ *
+ * Счётчик /stati/<slug> (миграция 065). Та же функция, что читает сайт:
+ * без списка slug отдаёт все статьи с просмотрами.
+ */
+export const fetchArticleViews = async () =>
+  unwrap(await supabase.rpc('article_views_get', { p_slugs: null }));

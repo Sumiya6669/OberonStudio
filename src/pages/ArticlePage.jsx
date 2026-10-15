@@ -1,7 +1,8 @@
 /**
  * /stati/<slug> — одна статья.
  *
- * Порядок: путь и метки, заголовок, автор с датой и временем чтения,
+ * Порядок: путь и метки, заголовок, автор с датой, временем чтения и
+ * числом просмотров (когда база ответила, в том числе 0 — src/lib/site/articleViews.js),
  * оглавление (если подзаголовков больше двух), текст, источники, автор
  * подробно, предложение проверить базу и продукты по теме, «Читайте также».
  * Предложение — после текста: статья, которая начинается с «купите»,
@@ -12,7 +13,7 @@
  */
 import React from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { ArrowRight, Clock, ScanSearch } from 'lucide-react';
+import { ArrowRight, Clock, Eye, ScanSearch } from 'lucide-react';
 import Reveal from '@/components/core/Reveal';
 import Breadcrumbs from '@/components/nav/Breadcrumbs';
 import ArticleBody, { anchorId, headings } from '@/components/core/ArticleBody';
@@ -21,6 +22,7 @@ import PageNotFound from '@/lib/PageNotFound';
 import { useAnswers } from '@/lib/site/SiteContentContext';
 import { PRODUCTS } from '@/lib/content/site';
 import { productHref } from '@/lib/content/answerProducts';
+import { useArticleViews, viewsLabel } from '@/lib/site/articleViews';
 import { getAuthor } from '@/lib/content/authors';
 import {
   ARTICLES_PATH, articlePath, articleUi, formatDate, getArticle, readingMinutes, relatedArticles,
@@ -32,6 +34,8 @@ export default function ArticlePage() {
   const { slug } = useParams();
   const article = getArticle(slug);
   const answers = useAnswers();
+  // Засчитывает просмотр (раз за сессию) и отдаёт число; null — не показывать.
+  const views = useArticleViews(article?.slug);
   if (!article) return <PageNotFound />;
 
   const ui = articleUi(article.lang);
@@ -76,6 +80,14 @@ export default function ArticlePage() {
               )}
               <span aria-hidden="true">·</span>
               <span className="inline-flex items-center gap-1"><Clock className="h-3 w-3" aria-hidden="true" /> {ui.minutes(readingMinutes(article))}</span>
+              {views !== null && (
+                <>
+                  <span aria-hidden="true">·</span>
+                  <span data-article-views="" className="inline-flex items-center gap-1">
+                    <Eye className="h-3 w-3" aria-hidden="true" /> {viewsLabel(views, article.lang)}
+                  </span>
+                </>
+              )}
             </p>
           </div>
         </Reveal>

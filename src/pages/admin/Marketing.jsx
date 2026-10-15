@@ -1,7 +1,8 @@
 /**
  * Маркетинг — всё, что не касается рекламных кабинетов (Meta и Яндекс Директ
  * подключатся отдельно): откуда приходят заявки, ссылки с метками для
- * каналов, где реклама не настраивается кабинетом, и очередь тем Контентщика.
+ * каналов, где реклама не настраивается кабинетом, очередь тем Контентщика
+ * и просмотры статей /stati.
  *
  * Вкладка живёт в адресе (?tab=links), чтобы ссылку на нужную вкладку можно
  * было переслать, а «Назад» в браузере возвращал туда, где вы были.
@@ -15,11 +16,13 @@ import { Tabs } from '@/components/admin/ui';
 import LeadOrigins from './marketing/LeadOrigins';
 import LinkBuilder from './marketing/LinkBuilder';
 import ContentTopics from './marketing/ContentTopics';
+import ArticleViews from './marketing/ArticleViews';
 
 const TABS = [
   { value: 'origins', label: 'Откуда заявки' },
   { value: 'links', label: 'Ссылки с метками' },
   { value: 'topics', label: 'Темы статей' },
+  { value: 'views', label: 'Просмотры статей' },
 ];
 
 export default function Marketing() {
@@ -41,6 +44,7 @@ export default function Marketing() {
       {tab === 'origins' && <LeadOrigins />}
       {tab === 'links' && <LinkBuilder />}
       {tab === 'topics' && <ContentTopics />}
+      {tab === 'views' && <ArticleViews />}
     </div>
   );
 }

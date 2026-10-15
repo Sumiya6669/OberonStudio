@@ -9,13 +9,14 @@
  */
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Clock, PenLine } from 'lucide-react';
+import { ArrowRight, Clock, Eye, PenLine } from 'lucide-react';
 import Reveal from '@/components/core/Reveal';
 import { LocaleLink } from '@/components/nav/LocaleLink';
 import { AuthorAvatar } from '@/components/core/AuthorBadge';
 import { useLang } from '@/lib/i18n/LangContext';
 import { CONTACT_PATH } from '@/lib/routes';
 import { getAuthor } from '@/lib/content/authors';
+import { useArticlesViews, viewsLabel } from '@/lib/site/articleViews';
 import {
   ARTICLES, ARTICLES_UI, articlePath, formatDate, readingMinutes,
 } from '@/lib/content/articles';
@@ -23,6 +24,8 @@ import {
 export default function ArticlesPage() {
   const { lang } = useLang();
   const ui = { ...ARTICLES_UI.ru, ...(ARTICLES_UI[lang] || {}) };
+  // Просмотры приходят из базы после загрузки; пока их нет — в карточке их просто нет.
+  const views = useArticlesViews(ARTICLES.map((a) => a.slug));
 
   return (
     <div className="relative overflow-hidden">
@@ -79,6 +82,14 @@ export default function ArticlesPage() {
                           <span className="inline-flex items-center gap-1">
                             <Clock className="h-3 w-3" aria-hidden="true" /> {ui.minutes(readingMinutes(a))}
                           </span>
+                          {views.has(a.slug) && (
+                            <>
+                              <span aria-hidden="true">·</span>
+                              <span data-article-views="" className="inline-flex items-center gap-1">
+                                <Eye className="h-3 w-3" aria-hidden="true" /> {viewsLabel(views.get(a.slug), lang)}
+                              </span>
+                            </>
+                          )}
                         </p>
                       </div>
                     </div>
