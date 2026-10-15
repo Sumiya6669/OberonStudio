@@ -305,7 +305,8 @@ async function checkProductPages(paths) {
     }
     const app = ld.find((j) => j['@type'] === 'SoftwareApplication');
     if (app && !(app.offers || []).length) problems.push('в SoftwareApplication нет цены');
-    if (/"aggregateRating"|"review"|"ratingValue"/.test(body)) problems.push('в разметке рейтинг или отзывы');
+    // Только JSON-LD: во встроенных данных страницы есть коллекция CMS «review» (страница /reviews) — это не разметка.
+    if (/"aggregateRating"|"review"|"ratingValue"/.test(JSON.stringify(ld))) problems.push('в разметке рейтинг или отзывы');
     const faq = ld.find((j) => j['@type'] === 'FAQPage');
     if (faq && (faq.mainEntity || []).length < 3) problems.push('в FAQ меньше трёх вопросов');
     if (!body.includes('href="/proverka"')) problems.push('нет ссылки на /proverka');
