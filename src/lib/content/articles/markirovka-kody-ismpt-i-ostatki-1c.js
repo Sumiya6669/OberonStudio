@@ -22,13 +22,12 @@
  */
 export default {
   slug: 'markirovka-kody-ismpt-ne-shodyatsya-s-ostatkami-1c',
-  draft: true, // ждёт вычитки автором — убрать перед публикацией
   lang: 'ru',
   title: 'Коды в ИС МПТ не сходятся с остатками 1С: откуда расхождение и как его найти',
   description: 'В 1С остаток маркируемого товара — в штуках, в ИС МПТ — в кодах, которые числятся за организацией. Почему эти два учёта расходятся, как по знаку расхождения понять причину и что проверить в БухКз 3.0 и КА 2.4, пока касса не перестала пробивать товар.',
   author: 'albert-gaan',
-  publishedAt: '2026-11-20',
-  updatedAt: '2026-11-20',
+  publishedAt: '2026-10-15',
+  updatedAt: '2026-10-15',
   tags: ['Маркировка', 'ИС МПТ', 'Остатки'],
   related: {
     answers: ['markirovka-otgruzka-bez-akta', 'ne-shodyatsya-ostatki', 'kassa-ne-probivaet'],

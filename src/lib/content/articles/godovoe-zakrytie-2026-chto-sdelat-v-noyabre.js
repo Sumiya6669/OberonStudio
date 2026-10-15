@@ -26,13 +26,12 @@
  */
 export default {
   slug: 'godovoe-zakrytie-2026-chto-sdelat-v-noyabre',
-  draft: true, // ждёт вычитки автором — убрать перед публикацией
   lang: 'ru',
   title: 'Годовое закрытие 2026: что сделать в 1С уже в ноябре, чтобы декабрь и январь прошли спокойно',
   description: 'Годовые декларации сдаются в феврале и марте, но спокойный январь начинается в ноябре. Какие месяцы закрыть заново, где поставить дату запрета изменения, что сверить по банку и расчётам и какие сроки за 2026 год держать перед глазами — для БухКз 3.0 и КА 2.4.',
   author: 'albert-gaan',
-  publishedAt: '2026-11-04',
-  updatedAt: '2026-11-04',
+  publishedAt: '2026-10-15',
+  updatedAt: '2026-10-15',
   tags: ['Закрытие месяца', 'Сроки', 'БухКз', 'КА'],
   related: {
     answers: ['ne-zakryvaetsya-mesyac', 'sroki-deklaraciy-buhfirmy', 'raznoska-vypiski-po-knp', 'akty-sverki-za-god'],

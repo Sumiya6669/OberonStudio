@@ -21,13 +21,12 @@
  */
 export default {
   slug: 'kaspi-v-1c-zakazy-vozvraty-komissiya',
-  draft: true, // ждёт вычитки автором — убрать перед публикацией
   lang: 'ru',
   title: 'Продажи через Kaspi в 1С: заказы, возвраты, комиссия и сверка с Kaspi Pay',
   description: 'Заказ живёт в кабинете Kaspi, учёт — в 1С, деньги и комиссия — в выписке Kaspi Pay. Где эти три картины расходятся и что проверить в БухКз 3.0 и КА 2.4: выданные заказы без реализации, возвраты, комиссию и доставку Kaspi в расходах.',
   author: 'albert-gaan',
-  publishedAt: '2026-11-11',
-  updatedAt: '2026-11-11',
+  publishedAt: '2026-10-15',
+  updatedAt: '2026-10-15',
   tags: ['Kaspi', 'Маркетплейсы', 'БухКз', 'КА'],
   related: {
     answers: ['kaspi-zakazy-v-1c', 'raznoska-vypiski-po-knp'],

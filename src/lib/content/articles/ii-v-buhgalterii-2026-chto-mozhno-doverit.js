@@ -24,13 +24,12 @@
  */
 export default {
   slug: 'ii-v-buhgalterii-2026-chto-mozhno-doverit',
-  draft: true, // ждёт вычитки автором — убрать перед публикацией
   lang: 'ru',
   title: 'ИИ в бухгалтерии в 2026 году: что можно доверить программе, а что нет',
   description: 'ИИ хорошо читает сканы, письма и PDF-выписки, но отвечать за проводку он не может. Где проходит граница: черновик вместо проведения, проверки правилами после распознавания, согласие на отправку данных и вопросы, которые стоит задать любому поставщику ИИ для 1С.',
   author: 'albert-gaan',
-  publishedAt: '2026-11-27',
-  updatedAt: '2026-11-27',
+  publishedAt: '2026-10-15',
+  updatedAt: '2026-10-15',
   tags: ['ИИ', 'Безопасность', 'БухКз', 'КА'],
   related: {
     answers: ['nds-16-vo-vhodyashchih-dokumentah', 'raznoska-vypiski-po-knp', 'akty-sverki-za-god'],

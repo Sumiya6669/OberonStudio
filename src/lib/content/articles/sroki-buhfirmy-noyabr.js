@@ -19,13 +19,12 @@
  */
 export default {
   slug: 'sroki-deklaraciy-buhfirmy-noyabr-2026',
-  draft: true, // ждёт вычитки автором — убрать перед публикацией
   lang: 'ru',
   title: 'Срок 16 ноября у бухгалтерской фирмы: как не пропустить 300.00 и 200.00 ни у одного клиента',
   description: 'Декларации 300.00 и 200.00 за третий квартал 2026 года сдаются до 16 ноября: 15-е выпало на воскресенье. Почему у бухгалтерской фирмы срок пропускают не из-за даты, что проверить в каждой клиентской базе за десять дней до него и что сделать после сдачи.',
   author: 'albert-gaan',
-  publishedAt: '2026-11-05',
-  updatedAt: '2026-11-05',
+  publishedAt: '2026-10-15',
+  updatedAt: '2026-10-15',
   tags: ['300.00', 'Бухфирмы', 'Сроки'],
   related: {
     answers: ['sroki-deklaraciy-buhfirmy', 'nds-v-zachete-bez-izvescheniya-esf', 'uvedomlenie-kameralnogo-kontrolya'],
