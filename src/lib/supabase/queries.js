@@ -707,3 +707,12 @@ export const fetchContentTopics = async () => {
  */
 export const fetchArticleViews = async () =>
   unwrap(await supabase.rpc('article_views_get', { p_slugs: null }));
+
+/* ── Посещения сайта ──────────────────────────────────────────────────────
+ *
+ * Свой учёт посещений (миграция 067): сводка за последние N дней одним
+ * ответом — по дням, источники, домены, метки, страницы. Сводку отдаёт
+ * только вошедшим в панель с ролью; посетитель сайта её не видит.
+ */
+export const fetchSiteVisits = async (days = 30) =>
+  unwrap(await supabase.rpc('site_visits_report', { p_days: days }));

@@ -8,6 +8,7 @@ import CursorGlow from '../core/CursorGlow';
 import RouteSeo from '@/lib/seo/RouteSeo';
 import PageTransition from './PageTransition';
 import CookieConsent from './CookieConsent';
+import { useSiteVisits } from '@/lib/site/siteVisits';
 
 /**
  * Раскладка публичного сайта.
@@ -28,6 +29,8 @@ export default function SiteLayout() {
   // useOutlet отдаёт готовый узел. Сохранённый элемент держит его в себе,
   // и уходящая страница остаётся собой до конца анимации.
   const stranica = useOutlet();
+  // Свой учёт посещений (агрегаты без cookie, миграция 067). Панель /admin сюда не входит.
+  useSiteVisits();
 
   return (
     <div className="min-h-screen bg-background font-inter">
