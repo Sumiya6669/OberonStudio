@@ -17,13 +17,12 @@
  */
 export default {
   slug: 'pochemu-esf-nado-vypisyvat-v-srok',
-  draft: true, // ждёт вычитки автором — убрать перед публикацией
   lang: 'ru',
   title: 'Почему ЭСФ надо выписывать в срок — и как не пропустить срок в 1С',
   description: 'ЭСФ выписывается не позднее 15 календарных дней после даты оборота. Почему не стоит тянуть до последнего дня: зачёт НДС у покупателя, камеральный контроль, виртуальный склад и отказы ИС ЭСФ — и что каждый день проверять в 1С.',
   author: 'albert-gaan',
-  publishedAt: '2026-10-09',
-  updatedAt: '2026-10-09',
+  publishedAt: '2026-10-15',
+  updatedAt: '2026-10-15',
   tags: ['ЭСФ', 'НДС', 'СНТ'],
   related: {
     answers: ['esf-oshibka', 'virtualnyy-sklad-i-snt', 'nds-v-zachete-bez-izvescheniya-esf'],

@@ -11,13 +11,12 @@
  */
 export default {
   slug: 'kak-zakryt-mesyac-v-1c-bez-syurprizov',
-  draft: true, // ждёт вычитки автором — убрать перед публикацией
   lang: 'ru',
   title: 'Как закрыть месяц в 1С без сюрпризов: шесть проверок до запуска',
   description: 'Закрытие месяца — очередь операций, и ошибка в нём почти всегда указывает на документ, который мешает. Шесть проверок, которые стоит сделать до запуска закрытия в БухКз 3.0 и КА 2.4, и что делать, если закрытие всё-таки упало.',
   author: 'albert-gaan',
-  publishedAt: '2026-10-09',
-  updatedAt: '2026-10-09',
+  publishedAt: '2026-10-15',
+  updatedAt: '2026-10-15',
   tags: ['Закрытие месяца', 'БухКз', 'КА'],
   related: {
     answers: ['ne-zakryvaetsya-mesyac', 'ne-shodyatsya-ostatki', 'obmen-s-bankom'],
