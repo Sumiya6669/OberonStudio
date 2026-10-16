@@ -65,6 +65,10 @@ const Marketing = lazy(() => import('./pages/admin/Marketing'));
 const AiLive = lazy(() => import('./pages/admin/AiLive'));
 const AiSpend = lazy(() => import('./pages/admin/AiSpend'));
 const AiRights = lazy(() => import('./pages/admin/AiRights'));
+const AgentsOffice = lazy(() => import('./pages/admin/AgentsOffice'));
+// Демо 3D-офиса с тестовыми данными — только в режиме разработки (npm run dev). В сборке
+// import.meta.env.DEV = false: условие сворачивается, динамический импорт и маршрут исчезают.
+const OfficeDemo = import.meta.env.DEV ? lazy(() => import('./pages/dev/OfficeDemo')) : null;
 const SysHealth = lazy(() => import('./pages/admin/SysHealth'));
 const SysPeople = lazy(() => import('./pages/admin/SysPeople'));
 const SysRegistry = lazy(() => import('./pages/admin/SysRegistry'));
@@ -149,6 +153,7 @@ const AppRoutes = () => (
 
     {/* Рабочая панель */}
     <Route path="/admin/login" element={<Lazy><AdminLogin /></Lazy>} />
+    {OfficeDemo && <Route path="/admin/dev-office" element={<Lazy><OfficeDemo /></Lazy>} />}
     <Route path="/admin" element={<RequireAuth><AdminLayout /></RequireAuth>}>
       <Route index element={<Lazy><Overview /></Lazy>} />
       {/* СРМ */}
@@ -179,6 +184,7 @@ const AppRoutes = () => (
       <Route path="ai/queue" element={<Lazy><Queue /></Lazy>} />
       <Route path="ai/spend" element={<Lazy><AiSpend /></Lazy>} />
       <Route path="ai/rights" element={<Lazy><AiRights /></Lazy>} />
+      <Route path="ai/office" element={<Lazy><AgentsOffice /></Lazy>} />
 
       {/* Администрирование */}
       <Route path="system" element={<Lazy><SysHealth /></Lazy>} />

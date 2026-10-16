@@ -716,3 +716,13 @@ export const fetchArticleViews = async () =>
  */
 export const fetchSiteVisits = async (days = 30) =>
   unwrap(await supabase.rpc('site_visits_report', { p_days: days }));
+
+/* ── ИИ → 3D-офис (миграция 068) ──────────────────────────────────────────── */
+
+/** Сводка по агентам: очередь, работа, итоги за 24 ч / 7 дн, последняя ошибка без ПД. */
+export const fetchAgentsOffice = async (aliveHours = 24) =>
+  unwrap(await supabase.rpc('agents_office', { p_alive_hours: aliveHours }));
+
+/** Последние задачи и шаги журнала одного агента (без payload / result / params). */
+export const fetchAgentOfficeJobs = async (agentKind, limit = 20) =>
+  unwrap(await supabase.rpc('agents_office_jobs', { p_agent_kind: agentKind, p_limit: limit }));

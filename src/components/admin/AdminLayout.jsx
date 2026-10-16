@@ -13,7 +13,7 @@ import {
   Bot, Building2, Clock, Database, ExternalLink, FileText, Globe, Inbox,
   LayoutDashboard, ListTodo, LogOut, Receipt, Settings, ShieldCheck, Users,
   Wallet, Activity, Coins, BookOpen, PieChart, HeartPulse, Boxes, Compass,
-  Repeat, Gauge, CalendarCheck, Landmark, Filter, MessageSquare, Megaphone, Target,
+  Repeat, Gauge, CalendarCheck, Landmark, Filter, MessageSquare, Megaphone, Target, Building,
 } from 'lucide-react';
 import { useAuth } from '@/lib/auth/AuthContext';
 import { cx } from './ui';
@@ -56,6 +56,7 @@ export const NAV_GROUPS = [
     code: 'ai', label: 'ИИ', icon: Bot,
     items: [
       { to: '/admin/ai', end: true, label: 'Живой экран', icon: Activity },
+      { to: '/admin/ai/office', label: '3D-офис', icon: Building },
       { to: '/admin/ai/queue', label: 'Очередь и журнал', icon: ListTodo },
       { to: '/admin/ai/spend', label: 'Расход и квоты', icon: Coins },
       { to: '/admin/ai/rights', label: 'Права и автономия', icon: ShieldCheck },
